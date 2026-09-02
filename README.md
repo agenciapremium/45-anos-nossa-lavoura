@@ -33,11 +33,13 @@ e os headers de segurança.
 
 ```
 index.html          # a página inteira, seção por seção, comentada
+sitemap.xml         # uma URL, com extensão de imagem
+robots.txt          # aponta para o sitemap
 tokens.css          # tokens do design system, cópia literal — não editar
 styles.css          # estilos da página, só consomem os tokens acima
 main.js             # nav, reveal, contadores, contagem regressiva, player e scroll-scrub
 assets/
-  img/              # pastagem, selo estático e imagem de compartilhamento
+  img/              # pastagem, selo estático e a imagem de compartilhamento (KV)
   fonts/            # Parkinsans e Hanken Grotesk em WOFF2
   svg/              # octógonos e ícones da marca
   video/            # onde entra o VT (ver abaixo)
@@ -143,6 +145,53 @@ tarja de campanha e o player do VT — nenhum listener de scroll na página.
 - Sem overflow horizontal em 360px e 390px, verificado.
 - Em telas baixas (altura ≤ 720px) o hero comprime — selo menor, manchete no tamanho
   `--text-display` — para os dois botões caberem na dobra.
+
+---
+
+## SEO
+
+**Imagem de compartilhamento.** O KV oficial da campanha (`docs/kv.png`, 3840×2160) virou
+`assets/img/og.jpg` — recortado de 16:9 para os 1200×630 do padrão OG, sem perder o selo,
+as datas nem a assinatura. Há também `assets/img/og.webp`, 127 KB contra 173 KB do JPEG.
+
+O `og:image` aponta para o **JPEG**, não para o WebP, de propósito: o WhatsApp é o canal
+principal de compartilhamento desse público e é justamente o que mais falha em renderizar
+preview de `og:image` em WebP. Facebook e X aceitam, o WhatsApp é instável. Os 46 KB que se
+ganharia não compensam arriscar o preview. O WebP está gerado e pronto: se quiser trocar,
+é uma linha no `<head>`.
+
+**Metadados.** `robots` com `max-image-preview:large`, `og:url`, `og:image:width/height/alt`,
+`twitter:image:alt`, canonical e `lang="pt-BR"`.
+
+**Dados estruturados** em um `@graph` de JSON-LD, validado:
+
+| Tipo | Para quê |
+|---|---|
+| `Organization` | a rede, com CNPJ, endereço, os três estados em `areaServed` e as categorias em `knowsAbout` |
+| `WebSite` | o site institucional como pai da página |
+| `WebPage` | esta página, ligada ao site e à organização |
+| `ImageObject` | o KV como imagem principal |
+| `SaleEvent` | a semana de aniversário, 19 a 24 de outubro — é o que pode render rich result |
+
+**Também entrou:** `sitemap.xml` com extensão de imagem, `robots.txt` apontando para ele,
+`width`/`height` em todas as imagens (evita CLS, que é fator de ranqueamento) e alt mais
+descritivo na fotografia do manifesto.
+
+### Antes de submeter ao Search Console
+
+- **O canonical e as URLs absolutas do OG apontam para `nossalavoura.com.br/45anos`**, que é
+  onde a página vai morar. Enquanto ela estiver só no `.vercel.app`, o preview de
+  compartilhamento não renderiza, porque a imagem é buscada num caminho que ainda não existe.
+  É proposital: canonical de staging faria o Google indexar a URL errada. Assim que o domínio
+  estiver ligado, tudo funciona sem tocar em nada.
+- **Título com 78 caracteres e description com 166** — ambos vêm da copy aprovada e vão
+  truncar no resultado de busca (o corte fica perto de 60 e 155). Mantive como está por serem
+  copy fechada; encurtar é decisão de vocês.
+- **"Casa da Lavoura"** está na copy como palavra-chave de defesa de marca, e a página é o
+  destino natural desse tráfego. Não coloquei o termo no texto nem no `alternateName` do
+  JSON-LD: o próprio documento avisa do risco de confusão com uma concorrente que usa esse
+  nome. Se quiserem cobrir o termo, o caminho seguro é pelo anúncio pago, que já está validado
+  em Jaru, e não pelo conteúdo da página.
 
 ---
 
