@@ -2,6 +2,20 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "45-anos-nossa-lavoura.vercel.app" }],
+      "destination": "https://45anosnossalavoura.agpremium.com.br/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "45-anos-nossa-lavoura-agencia-premium.vercel.app" }],
+      "destination": "https://45anosnossalavoura.agpremium.com.br/:path*",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",

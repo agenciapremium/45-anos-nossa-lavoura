@@ -24,8 +24,8 @@ e a sequência de frames do selo são carregadas por fetch.
 ## Deploy na Vercel
 
 Projeto estático puro: sem framework, sem comando de build, output na raiz.
-O [`vercel.json`](vercel.json) já define `cleanUrls`, cache imutável de um ano para `/assets/*`
-e os headers de segurança.
+O [`vercel.json`](vercel.json) define `cleanUrls`, cache imutável de um ano para `/assets/*`,
+os headers de segurança e o redirecionamento dos endereços `.vercel.app` para o domínio final.
 
 ---
 
@@ -182,6 +182,12 @@ descritivo na fotografia do manifesto.
 A página vive em **https://45anosnossalavoura.agpremium.com.br** — é para lá que apontam o
 canonical, o `og:url`, o `og:image`, o `twitter:image`, os `@id` do JSON-LD, o `sitemap.xml`
 e o `robots.txt`.
+
+Os dois endereços `.vercel.app` estáveis redirecionam para ele com 308, configurado em
+`vercel.json`. Sem isso a mesma página responderia em três domínios, dividindo os sinais de
+busca e permitindo que alguém compartilhasse a URL errada. As URLs de deploy específico
+(`...-abc123-agencia-premium.vercel.app`) não são tocadas: elas servem para inspecionar
+versões antigas.
 
 A `Organization` do JSON-LD continua ancorada em `nossalavoura.com.br`, que é o site
 institucional da rede e existe de verdade. Só a página da campanha mudou de endereço.
