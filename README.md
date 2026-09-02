@@ -1,7 +1,12 @@
 # Nossa Lavoura · 45 Anos
 
-Landing page da campanha de aniversário — hub institucional que vai do afetivo ao comercial,
-conforme a copy estruturada em [`docs/45-ANOS-LANDING-PAGE-COPY.md`](docs/45-ANOS-LANDING-PAGE-COPY.md).
+Landing page única da campanha de aniversário — sem header, sem navegação, uma leitura só,
+que vai do afetivo ao comercial conforme a copy estruturada em
+[`docs/45-ANOS-LANDING-PAGE-COPY.md`](docs/45-ANOS-LANDING-PAGE-COPY.md).
+
+O hero ocupa a tela inteira com a fotografia do rebanho. Da segunda seção em diante, o selo
+3D é o fundo da página: um canvas fixo atrás de todo o conteúdo, cujo quadro é escolhido pela
+posição da rolagem — o selo se monta ao longo da leitura e chega inteiro na assinatura.
 
 **Stack:** HTML, CSS e JavaScript puros. Sem build, sem dependências. Deploy direto na Vercel.
 
@@ -33,8 +38,8 @@ tokens.css          # tokens do design system, cópia literal — não editar
 styles.css          # estilos da página, só consomem os tokens acima
 main.js             # nav, reveal, contadores, contagem regressiva, player e scroll-scrub
 assets/
-  selo/d/           # 105 frames WebP com alpha, 960px  (desktop)
-  selo/m/           # 105 frames WebP com alpha, 560px  (mobile)
+  selo/bg-d/        # 53 frames WebP com alpha, 640px  (desktop)
+  selo/bg-m/        # 53 frames WebP com alpha, 380px  (mobile)
   img/              # pastagem, selo estático e imagem de compartilhamento
   fonts/            # Parkinsans e Hanken Grotesk em WOFF2
   svg/              # octógonos e ícones da marca
@@ -78,58 +83,91 @@ Vários pontos estavam fora. Corrigidos:
 - **Pesos 500 e 600** de ambas as famílias não existem no sistema. Removidos.
 - **`backdrop-filter`** no header e no botão fantasma: o sistema proíbe blur de fundo.
 - **Recortes diagonais** entre seções: o sistema encosta as bandas, a borda é o divisor.
-- **Header** era fixo, transparente e 68px. Agora é sticky, terra, 76px.
+- **Header**: a página não tem mais header nenhum — virou uma leitura única.
 - **Proteção de texto sobre foto** era um véu bege. Agora é o gradiente lateral de 96° em terra.
 - **Manchetes de categoria** estavam em caixa alta. O sistema não admite manchete em caixa alta.
 - **Durações e curvas** de animação agora vêm de `tokens/motion.css`.
 
 ### Desvios deliberados, que valem seu aval
 
-1. **O scrub do selo pelo scroll.** O sistema diz "no parallax, no scroll-jacking". Mantive
+1. **O chão da página é terra, não creme.** O sistema pede aproximadamente 60/30/10 —
+   creme fundando, terra estruturando, lima pontuando. Esta página inverte: o chão é
+   `--terra-900` e o creme volta nas superfícies de conteúdo (cards, painéis, botões claros).
+   O motivo é o selo: ele é um render 3D brilhante e só lê como fundo sobre um chão escuro.
+   Sobre creme, viraria uma marca d'água apagada. É o desvio que sustenta a ideia toda —
+   se não for aprovado, o fundo do selo cai junto.
+2. **O scrub do selo pelo scroll.** O sistema diz "no parallax, no scroll-jacking". Mantive
    porque foi um pedido explícito seu, e porque a página rola normalmente — o scroll não é
-   sequestrado, só alimenta qual quadro aparece. Se preferir aderência total, é trocar a
-   seção de fechamento pelo selo estático: o código já faz isso sozinho em
-   `prefers-reduced-motion`.
-2. **Três cores de fundo.** O sistema pede no máximo duas por página. Uso creme + terra + lima,
+   sequestrado, só alimenta qual quadro aparece. O canvas é fixo e nunca se desloca, então
+   não há parallax de fato. Com `prefers-reduced-motion` o código já mostra só o quadro final.
+3. **Três cores de fundo.** O sistema pede no máximo duas por página. Uso creme + terra + lima,
    e a lima só na faixa da semana de aniversário — a exceção que o próprio sistema abre para
    "a faixa de campanha e o hero de campanha".
-3. **Cards sem pictograma.** São quatro pictogramas para seis categorias. Repetir boi e saco
+4. **Cards sem pictograma.** São quatro pictogramas para seis categorias. Repetir boi e saco
    para preencher a grade ficaria pior do que tipografia limpa. Se a marca liberar novos
    pictogramas, os cards já têm lugar para eles.
-4. **Manchete de categoria em sentence case**, contrariando a copy, que as escreveu em caixa
+5. **Manchete de categoria em sentence case**, contrariando a copy, que as escreveu em caixa
    alta. Casing é decisão de renderização e o sistema é explícito: "never uppercase a whole
    headline — the display face is wide and it stops reading".
-5. **Sem logotipo vetorial.** O sistema registra essa lacuna. A marca no header e no rodapé é
+6. **Sem logotipo vetorial.** O sistema registra essa lacuna. A marca no hero e no rodapé é
    tipo Parkinsans Bold, como ele determina, mais o PNG do selo. Vale pedir o vetor à marca
    antes de publicar.
 
 ---
 
-## O selo 3D dirigido pelo scroll
+## O selo 3D como fundo da página
 
-O selo animado (`docs/ASSETS/selo_animation.mov`, ProRes 4444 com alpha) foi convertido em
-105 frames WebP com transparência. Na seção de fechamento, a posição do scroll controla qual
-frame aparece no `<canvas>` — o selo se monta conforme o leitor termina a página. É a mesma
-técnica de scrub do [scroll-world](https://github.com/oso95/scroll-world), sem WebGL e sem
-biblioteca: o asset já é um render 3D, então não há motivo para reconstruir a cena em runtime.
+O selo animado (`docs/ASSETS/selo_animation.mov`, ProRes 4444 com alpha) virou uma sequência
+de frames WebP com transparência. Um `<canvas>` **fixo**, atrás de todo o conteúdo, desenha o
+quadro correspondente à posição da rolagem. O elemento nunca se move — só o desenho muda —
+então não há parallax: é a mesma técnica de scrub do
+[scroll-world](https://github.com/oso95/scroll-world), aplicada à página inteira em vez de a
+uma seção.
 
-Detalhes da implementação, em `main.js`:
+O selo começa a se montar no fim do hero e fica inteiro quando a assinatura entra em cena,
+antes do rodapé. As bandas de conteúdo alternam entre transparentes (o selo aparece por
+inteiro) e com véu de terra a 70% (o selo passa de leve), o que devolve ritmo à página sem
+esconder o fundo. Os cards são creme e opacos, então o texto longo nunca disputa com o selo.
 
-- a sequência só começa a baixar quando o fechamento entra a 1,5 viewport de distância;
-- carrega em blocos de 8 frames e já exibe o canvas depois do primeiro bloco;
-- até lá mostra o selo estático, então o primeiro paint nunca depende da sequência;
-- se um frame ainda não chegou, desenha o anterior mais próximo em vez de piscar;
-- mobile recebe a sequência de 560px (1,5 MB em vez de 2,9 MB);
-- com `prefers-reduced-motion`, o scrub é desligado e fica só o selo estático.
+### Otimização
+
+A versão anterior carregava 105 frames a 960px, o que dava ~218 MB de bitmap decodificado no
+desktop e ~74 MB no mobile — inviável para um fundo que fica vivo a página toda. A sequência
+de fundo usa um quadro a cada dois:
+
+| | frames | largura | disco | bitmap decodificado |
+|---|---|---|---|---|
+| desktop | 53 | 640px | 924 KB | ~49 MB |
+| mobile | 53 | 380px | 544 KB | ~17 MB |
+
+Mais detalhes da implementação, em `main.js`:
+
+- a sequência só começa a baixar depois do `load`: o hero tem prioridade;
+- carrega em blocos de 6 e mostra o canvas assim que o primeiro bloco chega;
+- antes disso não há nada no fundo, então não existe troca brusca de imagem;
+- se um quadro ainda não chegou, desenha o anterior mais próximo em vez de piscar;
+- só redesenha quando o índice do quadro muda, e sempre dentro de um `requestAnimationFrame`;
+- com `prefers-reduced-motion`, o scrub não roda e fica só o quadro final, parado.
 
 Para regenerar os frames a partir do `.mov`:
 
 ```bash
 ffmpeg -i docs/ASSETS/selo_animation.mov -vf "scale=1400:-1" -pix_fmt rgba build/frames/f%03d.png
-# depois, para cada frame (pulando o primeiro, que é transparente):
-cwebp -q 68 -alpha_q 88 -resize 960 0 -m 6 entrada.png -o assets/selo/d/001.webp
-cwebp -q 66 -alpha_q 85 -resize 560 0 -m 6 entrada.png -o assets/selo/m/001.webp
+# depois, um quadro a cada dois (pulando o primeiro, que é transparente):
+cwebp -q 70 -alpha_q 88 -resize 640 0 -m 6 entrada.png -o assets/selo/bg-d/001.webp
+cwebp -q 68 -alpha_q 85 -resize 380 0 -m 6 entrada.png -o assets/selo/bg-m/001.webp
 ```
+
+---
+
+## Mobile
+
+- Hero em `100svh`, sem barra de navegação para roubar altura.
+- Botões com `min-height: 48px` e largura total nas seções de ação.
+- Linha do tempo vira trilho vertical; grades de cards viram uma coluna.
+- Os três estados ficam em uma linha só, em grade de três colunas.
+- Selo de fundo mais discreto (opacidade 0.15) e na sequência de 380px.
+- Sem overflow horizontal em 360px e 390px, verificado.
 
 ---
 
@@ -183,7 +221,7 @@ Estes pontos vêm dos `[APURAR]` da copy e das decisões que tomei na ausência 
 - Navegação por teclado com skip link e foco visível em lima.
 - `prefers-reduced-motion` desliga reveals, parallax, flutuação e o scrub do selo.
 - Imagens em WebP com `srcset` por viewport; fontes em WOFF2 com `font-display:swap`.
-- O primeiro paint não depende da sequência de frames: carga inicial na casa de 500 KB.
+- O primeiro paint não depende da sequência de frames: ela só baixa depois do `load`.
 
 ## Nota sobre o import do Claude Design
 

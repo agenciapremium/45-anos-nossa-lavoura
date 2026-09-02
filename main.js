@@ -17,13 +17,12 @@
     revealables.forEach(el => el.classList.add('is-in'));
   } else {
     const io = new IntersectionObserver((entries, obs) => {
-      const shown = entries.filter(e => e.isIntersecting);
-      shown.forEach((e, i) => {
+      entries.filter(e => e.isIntersecting).forEach((e, i) => {
         e.target.style.setProperty('--d', `${Math.min(i, 5) * 60}ms`);
         e.target.classList.add('is-in');
         obs.unobserve(e.target);
       });
-    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.12 });
+    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.1 });
     revealables.forEach(el => io.observe(el));
   }
 
@@ -38,8 +37,7 @@
     const dur = 1400, t0 = performance.now();
     const tick = now => {
       const p = Math.min((now - t0) / dur, 1);
-      const eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = prefix + Math.round(target * eased);
+      el.textContent = prefix + Math.round(target * (1 - Math.pow(1 - p, 3)));
       if (p < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
@@ -96,8 +94,8 @@
   /* ---------------------------------------------------------
      Player do VT
      O arquivo entra em assets/video/vt-45-anos.mp4.
-     Enquanto ele não existir, a página mantém o pôster
-     e a versão em texto logo abaixo.
+     Enquanto ele não existir, a página mantém o pôster e a
+     versão em texto logo abaixo.
      --------------------------------------------------------- */
   const vtPlay = $('#vtPlay');
   if (vtPlay) {
@@ -121,120 +119,125 @@
     });
   }
 
-  /* ---------------------------------------------------------
-     Selo 45 anos em sequência de frames, dirigido pelo scroll
-     (mesma técnica de scrub de vídeo do scroll-world:
-      a posição do scroll controla o quadro exibido)
-     --------------------------------------------------------- */
-  const canvas   = $('#seloCanvas');
-  const fallback = $('#seloFallback');
-  const stage    = $('.fim__stage');
+  /* =========================================================
+     O SELO COMO FUNDO DA PÁGINA
 
-  if (canvas && stage && !reduced) {
-    const TOTAL  = 105;
-    const mobile = matchMedia('(max-width: 760px)').matches;
-    const dir    = mobile ? 'assets/selo/m/' : 'assets/selo/d/';
-    const W      = mobile ? 560 : 960;
-    const H      = mobile ? 316 : 541;
+     Um canvas fixo atrás de todo o conteúdo. A posição da
+     rolagem escolhe o quadro, então o selo se monta ao longo
+     da leitura e chega inteiro na assinatura. O elemento não
+     se move — só o desenho muda, então não há parallax.
 
-    canvas.width  = W;
-    canvas.height = H;
+     Mobile recebe a sequência de 380px: 17 MB de bitmap
+     decodificado em vez dos 49 MB da versão desktop.
+     ========================================================= */
+  const canvas = $('#seloBg');
+  const still  = $('#seloBgStill');
+  const hero   = $('.hero');
+  const footer = $('.ft');
 
-    const ctx    = canvas.getContext('2d', { alpha: true });
-    const frames = new Array(TOTAL);
-    let loaded   = 0;
-    let ready    = false;
-    let current  = -1;
-    let queued   = false;
+  if (canvas && hero && footer) {
+    if (reduced) {
+      /* Sem scrub: fica o quadro final, parado. */
+      still.hidden = false;
+    } else {
+      const TOTAL  = 53;
+      const mobile = matchMedia('(max-width: 760px)').matches;
+      const dir    = mobile ? 'assets/selo/bg-m/' : 'assets/selo/bg-d/';
+      const W      = mobile ? 380 : 640;
+      const H      = mobile ? 214 : 361;
 
-    const src = i => `${dir}${String(i + 1).padStart(3, '0')}.webp`;
+      canvas.width  = W;
+      canvas.height = H;
 
-    /* Desenha o quadro mais próximo já carregado, para nunca piscar */
-    const draw = i => {
-      let f = frames[i];
-      if (!f || !f.complete || !f.naturalWidth) {
-        for (let k = i; k >= 0; k--) {
-          if (frames[k] && frames[k].complete && frames[k].naturalWidth) { f = frames[k]; break; }
+      const ctx    = canvas.getContext('2d', { alpha: true });
+      const frames = new Array(TOTAL);
+      let loaded  = 0;
+      let ready   = false;
+      let current = -1;
+      let queued  = false;
+      let from = 0, span = 1;
+
+      const src = i => `${dir}${String(i + 1).padStart(3, '0')}.webp`;
+
+      /* O selo começa a se montar no fim do hero e fica inteiro
+         quando a assinatura entra em cena, antes do rodapé. */
+      const measure = () => {
+        from = hero.offsetHeight * 0.6;
+        const to = footer.offsetTop - innerHeight * 0.6;
+        span = Math.max(to - from, 1);
+      };
+
+      const progress = () => Math.min(Math.max((scrollY - from) / span, 0), 1);
+
+      /* Desenha o quadro mais próximo já carregado, para nunca piscar */
+      const draw = i => {
+        let f = frames[i];
+        if (!f || !f.complete || !f.naturalWidth) {
+          for (let k = i; k >= 0; k--) {
+            if (frames[k] && frames[k].complete && frames[k].naturalWidth) { f = frames[k]; break; }
+          }
         }
-      }
-      if (!f) return;
-      ctx.clearRect(0, 0, W, H);
-      ctx.drawImage(f, 0, 0, W, H);
-    };
+        if (!f) return;
+        ctx.clearRect(0, 0, W, H);
+        ctx.drawImage(f, 0, 0, W, H);
+      };
 
-    const progress = () => {
-      const r = stage.getBoundingClientRect();
-      const span = r.height - innerHeight;
-      if (span <= 0) return 1;
-      return Math.min(Math.max(-r.top / span, 0), 1);
-    };
+      const render = () => {
+        queued = false;
+        if (!ready) return;
+        const i = Math.min(TOTAL - 1, Math.round(progress() * (TOTAL - 1)));
+        if (i === current) return;
+        current = i;
+        draw(i);
+      };
 
-    const render = () => {
-      queued = false;
-      if (!ready) return;
-      const i = Math.min(TOTAL - 1, Math.round(progress() * (TOTAL - 1)));
-      if (i === current) return;
-      current = i;
-      draw(i);
-    };
+      const onScroll = () => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(render);
+      };
 
-    const onScroll = () => {
-      if (queued) return;
-      queued = true;
-      requestAnimationFrame(render);
-    };
+      /* Carregamento em blocos, para não competir com o hero */
+      const CHUNK = 6;
+      const loadChunk = start => {
+        const end = Math.min(start + CHUNK, TOTAL);
+        let pending = end - start;
+        if (pending === 0) return;
 
-    /* Carregamento em blocos, para não competir com o resto da página */
-    const CHUNK = 8;
-    const loadChunk = start => {
-      const end = Math.min(start + CHUNK, TOTAL);
-      let pending = end - start;
-      if (pending === 0) return;
-
-      const next = () => {
-        if (--pending === 0) {
+        const next = () => {
+          if (--pending > 0) return;
           if (end < TOTAL) loadChunk(end);
           else canvas.dataset.complete = 'true';
+        };
+
+        for (let i = start; i < end; i++) {
+          const img = new Image();
+          img.decoding = 'async';
+          frames[i] = img;
+          img.addEventListener('load', () => {
+            loaded++;
+            if (!ready && loaded >= CHUNK) {
+              ready = true;
+              canvas.hidden = false;
+              render();
+            } else if (ready) {
+              current = -1;
+              onScroll();
+            }
+            next();
+          }, { once: true });
+          img.addEventListener('error', next, { once: true });
+          img.src = src(i);
         }
       };
 
-      for (let i = start; i < end; i++) {
-        const img = new Image();
-        img.decoding = 'async';
-        frames[i] = img;
-        img.addEventListener('load', () => {
-          loaded++;
-          /* Assim que o primeiro bloco chega, troca o fallback pelo canvas */
-          if (!ready && loaded >= CHUNK) {
-            ready = true;
-            canvas.hidden = false;
-            fallback.hidden = true;
-            render();
-          } else if (ready) {
-            current = -1;
-            onScroll();
-          }
-          next();
-        }, { once: true });
-        img.addEventListener('error', next, { once: true });
-        img.src = src(i);
-      }
-    };
+      measure();
+      addEventListener('scroll', onScroll, { passive: true });
+      addEventListener('resize', () => { measure(); current = -1; onScroll(); }, { passive: true });
 
-    /* Só começa a baixar quando o fechamento se aproxima */
-    const startLoad = () => loadChunk(0);
-    if ('IntersectionObserver' in window) {
-      const sio = new IntersectionObserver((entries, obs) => {
-        if (!entries.some(e => e.isIntersecting)) return;
-        obs.disconnect();
-        startLoad();
-      }, { rootMargin: '150% 0px' });
-      sio.observe(stage);
-    } else {
-      addEventListener('load', startLoad);
+      /* Só depois que a página carregou: o hero tem prioridade. */
+      if (document.readyState === 'complete') loadChunk(0);
+      else addEventListener('load', () => loadChunk(0), { once: true });
     }
-
-    addEventListener('scroll', onScroll, { passive: true });
-    addEventListener('resize', () => { current = -1; onScroll(); }, { passive: true });
   }
 })();
