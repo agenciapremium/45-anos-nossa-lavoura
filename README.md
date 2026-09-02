@@ -232,8 +232,11 @@ Estes pontos vêm dos `[APURAR]` da copy e das decisões que tomei na ausência 
 
 - **Botão "Falar com um Consultor de Vendas"** aponta para a seção 12, como a copy manda
   enquanto o destino não estiver definido. Trocar por WhatsApp ou seletor de loja quando definir.
-- **"Encontrar a loja mais próxima"** e **"Ler o regulamento completo"** apontam para
-  `nossalavoura.com.br`. Ajustar para as URLs finais.
+- **"Encontrar a loja mais próxima"** aponta para `lojas.nossalavoura.com.br` com UTM
+  (`utm_source=lp`, `utm_medium=button`, `utm_campaign=45anos`). O link "Nossas lojas" do
+  rodapé vai para o mesmo destino com `utm_medium=footer`, para separar os dois na análise.
+- **"Ler o regulamento completo"** ainda aponta para `nossalavoura.com.br`. Falta a URL final
+  do regulamento do Acelera no Campo 3.0.
 - **Fotografia.** Existe uma única foto de rebanho no material. Ela sustenta o hero e o
   manifesto. Os três blocos de gratidão são tipográficos, porque repetir a mesma imagem em três
   cards denunciaria placeholder — a copy pede "fotografia própria" em cada bloco. Quando as
