@@ -1,0 +1,194 @@
+/* =========================================================
+   TOKENS · Nossa Lavoura 45 Anos Design System
+   Copiado na íntegra de docs/Nossa Lavoura 45 Anos Design System/tokens/.
+   NÃO EDITAR À MÃO: reimportar do design system quando ele mudar.
+   Única adaptação: fonts.css aponta para os WOFF2 em assets/fonts/
+   em vez dos TTF originais.
+   ========================================================= */
+
+/* ---------- fonts (adaptado: TTF -> WOFF2) ---------- */
+@font-face{font-family:"Parkinsans";src:url("assets/fonts/Parkinsans-Light.woff2") format("woff2");font-weight:300;font-style:normal;font-display:swap}
+@font-face{font-family:"Parkinsans";src:url("assets/fonts/Parkinsans-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:"Hanken Grotesk";src:url("assets/fonts/HankenGrotesk-Light.woff2") format("woff2");font-weight:300;font-style:normal;font-display:swap}
+@font-face{font-family:"Hanken Grotesk";src:url("assets/fonts/HankenGrotesk-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Hanken Grotesk";src:url("assets/fonts/HankenGrotesk-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+
+/* ---------- colors.css ---------- */
+:root{
+/* --- Base palette (brand, exact) --- */
+--terra-900:#2a1512;
+--terra-700:#3d201b;
+--terra-500:#5c342c;
+--terra-300:#8a5b4f;
+--lima-700:#7d9a1f;
+--lima-600:#94b32a;
+--lima-500:#b8db3d;
+--lima-300:#d2e982;
+--lima-100:#e9f4c4;
+--creme-500:#fffadc;
+--creme-600:#f6eec6;
+--creme-700:#e8dcac;
+--branco:#ffffff;
+
+/* --- Semantic: surfaces --- */
+--surface-page:var(--creme-500);
+--surface-page-alt:var(--creme-600);
+--surface-inverse:var(--terra-700);
+--surface-inverse-deep:var(--terra-900);
+--surface-card:var(--branco);
+--surface-card-inverse:var(--terra-500);
+--surface-accent:var(--lima-500);
+--surface-accent-soft:var(--lima-100);
+--surface-field:var(--branco);
+--surface-scrim:color-mix(in srgb,var(--terra-900) 72%,transparent);
+
+/* --- Semantic: text --- */
+--text-body:var(--terra-700);
+--text-strong:var(--terra-900);
+--text-muted:var(--terra-300);
+--text-on-inverse:var(--creme-500);
+--text-on-inverse-muted:color-mix(in srgb,var(--creme-500) 62%,var(--terra-700));
+--text-on-accent:var(--terra-900);
+--text-accent:var(--lima-700);
+--text-link:var(--terra-700);
+--text-link-hover:var(--lima-700);
+
+/* --- Semantic: lines --- */
+--border-hairline:color-mix(in srgb,var(--terra-700) 16%,transparent);
+--border-strong:var(--terra-700);
+--border-accent:var(--lima-500);
+--border-on-inverse:color-mix(in srgb,var(--creme-500) 24%,transparent);
+--focus-ring:var(--lima-500);
+
+/* --- Semantic: status --- */
+--status-success:#4e8c2b;
+--status-success-soft:#e3f0d4;
+--status-warning:#c98a12;
+--status-warning-soft:#fbeecd;
+--status-danger:#a8341f;
+--status-danger-soft:#f7ded8;
+--status-info:var(--terra-500);
+--status-info-soft:var(--creme-600);
+}
+
+/* ---------- typography.css ---------- */
+:root{
+--font-display:"Parkinsans","Hanken Grotesk",system-ui,sans-serif;
+--font-body:"Hanken Grotesk",system-ui,sans-serif;
+
+--weight-light:300;
+--weight-regular:400;
+--weight-bold:700;
+
+--text-hero:clamp(3.25rem,6.2vw,5.5rem);
+--text-display:clamp(2.5rem,4.4vw,3.75rem);
+--text-h1:2.5rem;
+--text-h2:1.875rem;
+--text-h3:1.375rem;
+--text-lead:1.1875rem;
+--text-body-lg:1.0625rem;
+--text-body-md:0.9375rem;
+--text-body-sm:0.8125rem;
+--text-label:0.75rem;
+
+--leading-tight:0.94;
+--leading-snug:1.12;
+--leading-normal:1.5;
+--leading-loose:1.65;
+
+--tracking-hero:-0.03em;
+--tracking-display:-0.02em;
+--tracking-normal:0;
+--tracking-label:0.14em;
+--tracking-eyebrow:0.22em;
+}
+
+/* ---------- spacing.css ---------- */
+:root{
+--space-0:0;
+--space-1:4px;
+--space-2:8px;
+--space-3:12px;
+--space-4:16px;
+--space-5:24px;
+--space-6:32px;
+--space-7:48px;
+--space-8:64px;
+--space-9:96px;
+--space-10:128px;
+
+--gutter-page:clamp(20px,5vw,64px); /* @kind spacing */
+--content-max:1200px;
+--measure-prose:62ch;
+--section-y:var(--space-9);
+--stack-tight:var(--space-2);
+--stack-default:var(--space-4);
+--stack-loose:var(--space-6);
+}
+
+/* ---------- shape.css ---------- */
+:root{
+--radius-xs:6px;
+--radius-sm:10px;
+--radius-md:16px;
+--radius-lg:24px;
+--radius-xl:40px;
+--radius-pill:999px;
+--radius-none:0;
+--radius-control:12px;   /* buttons, fields, chips */
+--radius-card:20px;      /* cards, panels */
+--radius-surface:32px;   /* dialogs, hero blocks */
+
+--border-width-hair:1px;
+--border-width-thick:2px;
+--border-width-slab:4px;
+
+/* Octagon: background element only, showing exactly two faces
+   (one straight edge + one 45° edge). Never a container shape. */
+--octagon-cut:38%; /* @kind spacing */
+}
+/* Solid corner fragment, anchored bottom-left of its container */
+.nl-octagon-corner{clip-path:polygon(0 100%,0 var(--octagon-cut),calc(100% - var(--octagon-cut)) var(--octagon-cut),100% 100%)}
+
+/* ---------- elevation.css ---------- */
+:root{
+/* Flat-first brand: elevation is offset slabs of colour, not blur. */
+--shadow-none:none;
+--shadow-slab-sm:4px 4px 0 0 var(--terra-700);
+--shadow-slab-md:8px 8px 0 0 var(--terra-700);
+--shadow-slab-accent:8px 8px 0 0 var(--lima-500);
+--shadow-soft:0 2px 8px color-mix(in srgb,var(--terra-900) 10%,transparent);
+--shadow-lifted:0 18px 44px color-mix(in srgb,var(--terra-900) 22%,transparent);
+--overlay-protection:linear-gradient(180deg,color-mix(in srgb,var(--terra-900) 76%,transparent) 0%,color-mix(in srgb,var(--terra-900) 30%,transparent) 55%,transparent 100%);
+}
+
+/* ---------- motion.css ---------- */
+:root{
+--ease-standard:cubic-bezier(0.2,0.7,0.3,1); /* @kind other */
+--ease-out-firm:cubic-bezier(0.16,1,0.3,1); /* @kind other */
+--ease-in:cubic-bezier(0.5,0,1,1); /* @kind other */
+--dur-instant:90ms; /* @kind other */
+--dur-fast:160ms; /* @kind other */
+--dur-normal:240ms; /* @kind other */
+--dur-slow:420ms; /* @kind other */
+--transition-control:background-color var(--dur-fast) var(--ease-standard),color var(--dur-fast) var(--ease-standard),border-color var(--dur-fast) var(--ease-standard),transform var(--dur-fast) var(--ease-standard),box-shadow var(--dur-fast) var(--ease-standard);
+}
+@media (prefers-reduced-motion:reduce){:root{--dur-instant:0ms; /* @kind other */
+--dur-fast:0ms; /* @kind other */
+--dur-normal:0ms; /* @kind other */
+--dur-slow:0ms /* @kind other */}}
+
+/* ---------- base.css ---------- */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--surface-page);color:var(--text-body);font-family:var(--font-body);font-weight:var(--weight-regular);font-size:var(--text-body-md);line-height:var(--leading-normal);text-wrap:pretty;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:var(--weight-bold);color:var(--text-strong);line-height:var(--leading-snug);letter-spacing:var(--tracking-display);margin:0}
+h1{font-size:var(--text-h1)}h2{font-size:var(--text-h2)}h3{font-size:var(--text-h3)}
+p{margin:0}
+a{color:var(--text-link);text-decoration-thickness:2px;text-underline-offset:3px;transition:color var(--dur-fast) var(--ease-standard)}
+a:hover{color:var(--text-link-hover)}
+:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
+::selection{background:var(--lima-500);color:var(--terra-900)}
+.nl-eyebrow{font-family:var(--font-body);font-weight:var(--weight-bold);font-size:var(--text-label);letter-spacing:var(--tracking-eyebrow);text-transform:uppercase}
+.nl-hero{font-family:var(--font-display);font-weight:var(--weight-bold);font-size:var(--text-hero);line-height:var(--leading-tight);letter-spacing:var(--tracking-hero)}
+

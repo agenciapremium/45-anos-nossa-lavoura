@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Nossa Lavoura 45 Anos | Uma história construída com quem faz o campo acontecer</title>
 <meta name="description" content="A Nossa Lavoura celebra 45 anos ao lado do produtor rural em Rondônia, Acre e Amazonas. Conheça a história e aproveite a semana de aniversário, de 19 a 24 de outubro.">
-<meta name="theme-color" content="#3D201B">
+<meta name="theme-color" content="#3d201b">
 <link rel="canonical" href="https://nossalavoura.com.br/45anos">
 
 <meta property="og:type" content="website">
@@ -24,6 +24,7 @@
 <link rel="preload" href="assets/fonts/Parkinsans-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/HankenGrotesk-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" as="image" href="assets/img/selo-1200.webp">
+<link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="styles.css">
 
 <script type="application/ld+json">
@@ -50,12 +51,24 @@
 
 <a class="skip" href="#conteudo">Pular para o conteúdo</a>
 
-<!-- ============ NAV ============ -->
-<header class="nav" id="nav">
+<!-- Geometria reutilizada do design system: fragmento de canto do octógono,
+     exatamente duas faces. Nunca vira container. -->
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <defs>
+    <path id="oct-solid" d="M0,100 L0,42 Q0,39 3,39 L39,39 Q42,39 44.1,41.1 L98,95 Q100,97 100,100 Z"/>
+    <path id="oct-line" d="M0,42 Q0,39 3,39 L39,39 Q42,39 44.1,41.1 L98,95 Q100,97 100,100"/>
+    <symbol id="pict-seta" viewBox="0 0 492 409.31">
+      <path d="M484.14,185.54L306.46,7.86c-5.07-5.07-11.83-7.86-19.04-7.86s-13.97,2.79-19.04,7.86l-16.13,16.14c-5.07,5.06-7.86,11.83-7.86,19.04s2.79,14.2,7.86,19.26l103.66,103.88H26.58c-14.85,0-26.58,11.62-26.58,26.48v22.81c0,14.85,11.73,27.65,26.58,27.65h330.5l-104.83,104.46c-5.07,5.07-7.86,11.65-7.86,18.86s2.79,13.88,7.86,18.95l16.13,16.08c5.07,5.07,11.83,7.84,19.04,7.84s13.97-2.8,19.04-7.87l177.68-177.68c5.08-5.09,7.87-11.88,7.86-19.11,0-7.24-2.79-14.05-7.86-19.11Z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ============ CABEÇALHO ============ -->
+<header class="nav">
   <div class="nav__in">
     <a class="nav__brand" href="#topo" aria-label="Nossa Lavoura 45 anos, ir para o topo">
-      <img src="assets/img/selo-600.webp" alt="" width="52" height="43" decoding="async">
-      <span class="nav__brandtxt"><b>Nossa Lavoura</b><i>45 anos</i></span>
+      <img src="assets/img/selo-600.webp" alt="" width="44" height="37" decoding="async">
+      <span class="nav__wordmark"><span>Nossa</span><span>Lavoura</span></span>
     </a>
     <nav class="nav__links" aria-label="Seções da página">
       <a href="#historia">História</a>
@@ -64,7 +77,7 @@
       <a href="#gratidao">Gratidão</a>
       <a href="#lojas">Lojas</a>
     </nav>
-    <a class="btn btn--sm btn--lima" href="#semana">Semana de aniversário</a>
+    <a class="btn btn--sm btn--primary" href="#semana">Semana de aniversário</a>
   </div>
 </header>
 
@@ -72,61 +85,64 @@
 
 <!-- ============ 01 · HERO ============ -->
 <section class="hero" id="topo">
-  <div class="hero__bg" aria-hidden="true">
-    <picture>
-      <source media="(max-width:700px)" srcset="assets/img/pasto-900.webp">
-      <source media="(max-width:1400px)" srcset="assets/img/pasto-1600.webp">
-      <img src="assets/img/pasto-2400.webp" alt="" fetchpriority="high" decoding="async">
-    </picture>
-  </div>
-  <div class="hero__veil" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="hero__block">
+      <div class="hero__kv" aria-hidden="true">
+        <picture>
+          <source media="(max-width:700px)" srcset="assets/img/pasto-900.webp">
+          <source media="(max-width:1400px)" srcset="assets/img/pasto-1600.webp">
+          <img src="assets/img/pasto-2400.webp" alt="" fetchpriority="high" decoding="async">
+        </picture>
+      </div>
+      <div class="hero__scrim" aria-hidden="true"></div>
+      <svg class="oct oct--tr" viewBox="0 0 100 100" width="280" height="280" aria-hidden="true" style="opacity:.4">
+        <use href="#oct-line" fill="none" stroke="var(--creme-500)" stroke-width="2" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+      </svg>
 
-  <svg class="hero__oct" viewBox="0 0 1080 1080" aria-hidden="true" focusable="false">
-    <path d="M739,6c14.31,0,27.76,5.57,37.87,15.69l281.44,281.44c10.12,10.12,15.69,23.57,15.69,37.87v398.01c0,14.31-5.57,27.76-15.69,37.87l-281.44,281.44c-10.12,10.12-23.57,15.69-37.87,15.69h-398.01c-14.31,0-27.76-5.57-37.87-15.69L21.69,776.88c-10.12-10.12-15.69-23.57-15.69-37.87v-398.01c0-14.31,5.57-27.76,15.69-37.87L303.13,21.69c10.12-10.12,23.57-15.69,37.87-15.69h398.01" fill="none" stroke="currentColor" stroke-width="6"/>
-  </svg>
+      <div class="hero__in">
+        <div class="hero__copy">
+          <h1 class="hero__h1">São <em>45 anos</em> ao lado de quem faz o campo acontecer.</h1>
+          <p class="hero__sub">A Nossa Lavoura celebra 45 anos de história, construídos com trabalho, parceria e confiança ao lado do produtor. Esta é a nossa festa, e ela é sua também.</p>
+          <div class="hero__cta">
+            <a class="btn btn--primary" href="#semana">
+              Ver a semana
+              <svg class="btn__seta" aria-hidden="true"><use href="#pict-seta"/></svg>
+            </a>
+            <a class="btn btn--on-dark" href="#historia">Nossa história</a>
+          </div>
+        </div>
 
-  <div class="hero__in wrap">
-    <div class="hero__copy">
-      <h1 class="hero__h1">São <em>45 anos</em> ao lado de quem faz o campo acontecer.</h1>
-      <p class="hero__sub">A Nossa Lavoura celebra 45 anos de história, construídos com trabalho, parceria e confiança ao lado do produtor. Esta é a nossa festa, e ela é sua também.</p>
-      <div class="hero__cta">
-        <a class="btn btn--lima" href="#semana">Ver a semana de aniversário</a>
-        <a class="btn btn--ghost" href="#historia">Conhecer a nossa história</a>
+        <div class="hero__selo">
+          <img src="assets/img/selo-1200.webp" alt="Selo comemorativo dos 45 anos da Nossa Lavoura" width="1200" height="1002" fetchpriority="high" decoding="async">
+        </div>
       </div>
     </div>
-
-    <div class="hero__selo" data-tilt>
-      <img src="assets/img/selo-1200.webp" alt="Selo comemorativo dos 45 anos da Nossa Lavoura" width="1200" height="1002" fetchpriority="high" decoding="async">
-    </div>
   </div>
-
-  <div class="hero__scroll" aria-hidden="true"><span></span>role a página</div>
 </section>
 
 <!-- Tarja de campanha: publicada automaticamente a partir de 12/10/2026 -->
 <div class="tarja" id="tarja" data-from="2026-10-12" hidden>
   <div class="wrap tarja__in">
-    <span class="tarja__dot" aria-hidden="true"></span>
     <p><b>Semana de aniversário:</b> 19 a 24 de outubro, em todas as lojas Nossa Lavoura.</p>
     <a href="#semana">Ver as ofertas</a>
   </div>
 </div>
 
 <!-- ============ 02 · NÚMEROS ============ -->
-<section class="nums" aria-label="Números da trajetória">
+<section class="band band--terra nums" aria-label="Números da trajetória">
+  <svg class="oct oct--br" viewBox="0 0 100 100" width="320" height="320" aria-hidden="true" style="opacity:.16">
+    <use href="#oct-solid" fill="var(--lima-500)"/>
+  </svg>
   <div class="wrap nums__grid">
     <div class="num" data-reveal>
-      <svg class="num__ico" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="18"/><path d="M24 13v11l7 5"/></svg>
       <b class="num__n" data-count="45">45</b>
       <span class="num__l">anos de história</span>
     </div>
     <div class="num" data-reveal>
-      <svg class="num__ico" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 41V21l16-11 16 11v20"/><path d="M4 41h40"/><path d="M19 41V29h10v12"/></svg>
-      <b class="num__n"><span data-count="40" data-prefix="+">+40</span></b>
+      <b class="num__n" data-count="40" data-prefix="+">+40</b>
       <span class="num__l">lojas em Rondônia, Acre e Amazonas</span>
     </div>
     <div class="num" data-reveal>
-      <svg class="num__ico" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 43s14-12.6 14-23a14 14 0 1 0-28 0c0 10.4 14 23 14 23Z"/><circle cx="24" cy="20" r="5"/></svg>
       <b class="num__n" data-count="3">3</b>
       <span class="num__l">estados onde o produtor encontra a Nossa Lavoura</span>
     </div>
@@ -134,7 +150,7 @@
 </section>
 
 <!-- ============ 03 · MANIFESTO ============ -->
-<section class="manif" id="historia">
+<section class="band band--page manif" id="historia">
   <div class="wrap manif__grid">
     <figure class="manif__fig" data-reveal>
       <img src="assets/img/pasto-1600.webp" alt="Rebanho nelore em pastagem, na região atendida pela Nossa Lavoura" loading="lazy" decoding="async">
@@ -156,9 +172,12 @@
 </section>
 
 <!-- ============ 04 · LINHA DO TEMPO ============ -->
-<section class="tl" id="trajetoria">
+<section class="band band--alt tl" id="trajetoria">
+  <svg class="oct oct--tr" viewBox="0 0 100 100" width="300" height="300" aria-hidden="true" style="opacity:.22">
+    <use href="#oct-line" fill="none" stroke="var(--terra-700)" stroke-width="2" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+  </svg>
   <div class="wrap">
-    <p class="eyebrow" data-reveal>Linha do tempo</p>
+    <p class="eyebrow eyebrow--center" data-reveal>Linha do tempo</p>
     <h2 class="h2 h2--center" data-reveal>Os capítulos dessa caminhada</h2>
   </div>
 
@@ -196,19 +215,19 @@
 </section>
 
 <!-- ============ 05 · VT EMOCIONAL ============ -->
-<section class="vt" id="filme">
+<section class="band band--deep vt" id="filme">
   <div class="wrap">
-    <p class="eyebrow eyebrow--lima" data-reveal>O filme</p>
-    <h2 class="h2 h2--center h2--light" data-reveal>45 anos em pouco mais de um minuto</h2>
-    <p class="lead lead--light lead--center" data-reveal>O filme que preparamos para contar essa história do jeito que ela merece ser contada: pelas pessoas que a construíram.</p>
+    <p class="eyebrow eyebrow--center eyebrow--on-inverse" data-reveal>O filme</p>
+    <h2 class="h2 h2--center h2--on-inverse" data-reveal>45 anos em pouco mais de um minuto</h2>
+    <p class="lead lead--center lead--on-inverse" data-reveal>O filme que preparamos para contar essa história do jeito que ela merece ser contada: pelas pessoas que a construíram.</p>
 
     <div class="vt__player" data-reveal>
       <div class="vt__poster" id="vtPoster">
         <img src="assets/img/pasto-1600.webp" alt="" loading="lazy" decoding="async">
         <img class="vt__seal" src="assets/img/selo-600.webp" alt="" loading="lazy" decoding="async">
-        <button class="vt__play" type="button" id="vtPlay" aria-label="Reproduzir o filme dos 45 anos">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>
-          <span>Assistir ao filme</span>
+        <button class="btn btn--primary vt__play" type="button" id="vtPlay">
+          Assistir ao filme
+          <svg class="btn__seta" aria-hidden="true"><use href="#pict-seta"/></svg>
         </button>
       </div>
       <p class="vt__missing" id="vtMissing" hidden>O filme ainda não está disponível nesta página. Leia abaixo a versão em texto.</p>
@@ -221,57 +240,28 @@
 </section>
 
 <!-- ============ 07 · GRATIDÃO ============ -->
-<section class="grat" id="gratidao">
+<section class="band band--page grat" id="gratidao">
+  <svg class="oct oct--bl" viewBox="0 0 100 100" width="300" height="300" aria-hidden="true" style="opacity:.5">
+    <use href="#oct-solid" fill="var(--lima-100)"/>
+  </svg>
   <div class="wrap">
-    <p class="eyebrow" data-reveal>Nossa gratidão</p>
+    <p class="eyebrow eyebrow--center" data-reveal>Nossa gratidão</p>
     <h2 class="h2 h2--center" data-reveal>Esses 45 anos são de todos que construíram junto</h2>
 
     <div class="grat__grid">
       <article class="gcard" data-reveal>
-        <div class="gcard__mark" aria-hidden="true">
-          <svg class="gcard__oct" viewBox="0 0 1080 1080" focusable="false"><path d="M739,0h-398.01c-15.8,0-30.95,6.28-42.12,17.44L17.44,298.88c-11.17,11.17-17.44,26.32-17.44,42.12v398.01c0,15.8,6.28,30.95,17.44,42.12l281.44,281.44c11.17,11.17,26.32,17.44,42.12,17.44h398.01c15.8,0,30.95-6.28,42.12-17.44l281.44-281.44c11.17-11.17,17.44-26.32,17.44-42.12v-398.01c0-15.8-6.28-30.95-17.44-42.12L781.12,17.44c-11.17-11.17-26.32-17.44-42.12-17.44Z"/></svg>
-          <svg class="gcard__ico" viewBox="0 0 48 48" focusable="false">
-            <path d="M12 14c-2.5-1-4-3-4-5.5 3.5 0 6.5 1.2 8.5 3.2"/>
-            <path d="M36 14c2.5-1 4-3 4-5.5-3.5 0-6.5 1.2-8.5 3.2"/>
-            <path d="M14 12h20v11c0 6-4.5 10-10 10s-10-4-10-10V12Z"/>
-            <path d="M19 33h10v3a5 5 0 0 1-10 0v-3Z"/>
-            <path d="M19.5 20h.01M28.5 20h.01"/>
-          </svg>
-        </div>
-        <div class="gcard__body">
-          <h3>Obrigado, produtor. Esses 45 anos são seus também.</h3>
-          <p>Cada conquista da Nossa Lavoura tem a marca de quem confia no nosso trabalho. Foi ao seu lado, no dia a dia do campo, que construímos essa história.</p>
-        </div>
+        <h3>Obrigado, produtor. Esses 45 anos são seus também.</h3>
+        <p>Cada conquista da Nossa Lavoura tem a marca de quem confia no nosso trabalho. Foi ao seu lado, no dia a dia do campo, que construímos essa história.</p>
       </article>
 
       <article class="gcard" data-reveal>
-        <div class="gcard__mark" aria-hidden="true">
-          <svg class="gcard__oct" viewBox="0 0 1080 1080" focusable="false"><path d="M739,0h-398.01c-15.8,0-30.95,6.28-42.12,17.44L17.44,298.88c-11.17,11.17-17.44,26.32-17.44,42.12v398.01c0,15.8,6.28,30.95,17.44,42.12l281.44,281.44c11.17,11.17,26.32,17.44,42.12,17.44h398.01c15.8,0,30.95-6.28,42.12-17.44l281.44-281.44c11.17-11.17,17.44-26.32,17.44-42.12v-398.01c0-15.8-6.28-30.95-17.44-42.12L781.12,17.44c-11.17-11.17-26.32-17.44-42.12-17.44Z"/></svg>
-          <svg class="gcard__ico" viewBox="0 0 48 48" focusable="false">
-            <circle cx="18" cy="17" r="6.5"/>
-            <circle cx="33" cy="19.5" r="5"/>
-            <path d="M6 40c0-6.6 5.4-12 12-12s12 5.4 12 12"/>
-            <path d="M32 30.5c5.5 0 10 4.3 10 9.5"/>
-          </svg>
-        </div>
-        <div class="gcard__body">
-          <h3>Nada disso seria possível sem o nosso time.</h3>
-          <p>Por trás de 45 anos de história existe gente dedicada, que veste a camisa todos os dias e cuida de cada produtor que chega à Nossa Lavoura. A cada colaborador, o nosso muito obrigado.</p>
-        </div>
+        <h3>Nada disso seria possível sem o nosso time.</h3>
+        <p>Por trás de 45 anos de história existe gente dedicada, que veste a camisa todos os dias e cuida de cada produtor que chega à Nossa Lavoura. A cada colaborador, o nosso muito obrigado.</p>
       </article>
 
       <article class="gcard" data-reveal>
-        <div class="gcard__mark" aria-hidden="true">
-          <svg class="gcard__oct" viewBox="0 0 1080 1080" focusable="false"><path d="M739,0h-398.01c-15.8,0-30.95,6.28-42.12,17.44L17.44,298.88c-11.17,11.17-17.44,26.32-17.44,42.12v398.01c0,15.8,6.28,30.95,17.44,42.12l281.44,281.44c11.17,11.17,26.32,17.44,42.12,17.44h398.01c15.8,0,30.95-6.28,42.12-17.44l281.44-281.44c11.17-11.17,17.44-26.32,17.44-42.12v-398.01c0-15.8-6.28-30.95-17.44-42.12L781.12,17.44c-11.17-11.17-26.32-17.44-42.12-17.44Z"/></svg>
-          <svg class="gcard__ico" viewBox="0 0 48 48" focusable="false">
-            <circle cx="18" cy="24" r="10.5"/>
-            <circle cx="30" cy="24" r="10.5"/>
-          </svg>
-        </div>
-        <div class="gcard__body">
-          <h3>A quem constrói o campo com a gente: obrigado.</h3>
-          <p>Em 45 anos de história, cada fornecedor e parceiro teve papel na jornada da Nossa Lavoura. É essa rede de confiança que nos permite levar as melhores soluções ao produtor.</p>
-        </div>
+        <h3>A quem constrói o campo com a gente: obrigado.</h3>
+        <p>Em 45 anos de história, cada fornecedor e parceiro teve papel na jornada da Nossa Lavoura. É essa rede de confiança que nos permite levar as melhores soluções ao produtor.</p>
       </article>
     </div>
 
@@ -279,12 +269,15 @@
   </div>
 </section>
 
-<!-- ============ 08 · SEMANA DE ANIVERSÁRIO (virada de cor) ============ -->
-<section class="semana" id="semana">
+<!-- ============ 08 · SEMANA DE ANIVERSÁRIO ============ -->
+<section class="band band--accent semana" id="semana">
+  <svg class="oct oct--tl" viewBox="0 0 100 100" width="300" height="300" aria-hidden="true" style="opacity:.3">
+    <use href="#oct-line" fill="none" stroke="var(--terra-700)" stroke-width="2" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+  </svg>
   <div class="wrap semana__in">
-    <p class="eyebrow eyebrow--marrom" data-reveal>19 a 24 de outubro</p>
+    <p class="eyebrow eyebrow--center eyebrow--on-accent" data-reveal>19 a 24 de outubro</p>
     <h2 class="semana__h2" data-reveal>45 anos com ofertas especiais para quem faz o campo acontecer.</h2>
-    <p class="semana__lead" data-reveal>Para comemorar essa história, preparamos uma semana inteira de oportunidades para você economizar e produzir mais. São condições especiais em produtos para nutrição animal, pastagem, saúde do rebanho, sementes, máquinas, equipamentos e muito mais.</p>
+    <p class="lead lead--center lead--on-accent semana__lead" data-reveal>Para comemorar essa história, preparamos uma semana inteira de oportunidades para você economizar e produzir mais. São condições especiais em produtos para nutrição animal, pastagem, saúde do rebanho, sementes, máquinas, equipamentos e muito mais.</p>
 
     <div class="semana__box" data-reveal>
       <strong>De 19 a 24 de outubro, em toda a loja.</strong>
@@ -296,58 +289,52 @@
       </div>
     </div>
 
-    <a class="btn btn--marrom btn--lg" href="#lojas" data-reveal>
-      Falar com um Consultor de Vendas
-      <svg viewBox="0 0 492 409" aria-hidden="true" class="btn__arrow"><path d="M484.14,185.54L306.46,7.86c-5.07-5.07-11.83-7.86-19.04-7.86s-13.97,2.79-19.04,7.86l-16.13,16.14c-5.07,5.06-7.86,11.83-7.86,19.04s2.79,14.2,7.86,19.26l103.66,103.88H26.58c-14.85,0-26.58,11.62-26.58,26.48v22.81c0,14.85,11.73,27.65,26.58,27.65h330.5l-104.83,104.46c-5.07,5.07-7.86,11.65-7.86,18.86s2.79,13.88,7.86,18.95l16.13,16.08c5.07,5.07,11.83,7.84,19.04,7.84s13.97-2.8,19.04-7.87l177.68-177.68c5.08-5.09,7.87-11.88,7.86-19.11,0-7.24-2.79-14.05-7.86-19.11Z" fill="currentColor"/></svg>
+    <a class="btn btn--lg btn--secondary" href="#lojas" data-reveal>
+      Falar com um consultor
+      <svg class="btn__seta" aria-hidden="true"><use href="#pict-seta"/></svg>
     </a>
   </div>
 </section>
 
 <!-- ============ 09 · OFERTAS POR CATEGORIA ============ -->
-<section class="cats" id="ofertas">
+<section class="band band--page cats" id="ofertas">
   <div class="wrap">
-    <p class="eyebrow" data-reveal>Ofertas por categoria</p>
+    <p class="eyebrow eyebrow--center" data-reveal>Ofertas por categoria</p>
     <h2 class="h2 h2--center" data-reveal>O que tem de especial nesta semana</h2>
     <p class="lead lead--center" data-reveal>As condições de aniversário valem para as categorias que mais pesam na sua produção. Fale com o Consultor de Vendas da loja mais próxima e aproveite as melhores ofertas.</p>
 
     <div class="cats__grid">
       <article class="cat" data-reveal>
-        <span class="cat__ico"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 8h20l4 9v20a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V17l4-9Z"/><path d="M10 17h28"/><path d="M20 26h8"/></svg></span>
         <p class="cat__k">Nutrição animal</p>
         <h3 class="cat__t">Nutrição que leva o seu rebanho mais longe.</h3>
         <p class="cat__d">Soluções Supremax para cada fase do rebanho, com nutrição pensada para mais desempenho no campo.</p>
       </article>
 
       <article class="cat" data-reveal>
-        <span class="cat__ico"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 41S9 32 9 21a9 9 0 0 1 15-6.7A9 9 0 0 1 39 21c0 11-15 20-15 20Z"/><path d="M17 24h5l2-4 3 8 2-4h4"/></svg></span>
         <p class="cat__k">Saúde animal</p>
         <h3 class="cat__t">Cuidado com o rebanho também é produtividade.</h3>
         <p class="cat__d">Soluções para prevenção, proteção e manejo sanitário que ajudam a manter a saúde e o desempenho do seu rebanho.</p>
       </article>
 
       <article class="cat" data-reveal>
-        <span class="cat__ico"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 42V22"/><path d="M24 26c0-8 5-14 13-16 0 9-5 14-13 16Z"/><path d="M24 32c0-7-4-12-11-13 0 8 4 12 11 13Z"/><path d="M10 42h28"/></svg></span>
         <p class="cat__k">Pastagem e herbicidas</p>
         <h3 class="cat__t">Proteção para uma pastagem mais produtiva.</h3>
         <p class="cat__d">Tecnologia e inovação para proteger a sua pastagem com a linha exclusiva de herbicidas Corteva.</p>
       </article>
 
       <article class="cat" data-reveal>
-        <span class="cat__ico"><svg viewBox="0 0 48 48" aria-hidden="true"><ellipse cx="24" cy="18" rx="8" ry="11"/><path d="M24 29v13"/><path d="M13 38c4-6 8-8 11-8"/><path d="M35 38c-4-6-8-8-11-8"/></svg></span>
         <p class="cat__k">Sementes de pastagem</p>
         <h3 class="cat__t">Um pasto forte começa com uma boa escolha.</h3>
         <p class="cat__d">Sementes de qualidade para formar pastagens produtivas e preparar a propriedade para produzir mais.</p>
       </article>
 
       <article class="cat" data-reveal>
-        <span class="cat__ico"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 8v32M36 8v32"/><path d="M6 17h36M6 27h36"/><path d="M24 12v24"/></svg></span>
         <p class="cat__k">Arames e cercas</p>
         <h3 class="cat__t">Resistência para proteger o que você produz.</h3>
         <p class="cat__d">Soluções para cercamento que entregam segurança, resistência e praticidade para a rotina da propriedade.</p>
       </article>
 
       <article class="cat" data-reveal>
-        <span class="cat__ico"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="14" cy="33" r="7"/><circle cx="35" cy="35" r="5"/><path d="M14 26V14h10l5 9h6v12"/><path d="M9 14h10"/></svg></span>
         <p class="cat__k">Máquinas e implementos</p>
         <h3 class="cat__t">Força para fazer o campo acontecer.</h3>
         <p class="cat__d">Máquinas e equipamentos para facilitar o trabalho e aumentar a eficiência nas atividades da propriedade.</p>
@@ -359,55 +346,56 @@
 </section>
 
 <!-- ============ 10 · ACELERA NO CAMPO 3.0 ============ -->
-<section class="acel" id="acelera">
+<section class="band band--terra acel" id="acelera">
+  <svg class="oct oct--br" viewBox="0 0 100 100" width="340" height="340" aria-hidden="true" style="opacity:.14">
+    <use href="#oct-solid" fill="var(--lima-500)"/>
+  </svg>
   <div class="wrap acel__grid">
     <div class="acel__txt">
-      <p class="eyebrow eyebrow--lima" data-reveal>Acelera no Campo 3.0</p>
+      <p class="eyebrow eyebrow--on-inverse" data-reveal>Acelera no Campo 3.0</p>
       <h2 class="acel__h2" data-reveal>Nas compras do aniversário, você também pode acelerar rumo a um John Deere!</h2>
-      <p class="lead lead--light" data-reveal>Comprando produtos Virbac e Supremax na Nossa Lavoura, você recebe cupons para concorrer a um Trator John Deere 5080E.</p>
+      <p class="lead lead--on-inverse" data-reveal>Comprando produtos Virbac e Supremax na Nossa Lavoura, você recebe cupons para concorrer a um Trator John Deere 5080E.</p>
 
       <div class="acel__mec">
         <div class="mec" data-reveal>
           <b class="mec__v">R$ 500</b>
           <span class="mec__l">em produtos Virbac</span>
-          <span class="mec__eq" aria-hidden="true">=</span>
           <b class="mec__c">1 cupom</b>
         </div>
         <div class="mec" data-reveal>
           <b class="mec__v">R$ 2.000</b>
           <span class="mec__l">em produtos Supremax</span>
-          <span class="mec__eq" aria-hidden="true">=</span>
           <b class="mec__c">1 cupom</b>
         </div>
       </div>
 
       <p class="acel__vig" data-reveal>Promoção válida até 30 de novembro de 2026.</p>
-      <a class="btn btn--lima" href="https://nossalavoura.com.br" target="_blank" rel="noopener" data-reveal>Ler o regulamento completo</a>
+      <a class="btn btn--primary" href="https://nossalavoura.com.br" target="_blank" rel="noopener" data-reveal>
+        Ler o regulamento
+        <svg class="btn__seta" aria-hidden="true"><use href="#pict-seta"/></svg>
+      </a>
     </div>
 
-    <div class="acel__art" data-reveal aria-hidden="true">
-      <svg class="acel__oct" viewBox="0 0 1080 1080" focusable="false"><path d="M739,0h-398.01c-15.8,0-30.95,6.28-42.12,17.44L17.44,298.88c-11.17,11.17-17.44,26.32-17.44,42.12v398.01c0,15.8,6.28,30.95,17.44,42.12l281.44,281.44c11.17,11.17,26.32,17.44,42.12,17.44h398.01c15.8,0,30.95-6.28,42.12-17.44l281.44-281.44c11.17-11.17,17.44-26.32,17.44-42.12v-398.01c0-15.8-6.28-30.95-17.44-42.12L781.12,17.44c-11.17-11.17-26.32-17.44-42.12-17.44Z"/></svg>
-      <svg class="acel__tractor" viewBox="0 0 48 48" focusable="false"><circle cx="14" cy="33" r="7"/><circle cx="35" cy="35" r="5"/><path d="M14 26V14h10l5 9h6v12"/><path d="M9 14h10"/></svg>
-    </div>
   </div>
 </section>
 
 <!-- ============ 11 · CAFÉ DA MANHÃ ============ -->
-<section class="cafe" id="cafe">
+<section class="band band--alt cafe" id="cafe">
+  <svg class="oct oct--tr" viewBox="0 0 100 100" width="280" height="280" aria-hidden="true" style="opacity:.22">
+    <use href="#oct-line" fill="none" stroke="var(--terra-700)" stroke-width="2" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+  </svg>
   <div class="wrap cafe__in">
-    <p class="eyebrow" data-reveal>Convite</p>
+    <p class="eyebrow eyebrow--center" data-reveal>Convite</p>
     <h2 class="h2 h2--center" data-reveal>Café da manhã especial 45 anos</h2>
     <p class="cafe__call" data-reveal>Há 45 anos, crescemos ao lado de quem faz o agro acontecer.</p>
     <p class="lead lead--center" data-reveal>Para celebrar essa trajetória construída com confiança, parceria e dedicação, preparamos um café da manhã especial para receber você.</p>
 
     <div class="cafe__cards">
       <div class="icard" data-reveal>
-        <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="11" width="34" height="30" rx="4"/><path d="M7 19h34M16 6v9M32 6v9"/></svg>
         <p class="icard__k">Quando</p>
         <p class="icard__v">Dias 19, 21 e 23 de outubro</p>
       </div>
       <div class="icard" data-reveal>
-        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 43s14-12.6 14-23a14 14 0 1 0-28 0c0 10.4 14 23 14 23Z"/><circle cx="24" cy="20" r="5"/></svg>
         <p class="icard__k">Onde</p>
         <p class="icard__v">Em todas as lojas Nossa Lavoura</p>
       </div>
@@ -418,9 +406,9 @@
 </section>
 
 <!-- ============ 12 · ONDE NOS ENCONTRAR ============ -->
-<section class="lojas" id="lojas">
+<section class="band band--page lojas" id="lojas">
   <div class="wrap lojas__in">
-    <p class="eyebrow" data-reveal>Onde nos encontrar</p>
+    <p class="eyebrow eyebrow--center" data-reveal>Onde nos encontrar</p>
     <h2 class="h2 h2--center" data-reveal>Perto de você, em três estados</h2>
     <p class="lead lead--center" data-reveal>São mais de 40 lojas em Rondônia, Acre e Amazonas, com Consultores de Vendas que conhecem a realidade da sua região e da sua propriedade.</p>
 
@@ -430,16 +418,19 @@
       <div class="uf" data-reveal><b>AM</b><span>Amazonas</span></div>
     </div>
 
-    <a class="btn btn--marrom btn--lg" href="https://nossalavoura.com.br" target="_blank" rel="noopener" data-reveal>Encontrar a loja mais próxima</a>
+    <a class="btn btn--lg btn--outline" href="https://nossalavoura.com.br" target="_blank" rel="noopener" data-reveal>
+      Encontrar a loja mais próxima
+      <svg class="btn__seta" aria-hidden="true"><use href="#pict-seta"/></svg>
+    </a>
   </div>
 </section>
 
-<!-- ============ 13 · FECHAMENTO (selo 3D com scroll) ============ -->
+<!-- ============ 13 · FECHAMENTO ============ -->
 <section class="fim" id="fim">
   <div class="fim__stage">
     <div class="fim__sticky">
-      <svg class="fim__oct" viewBox="0 0 1080 1080" aria-hidden="true" focusable="false">
-        <path d="M739,6c14.31,0,27.76,5.57,37.87,15.69l281.44,281.44c10.12,10.12,15.69,23.57,15.69,37.87v398.01c0,14.31-5.57,27.76-15.69,37.87l-281.44,281.44c-10.12,10.12-23.57,15.69-37.87,15.69h-398.01c-14.31,0-27.76-5.57-37.87-15.69L21.69,776.88c-10.12-10.12-15.69-23.57-15.69-37.87v-398.01c0-14.31,5.57-27.76,15.69-37.87L303.13,21.69c10.12-10.12,23.57-15.69,37.87-15.69h398.01" fill="none" stroke="currentColor" stroke-width="4"/>
+      <svg class="oct oct--bl" viewBox="0 0 100 100" width="320" height="320" aria-hidden="true" style="opacity:.2">
+        <use href="#oct-line" fill="none" stroke="var(--lima-500)" stroke-width="2" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
       </svg>
 
       <!-- Fica oculto até a sequência estar pronta. Com prefers-reduced-motion
@@ -450,7 +441,7 @@
   </div>
 
   <div class="wrap fim__copy">
-    <div class="prose prose--center">
+    <div class="prose prose--center prose--on-inverse">
       <p data-reveal>Foram 45 anos de porta aberta, de safra que deu certo e de safra que deu trabalho, de conversa no balcão e de visita na propriedade.</p>
       <p data-reveal>Obrigado por caminhar com a gente até aqui. O próximo capítulo a gente escreve junto.</p>
     </div>
@@ -460,7 +451,10 @@
       <span class="lockup__b">amiga de quem planta, cria e produz</span>
     </p>
 
-    <a class="btn btn--lima btn--lg" href="#semana" data-reveal>Aproveitar a semana de aniversário</a>
+    <a class="btn btn--lg btn--primary" href="#semana" data-reveal>
+      Aproveitar a semana
+      <svg class="btn__seta" aria-hidden="true"><use href="#pict-seta"/></svg>
+    </a>
   </div>
 </section>
 
@@ -470,7 +464,7 @@
 <footer class="ft">
   <div class="wrap ft__in">
     <div class="ft__brand">
-      <img src="assets/img/selo-600.webp" alt="Selo 45 anos Nossa Lavoura" width="88" height="73" loading="lazy" decoding="async">
+      <img src="assets/img/selo-600.webp" alt="Selo 45 anos Nossa Lavoura" width="80" height="67" loading="lazy" decoding="async">
       <p class="ft__sig"><b>Nossa Lavoura,</b><br>amiga de quem planta, cria e produz</p>
     </div>
 

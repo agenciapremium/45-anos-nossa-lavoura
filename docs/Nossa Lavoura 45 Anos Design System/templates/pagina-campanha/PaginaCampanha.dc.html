@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Página de campanha" description="Landing de campanha Nossa Lavoura: herói com selo, faixa de números, grade de ofertas e CTA." -->
+<helmet><script src="./ds-base.js"></script><style>body{margin:0;background:#fffadc;font-family:"Hanken Grotesk",system-ui,sans-serif}</style></helmet>
+<div style="min-height:100vh;background:#fffadc;color:#3d201b">
+<header style="background:#3d201b;color:#fffadc;display:flex;align-items:center;justify-content:space-between;gap:32px;padding:0 clamp(20px,5vw,64px);height:76px">
+<span style="font-family:'Parkinsans',sans-serif;font-weight:700;font-size:20px;line-height:1;letter-spacing:-0.01em">NOSSA<br><span style="color:#b8db3d">LAVOURA</span></span>
+<span style="font-weight:700;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#b8db3d">45 anos · 1980 — 2026</span>
+</header>
+<section style="position:relative;overflow:hidden;background:#b8db3d;padding:64px clamp(20px,5vw,64px)">
+<svg viewBox="0 0 100 100" width="280" height="280" aria-hidden="true" style="position:absolute;left:0;top:0;transform:rotate(90deg);opacity:0.4"><path d="M0,42 Q0,39 3,39 L39,39 Q42,39 44.1,41.1 L98,95 Q100,97 100,100" fill="none" stroke="#3d201b" stroke-width="2" stroke-linecap="round" vector-effect="non-scaling-stroke"></path></svg>
+<svg viewBox="0 0 100 100" width="240" height="240" aria-hidden="true" style="position:absolute;right:0;bottom:0;transform:rotate(270deg);opacity:1"><path d="M0,100 L0,42 Q0,39 3,39 L39,39 Q42,39 44.1,41.1 L98,95 Q100,97 100,100 Z" fill="#94b32a"></path></svg>
+<div style="position:relative;max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1fr 0.8fr;gap:48px;align-items:center">
+<div style="display:flex;flex-direction:column;gap:20px;align-items:flex-start">
+<span style="background:#3d201b;color:#fffadc;padding:5px 12px;font-weight:700;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;border-radius:10px">Campanha de aniversário</span>
+<h1 style="font-family:'Parkinsans',sans-serif;font-weight:700;font-size:clamp(2.5rem,4.4vw,3.75rem);line-height:1.02;letter-spacing:-0.03em;color:#2a1512;max-width:20ch;margin:0">45 ofertas para comemorar 45 anos</h1>
+<p style="font-size:1.1875rem;font-weight:300;line-height:1.5;color:#3d201b;max-width:44ch;margin:0">Condições especiais em nutrição, sal mineral e sementes durante todo o mês — com frete cortesia acima de 1 tonelada.</p>
+<x-import component-from-global-scope="NossaLavoura45AnosDesignSystem_30d0cd.Button" variant="secondary" size="lg" icon="seta" hint-size="240px,58px">Quero as condições</x-import>
+</div>
+<div style="display:flex;justify-content:center"><img src="../../assets/selo-45-anos.png" alt="Selo 45 anos Nossa Lavoura" style="width:100%;max-width:360px;display:block"></div>
+</div>
+</section>
+<section style="background:#3d201b;padding:32px clamp(20px,5vw,64px)">
+<div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:32px">
+<div><div style="font-family:'Parkinsans',sans-serif;font-weight:700;font-size:46px;line-height:1;letter-spacing:-0.02em;color:#fffadc">45</div><div style="font-weight:700;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#b8db3d">anos de estrada</div></div>
+<div><div style="font-family:'Parkinsans',sans-serif;font-weight:700;font-size:46px;line-height:1;letter-spacing:-0.02em;color:#fffadc">6</div><div style="font-weight:700;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#b8db3d">unidades</div></div>
+<div><div style="font-family:'Parkinsans',sans-serif;font-weight:700;font-size:46px;line-height:1;letter-spacing:-0.02em;color:#fffadc">+3.200</div><div style="font-weight:700;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#b8db3d">produtores</div></div>
+<div><div style="font-family:'Parkinsans',sans-serif;font-weight:700;font-size:46px;line-height:1;letter-spacing:-0.02em;color:#fffadc">24h</div><div style="font-weight:700;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#b8db3d">para entrega</div></div>
+</div>
+</section>
+<section style="padding:96px clamp(20px,5vw,64px)">
+<div style="max-width:1400px;margin:0 auto;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;max-width:58ch;margin:0 auto">
+<span style="font-weight:700;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#7d9a1f">Ofertas do mês</span>
+<h2 style="font-family:'Parkinsans',sans-serif;font-weight:700;font-size:clamp(2.5rem,4.4vw,3.75rem);line-height:1.05;letter-spacing:-0.02em;color:#2a1512;margin:0">O que está em condição especial</h2>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+<x-import component-from-global-scope="NossaLavoura45AnosDesignSystem_30d0cd.Card" icon="saco" eyebrow="45 anos" title="Proteinado Cria 30" badge="-12%" description="Válido para pedidos fechados neste mês." hint-size="100%,300px"></x-import>
+<x-import component-from-global-scope="NossaLavoura45AnosDesignSystem_30d0cd.Card" icon="boi" eyebrow="45 anos" title="Mineral Seca 90" badge="-15%" tone="terra" cut="diagonalAlt" description="Válido para pedidos fechados neste mês." hint-size="100%,300px"></x-import>
+<x-import component-from-global-scope="NossaLavoura45AnosDesignSystem_30d0cd.Card" icon="grama" eyebrow="45 anos" title="Braquiária Brizantha" badge="-10%" description="Válido para pedidos fechados neste mês." hint-size="100%,300px"></x-import>
+<x-import component-from-global-scope="NossaLavoura45AnosDesignSystem_30d0cd.Card" icon="boi" eyebrow="45 anos" title="Núcleo Leite Plus" badge="-8%" cut="diagonalAlt" description="Válido para pedidos fechados neste mês." hint-size="100%,300px"></x-import>
+</div>
+</div>
+</section>
+<section style="padding:0 clamp(20px,5vw,64px) 96px">
+<div style="position:relative;overflow:hidden;max-width:1400px;margin:0 auto;background:#3d201b;padding:64px;border-radius:32px;display:flex;align-items:center;justify-content:space-between;gap:48px;flex-wrap:wrap">
+<svg viewBox="0 0 100 100" width="280" height="280" aria-hidden="true" style="position:absolute;right:0;top:0;transform:rotate(180deg);opacity:0.5"><path d="M0,42 Q0,39 3,39 L39,39 Q42,39 44.1,41.1 L98,95 Q100,97 100,100" fill="none" stroke="#b8db3d" stroke-width="2" stroke-linecap="round" vector-effect="non-scaling-stroke"></path></svg>
+<div style="position:relative;display:flex;flex-direction:column;gap:12px;max-width:40ch">
+<span style="font-weight:700;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#b8db3d">Consultoria na porteira</span>
+<h2 style="font-family:'Parkinsans',sans-serif;font-weight:700;font-size:2.5rem;line-height:1.05;letter-spacing:-0.02em;color:#fffadc;margin:0">Um técnico na sua fazenda, sem custo</h2>
+<p style="color:#cfc3a0;margin:0">Agende uma visita e receba um plano nutricional para a próxima safra.</p>
+</div>
+<x-import component-from-global-scope="NossaLavoura45AnosDesignSystem_30d0cd.Button" variant="primary" size="lg" icon="seta" hint-size="220px,58px">Agendar visita</x-import>
+</div>
+</section>
+</div>
+
+</x-dc>
+</body>
+</html>

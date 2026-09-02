@@ -1,0 +1,40 @@
+<!-- @dsCard group="Site 45 Anos" viewport="1280x760" name="Site institucional — campanha 45 anos" subtitle="Home, catálogo e landing de aniversário, clicáveis" -->
+<!DOCTYPE html><html lang="pt-BR" data-nl-assets="../../assets/icons"><head><meta charset="utf-8"><title>Nossa Lavoura · 45 anos</title>
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{background:var(--surface-page)}</style>
+</head><body><div id="root"></div>
+<script type="text/babel" src="SiteChrome.jsx"></script>
+<script type="text/babel" src="HomeScreen.jsx"></script>
+<script type="text/babel" src="CatalogoScreen.jsx"></script>
+<script type="text/babel" src="CampanhaScreen.jsx"></script>
+<script type="text/babel">
+const { Dialog, Button, Input, Select, Toast } = window.NossaLavoura45AnosDesignSystem_30d0cd;
+function App(){
+  const [route,setRoute]=React.useState('home');
+  const [lead,setLead]=React.useState(false);
+  const [sent,setSent]=React.useState(false);
+  const go=(r)=>{setRoute(r);window.scrollTo({top:0});};
+  return <>
+    <SiteHeader route={route} onRoute={go} onLead={()=>setLead(true)}/>
+    {route==='home' && <HomeScreen onRoute={go} onLead={()=>setLead(true)}/>}
+    {route==='catalogo' && <CatalogoScreen onLead={()=>setLead(true)}/>}
+    {route==='campanha' && <CampanhaScreen onLead={()=>setLead(true)}/>}
+    <SiteFooter/>
+    <Dialog open={lead} title="Falar com um consultor" description="Atendemos toda a região Norte." onClose={()=>{setLead(false);setSent(false);}}
+      footer={sent?null:<><Button variant="ghost" size="sm" onClick={()=>setLead(false)}>Cancelar</Button><Button variant="primary" size="sm" onClick={()=>setSent(true)}>Enviar</Button></>}>
+      {sent
+        ? <Toast title="Contato enviado" message="Ligamos em até 1 dia útil."/>
+        : <div style={{display:'flex',flexDirection:'column',gap:'var(--space-4)'}}>
+            <Input label="Nome" placeholder="Seu nome"/>
+            <Input label="WhatsApp" placeholder="(69) 90000-0000"/>
+            <Select label="Município" placeholder="Selecione" options={['Ji-Paraná','Cacoal','Vilhena','Rolim de Moura']}/>
+          </div>}
+    </Dialog>
+  </>;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script></body></html>

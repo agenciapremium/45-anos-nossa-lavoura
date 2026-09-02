@@ -7,3 +7,8 @@ build/
 # Mídia original pesada (o .mov tem 137 MB e estoura o limite do GitHub).
 # Os derivados otimizados já estão versionados em assets/.
 docs/ASSETS/
+
+# Design system: versionamos o código (tokens, componentes, guidelines),
+# não os binários — o KV e o selo já estão otimizados em assets/.
+docs/Nossa Lavoura 45 Anos Design System/assets/
+docs/Nossa Lavoura 45 Anos Design System/uploads/

@@ -1,0 +1,10 @@
+:root{
+/* Flat-first brand: elevation is offset slabs of colour, not blur. */
+--shadow-none:none;
+--shadow-slab-sm:4px 4px 0 0 var(--terra-700);
+--shadow-slab-md:8px 8px 0 0 var(--terra-700);
+--shadow-slab-accent:8px 8px 0 0 var(--lima-500);
+--shadow-soft:0 2px 8px color-mix(in srgb,var(--terra-900) 10%,transparent);
+--shadow-lifted:0 18px 44px color-mix(in srgb,var(--terra-900) 22%,transparent);
+--overlay-protection:linear-gradient(180deg,color-mix(in srgb,var(--terra-900) 76%,transparent) 0%,color-mix(in srgb,var(--terra-900) 30%,transparent) 55%,transparent 100%);
+}

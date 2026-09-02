@@ -10,14 +10,6 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------------------------------------------------------
-     Nav: fundo sólido depois de sair do topo
-     --------------------------------------------------------- */
-  const nav = $('#nav');
-  const onScrollNav = () => nav.classList.toggle('is-stuck', scrollY > 40);
-  addEventListener('scroll', onScrollNav, { passive: true });
-  onScrollNav();
-
-  /* ---------------------------------------------------------
      Reveal on scroll, com escalonamento por grupo
      --------------------------------------------------------- */
   const revealables = $$('[data-reveal]');
@@ -27,7 +19,7 @@
     const io = new IntersectionObserver((entries, obs) => {
       const shown = entries.filter(e => e.isIntersecting);
       shown.forEach((e, i) => {
-        e.target.style.setProperty('--d', `${Math.min(i, 5) * 80}ms`);
+        e.target.style.setProperty('--d', `${Math.min(i, 5) * 60}ms`);
         e.target.classList.add('is-in');
         obs.unobserve(e.target);
       });
@@ -63,25 +55,6 @@
     counters.forEach(el => cio.observe(el));
   } else {
     counters.forEach(runCount);
-  }
-
-  /* ---------------------------------------------------------
-     Selo do hero: leve inclinação 3D com o ponteiro
-     --------------------------------------------------------- */
-  const tilt = $('[data-tilt]');
-  if (tilt && !reduced && matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    const img = tilt.querySelector('img');
-    tilt.addEventListener('pointermove', e => {
-      const r = tilt.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width - 0.5;
-      const y = (e.clientY - r.top) / r.height - 0.5;
-      img.style.setProperty('--ry', `${x * 16}deg`);
-      img.style.setProperty('--rx', `${-y * 14}deg`);
-    });
-    tilt.addEventListener('pointerleave', () => {
-      img.style.setProperty('--ry', '0deg');
-      img.style.setProperty('--rx', '0deg');
-    });
   }
 
   /* ---------------------------------------------------------

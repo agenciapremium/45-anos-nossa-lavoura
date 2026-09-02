@@ -1,0 +1,12 @@
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--surface-page);color:var(--text-body);font-family:var(--font-body);font-weight:var(--weight-regular);font-size:var(--text-body-md);line-height:var(--leading-normal);text-wrap:pretty;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:var(--weight-bold);color:var(--text-strong);line-height:var(--leading-snug);letter-spacing:var(--tracking-display);margin:0}
+h1{font-size:var(--text-h1)}h2{font-size:var(--text-h2)}h3{font-size:var(--text-h3)}
+p{margin:0}
+a{color:var(--text-link);text-decoration-thickness:2px;text-underline-offset:3px;transition:color var(--dur-fast) var(--ease-standard)}
+a:hover{color:var(--text-link-hover)}
+:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
+::selection{background:var(--lima-500);color:var(--terra-900)}
+.nl-eyebrow{font-family:var(--font-body);font-weight:var(--weight-bold);font-size:var(--text-label);letter-spacing:var(--tracking-eyebrow);text-transform:uppercase}
+.nl-hero{font-family:var(--font-display);font-weight:var(--weight-bold);font-size:var(--text-hero);line-height:var(--leading-tight);letter-spacing:var(--tracking-hero)}

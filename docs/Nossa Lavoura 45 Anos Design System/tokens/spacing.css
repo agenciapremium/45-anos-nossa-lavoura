@@ -1,0 +1,21 @@
+:root{
+--space-0:0;
+--space-1:4px;
+--space-2:8px;
+--space-3:12px;
+--space-4:16px;
+--space-5:24px;
+--space-6:32px;
+--space-7:48px;
+--space-8:64px;
+--space-9:96px;
+--space-10:128px;
+
+--gutter-page:clamp(20px,5vw,64px); /* @kind spacing */
+--content-max:1200px;
+--measure-prose:62ch;
+--section-y:var(--space-9);
+--stack-tight:var(--space-2);
+--stack-default:var(--space-4);
+--stack-loose:var(--space-6);
+}

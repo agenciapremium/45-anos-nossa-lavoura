@@ -1,0 +1,22 @@
+:root{
+--radius-xs:6px;
+--radius-sm:10px;
+--radius-md:16px;
+--radius-lg:24px;
+--radius-xl:40px;
+--radius-pill:999px;
+--radius-none:0;
+--radius-control:12px;   /* buttons, fields, chips */
+--radius-card:20px;      /* cards, panels */
+--radius-surface:32px;   /* dialogs, hero blocks */
+
+--border-width-hair:1px;
+--border-width-thick:2px;
+--border-width-slab:4px;
+
+/* Octagon: background element only, showing exactly two faces
+   (one straight edge + one 45° edge). Never a container shape. */
+--octagon-cut:38%; /* @kind spacing */
+}
+/* Solid corner fragment, anchored bottom-left of its container */
+.nl-octagon-corner{clip-path:polygon(0 100%,0 var(--octagon-cut),calc(100% - var(--octagon-cut)) var(--octagon-cut),100% 100%)}

@@ -29,7 +29,8 @@ e os headers de segurança.
 
 ```
 index.html          # a página inteira, seção por seção, comentada
-styles.css          # tokens de marca + estilos, na ordem das seções
+tokens.css          # tokens do design system, cópia literal — não editar
+styles.css          # estilos da página, só consomem os tokens acima
 main.js             # nav, reveal, contadores, contagem regressiva, player e scroll-scrub
 assets/
   selo/d/           # 105 frames WebP com alpha, 960px  (desktop)
@@ -41,16 +42,66 @@ assets/
 docs/               # copy da campanha e mídia original (não versionada)
 ```
 
-## Marca
+## Design system
 
-| Token | Valor | Uso |
-|---|---|---|
-| `--marrom` | `#3D201B` | faixas escuras, tipografia sobre bege |
-| `--lima` | `#B8DB3D` | destaque, seção comercial, CTAs |
-| `--bege` | `#F4ECDD` | fundo padrão |
-| `--creme` | `#FDF9F1` | cards sobre bege, texto sobre marrom |
+A página consome o **Nossa Lavoura 45 Anos Design System** (em `docs/Nossa Lavoura 45 Anos Design System/`).
 
-Display: **Parkinsans**. Texto: **Hanken Grotesk**. Ambas self-hosted em WOFF2.
+`tokens.css` é a cópia literal de `tokens/*.css` do sistema, concatenada em um arquivo só.
+A única adaptação é o `@font-face`, que aponta para os WOFF2 em `assets/fonts/` em vez dos
+TTF originais. **Não editar `tokens.css` à mão** — reimportar quando o sistema mudar.
+
+`styles.css` só consome esses tokens. Sem hex cru, sem px onde existe token, sem família
+tipográfica de fora.
+
+| | |
+|---|---|
+| Paleta | terra `#3d201b`, lima `#b8db3d`, creme `#fffadc` — as três exatas, mais as rampas |
+| Display | Parkinsans, pesos 300 e 700 apenas |
+| Texto | Hanken Grotesk, pesos 300, 400 e 700 apenas |
+| Botões | Hanken Bold em caixa alta, `--radius-control`, recuo de 1px no press |
+| Octógono | fragmento de canto, duas faces, só como fundo — nunca container |
+| Elevação | lajes de cor sólida; blur só no selo |
+| Motion | `--dur-*` e `--ease-*`; fade com translate de 8px |
+
+### O que mudou na revalidação
+
+O primeiro corte foi feito sem acesso ao sistema, derivando tokens dos SVGs da marca.
+Vários pontos estavam fora. Corrigidos:
+
+- **Creme era `#F4ECDD`**, um bege que inventei. O valor certo é `#fffadc`.
+- **Botões** eram pill em Parkinsans sentence case, com elevação no hover. Agora seguem
+  `components/core/Button.jsx`: Hanken Bold, caixa alta, raio por tamanho, press de 1px.
+- **Ícones**: eu tinha desenhado um set de contorno inteiro. O sistema tem exatamente quatro
+  pictogramas e trata qualquer outro como violação de marca. Removidos; sobrou o `seta`.
+- **Octógonos** apareciam inteiros e, nos selos de UF, como container recortado. Agora são
+  fragmentos de canto de duas faces, e os UF viraram painéis arredondados.
+- **Pesos 500 e 600** de ambas as famílias não existem no sistema. Removidos.
+- **`backdrop-filter`** no header e no botão fantasma: o sistema proíbe blur de fundo.
+- **Recortes diagonais** entre seções: o sistema encosta as bandas, a borda é o divisor.
+- **Header** era fixo, transparente e 68px. Agora é sticky, terra, 76px.
+- **Proteção de texto sobre foto** era um véu bege. Agora é o gradiente lateral de 96° em terra.
+- **Manchetes de categoria** estavam em caixa alta. O sistema não admite manchete em caixa alta.
+- **Durações e curvas** de animação agora vêm de `tokens/motion.css`.
+
+### Desvios deliberados, que valem seu aval
+
+1. **O scrub do selo pelo scroll.** O sistema diz "no parallax, no scroll-jacking". Mantive
+   porque foi um pedido explícito seu, e porque a página rola normalmente — o scroll não é
+   sequestrado, só alimenta qual quadro aparece. Se preferir aderência total, é trocar a
+   seção de fechamento pelo selo estático: o código já faz isso sozinho em
+   `prefers-reduced-motion`.
+2. **Três cores de fundo.** O sistema pede no máximo duas por página. Uso creme + terra + lima,
+   e a lima só na faixa da semana de aniversário — a exceção que o próprio sistema abre para
+   "a faixa de campanha e o hero de campanha".
+3. **Cards sem pictograma.** São quatro pictogramas para seis categorias. Repetir boi e saco
+   para preencher a grade ficaria pior do que tipografia limpa. Se a marca liberar novos
+   pictogramas, os cards já têm lugar para eles.
+4. **Manchete de categoria em sentence case**, contrariando a copy, que as escreveu em caixa
+   alta. Casing é decisão de renderização e o sistema é explícito: "never uppercase a whole
+   headline — the display face is wide and it stops reading".
+5. **Sem logotipo vetorial.** O sistema registra essa lacuna. A marca no header e no rodapé é
+   tipo Parkinsans Bold, como ele determina, mais o PNG do selo. Vale pedir o vetor à marca
+   antes de publicar.
 
 ---
 
@@ -109,10 +160,10 @@ Estes pontos vêm dos `[APURAR]` da copy e das decisões que tomei na ausência 
 - **"Encontrar a loja mais próxima"** e **"Ler o regulamento completo"** apontam para
   `nossalavoura.com.br`. Ajustar para as URLs finais.
 - **Fotografia.** Existe uma única foto de rebanho no material. Ela sustenta o hero e o
-  manifesto. Nos três blocos de gratidão usei o octógono da marca com ícone, porque repetir a
-  mesma imagem em três cards denunciaria placeholder — a copy pede "fotografia própria" em cada
-  bloco. Quando as fotos chegarem, é trocar o `<div class="gcard__mark">` por
-  `<div class="gcard__img"><img …></div>`.
+  manifesto. Os três blocos de gratidão são tipográficos, porque repetir a mesma imagem em três
+  cards denunciaria placeholder — a copy pede "fotografia própria" em cada bloco. Quando as
+  fotos chegarem, cada `.gcard` recebe um bloco de imagem de 168px encostado no topo, como
+  define o `Card` do design system.
 - **Nota "imagem meramente ilustrativa"** na seção 11 foi removida: ela se refere a uma
   fotografia de mesa posta que ainda não existe. Volta junto com a foto.
 - **Contagem regressiva** na seção 08: não estava na copy. Entrei com ela porque a data
@@ -134,10 +185,8 @@ Estes pontos vêm dos `[APURAR]` da copy e das decisões que tomei na ausência 
 - Imagens em WebP com `srcset` por viewport; fontes em WOFF2 com `font-display:swap`.
 - O primeiro paint não depende da sequência de frames: carga inicial na casa de 500 KB.
 
-## Nota sobre o projeto do Claude Design
+## Nota sobre o import do Claude Design
 
-O import de `claude.ai/design/p/30d0cd88-02b0-434e-8628-4f48f0fb2bc7` não foi possível:
-a ferramenta exige autorização via `/design-login`, que não roda em sessão não interativa.
-Os tokens desta página foram derivados dos próprios assets da marca (as cores dos SVGs de
-octógono, o selo 3D e as duas famílias tipográficas). Se o design system for importado depois,
-vale conferir `styles.css` contra os tokens de lá.
+O import direto de `claude.ai/design/p/30d0cd88-…` não foi possível: a ferramenta exige
+`/design-login`, que não roda em sessão não interativa. O sistema foi lido da cópia local em
+`docs/Nossa Lavoura 45 Anos Design System/`, que é a mesma coisa para efeito de aderência.

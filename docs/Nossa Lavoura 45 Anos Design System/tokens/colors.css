@@ -1,0 +1,56 @@
+:root{
+/* --- Base palette (brand, exact) --- */
+--terra-900:#2a1512;
+--terra-700:#3d201b;
+--terra-500:#5c342c;
+--terra-300:#8a5b4f;
+--lima-700:#7d9a1f;
+--lima-600:#94b32a;
+--lima-500:#b8db3d;
+--lima-300:#d2e982;
+--lima-100:#e9f4c4;
+--creme-500:#fffadc;
+--creme-600:#f6eec6;
+--creme-700:#e8dcac;
+--branco:#ffffff;
+
+/* --- Semantic: surfaces --- */
+--surface-page:var(--creme-500);
+--surface-page-alt:var(--creme-600);
+--surface-inverse:var(--terra-700);
+--surface-inverse-deep:var(--terra-900);
+--surface-card:var(--branco);
+--surface-card-inverse:var(--terra-500);
+--surface-accent:var(--lima-500);
+--surface-accent-soft:var(--lima-100);
+--surface-field:var(--branco);
+--surface-scrim:color-mix(in srgb,var(--terra-900) 72%,transparent);
+
+/* --- Semantic: text --- */
+--text-body:var(--terra-700);
+--text-strong:var(--terra-900);
+--text-muted:var(--terra-300);
+--text-on-inverse:var(--creme-500);
+--text-on-inverse-muted:color-mix(in srgb,var(--creme-500) 62%,var(--terra-700));
+--text-on-accent:var(--terra-900);
+--text-accent:var(--lima-700);
+--text-link:var(--terra-700);
+--text-link-hover:var(--lima-700);
+
+/* --- Semantic: lines --- */
+--border-hairline:color-mix(in srgb,var(--terra-700) 16%,transparent);
+--border-strong:var(--terra-700);
+--border-accent:var(--lima-500);
+--border-on-inverse:color-mix(in srgb,var(--creme-500) 24%,transparent);
+--focus-ring:var(--lima-500);
+
+/* --- Semantic: status --- */
+--status-success:#4e8c2b;
+--status-success-soft:#e3f0d4;
+--status-warning:#c98a12;
+--status-warning-soft:#fbeecd;
+--status-danger:#a8341f;
+--status-danger-soft:#f7ded8;
+--status-info:var(--terra-500);
+--status-info-soft:var(--creme-600);
+}
