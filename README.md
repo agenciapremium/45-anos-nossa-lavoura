@@ -4,8 +4,8 @@ Landing page única da campanha de aniversário — sem header, sem navegação,
 que vai do afetivo ao comercial conforme a copy estruturada em
 [`docs/45-ANOS-LANDING-PAGE-COPY.md`](docs/45-ANOS-LANDING-PAGE-COPY.md).
 
-O hero ocupa a tela inteira com a fotografia do rebanho. No topo, a marca em tipo à esquerda
-e o selo dos 45 anos ancorado à direita.
+O hero ocupa a tela inteira com a fotografia do rebanho: manchete e chamadas à esquerda,
+selo dos 45 anos à direita, lado a lado. Não há barra de topo nenhuma.
 
 **Stack:** HTML, CSS e JavaScript puros. Sem build, sem dependências. Deploy direto na Vercel.
 
@@ -117,8 +117,9 @@ de existir: não há mais nenhuma animação ligada ao scroll na página.
 
 ## O selo
 
-O selo entra como imagem estática, ancorado à direita no topo do hero
-(`assets/img/selo-600.webp`, com `preload` porque aparece acima da dobra).
+O selo entra como imagem estática, na coluna da direita do hero, ao lado do texto
+(`assets/img/selo-1200.webp`, com `preload` porque aparece acima da dobra). No mobile a
+coluna empilha e o selo abre a seção, acima da manchete.
 
 A sequência animada foi removida. Ela existiu em duas versões — scrub na seção de fechamento
 e depois como fundo fixo da página inteira — e nenhuma das duas convenceu. Os 106 frames
@@ -140,6 +141,8 @@ tarja de campanha e o player do VT — nenhum listener de scroll na página.
 - Linha do tempo vira trilho vertical; grades de cards viram uma coluna.
 - Os três estados ficam em uma linha só, em grade de três colunas.
 - Sem overflow horizontal em 360px e 390px, verificado.
+- Em telas baixas (altura ≤ 720px) o hero comprime — selo menor, manchete no tamanho
+  `--text-display` — para os dois botões caberem na dobra.
 
 ---
 
