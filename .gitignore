@@ -1,0 +1,9 @@
+.DS_Store
+**/.DS_Store
+node_modules/
+build/
+.vercel/
+
+# Mídia original pesada (o .mov tem 137 MB e estoura o limite do GitHub).
+# Os derivados otimizados já estão versionados em assets/.
+docs/ASSETS/
