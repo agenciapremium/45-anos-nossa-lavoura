@@ -35,33 +35,15 @@ img{height:auto}
 .skip:focus{left:0}
 
 /* ---------------------------------------------------------
-   O SELO COMO FUNDO
-   Canvas fixo, atrás de tudo. Só o quadro muda; o elemento
-   nunca se move, então não há parallax.
-   --------------------------------------------------------- */
-.selobg{
-  position:fixed;left:50%;top:50%;translate:-50% -50%;
-  width:min(96vmin,860px);aspect-ratio:640/361;
-  z-index:0;pointer-events:none;
-  opacity:var(--selo-op,.18);
-}
-.selobg__canvas,.selobg__still{width:100%;height:auto}
-.selobg__still{position:absolute;inset:0;margin:auto}
-.selobg__canvas[hidden],.selobg__still[hidden]{display:none}
-
-/* Todo o conteúdo passa por cima do selo. */
-main,.ft,.tarja{position:relative;z-index:1}
-
-/* ---------------------------------------------------------
    Bandas
    --------------------------------------------------------- */
+/* Bandas chapadas, encostadas: a borda da banda é o divisor. */
 .band{
   padding-block:var(--section-y);
   position:relative;overflow:hidden;
+  background:var(--surface-inverse-deep);
 }
-/* Banda transparente: o selo do fundo aparece por inteiro.
-   A banda com véu deixa o selo passar de leve e devolve ritmo. */
-.band--veil{background:color-mix(in srgb,var(--terra-700) 70%,transparent)}
+.band--veil{background:var(--surface-inverse)}
 .band--accent{background:var(--surface-accent);color:var(--text-on-accent)}
 
 /* ---------------------------------------------------------
@@ -170,20 +152,17 @@ main,.ft,.tarja{position:relative;z-index:1}
 }
 
 .hero__top{display:flex;align-items:center;justify-content:space-between;gap:var(--space-4)}
-.brand{display:flex;align-items:center;gap:var(--space-3)}
-.brand img{width:40px;flex:none}
+.hero__selo{
+  width:clamp(76px,12vw,152px);flex:none;
+  filter:drop-shadow(var(--shadow-lifted));
+}
 .brand__wm{
   display:flex;flex-direction:column;line-height:1.02;
   font-family:var(--font-display);font-weight:var(--weight-bold);
-  font-size:var(--text-body-md);letter-spacing:var(--tracking-display);
+  font-size:var(--text-h3);letter-spacing:var(--tracking-display);
   color:var(--creme-500);
 }
 .brand__wm span:last-child{color:var(--lima-500)}
-.brand__tag{
-  font-family:var(--font-body);font-weight:var(--weight-bold);
-  font-size:var(--text-label);letter-spacing:var(--tracking-eyebrow);
-  text-transform:uppercase;color:var(--lima-500);
-}
 
 .hero__in{padding-block:var(--space-6)}
 .hero__h1{
@@ -569,10 +548,6 @@ main,.ft,.tarja{position:relative;z-index:1}
 
 @media(max-width:760px){
   :root{--section-y:var(--space-8)}
-
-  /* O selo de fundo fica mais discreto: em tela pequena o conteúdo
-     passa por cima dele o tempo todo. */
-  .selobg{width:120vw;opacity:var(--selo-op,.15)}
 
   .hero{padding-block:var(--space-4) var(--space-6)}
   .hero__h1{max-width:none}

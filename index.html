@@ -23,6 +23,7 @@
 
 <link rel="preload" href="assets/fonts/Parkinsans-Bold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/HankenGrotesk-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" as="image" href="assets/img/selo-600.webp">
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="styles.css">
 
@@ -61,21 +62,6 @@
   </defs>
 </svg>
 
-<!-- ============================================================
-     O SELO COMO FUNDO DA PÁGINA
-     Canvas fixo atrás de todo o conteúdo. A rolagem da página
-     inteira controla qual quadro aparece, então o selo se monta
-     ao longo da leitura e fica inteiro na assinatura.
-     ============================================================ -->
-<div class="selobg" aria-hidden="true">
-  <canvas class="selobg__canvas" id="seloBg" width="640" height="361" hidden></canvas>
-  <!-- Quadro final, usado só quando o scrub está desligado. -->
-  <picture>
-    <source media="(max-width:760px)" srcset="assets/selo/bg-m/053.webp">
-    <img class="selobg__still" id="seloBgStill" src="assets/selo/bg-d/053.webp" alt="" decoding="async" hidden>
-  </picture>
-</div>
-
 <main id="conteudo">
 
 <!-- ============ 01 · HERO ============ -->
@@ -90,11 +76,10 @@
   <div class="hero__scrim" aria-hidden="true"></div>
 
   <div class="hero__top wrap">
-    <span class="brand">
-      <img src="assets/img/selo-600.webp" alt="" width="40" height="33" decoding="async">
-      <span class="brand__wm"><span>Nossa</span><span>Lavoura</span></span>
-    </span>
-    <span class="brand__tag">45 anos</span>
+    <span class="brand__wm"><span>Nossa</span><span>Lavoura</span></span>
+    <img class="hero__selo" src="assets/img/selo-600.webp"
+         alt="Selo comemorativo dos 45 anos da Nossa Lavoura"
+         width="600" height="501" fetchpriority="high" decoding="async">
   </div>
 
   <div class="hero__in wrap">
