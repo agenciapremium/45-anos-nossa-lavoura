@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://nossalavoura.com.br/45anos/sitemap.xml
+Sitemap: https://45anosnossalavoura.agpremium.com.br/sitemap.xml

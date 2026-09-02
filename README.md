@@ -177,13 +177,20 @@ ganharia não compensam arriscar o preview. O WebP está gerado e pronto: se qui
 `width`/`height` em todas as imagens (evita CLS, que é fator de ranqueamento) e alt mais
 descritivo na fotografia do manifesto.
 
+### Endereço público
+
+A página vive em **https://45anosnossalavoura.agpremium.com.br** — é para lá que apontam o
+canonical, o `og:url`, o `og:image`, o `twitter:image`, os `@id` do JSON-LD, o `sitemap.xml`
+e o `robots.txt`.
+
+A `Organization` do JSON-LD continua ancorada em `nossalavoura.com.br`, que é o site
+institucional da rede e existe de verdade. Só a página da campanha mudou de endereço.
+
+Se a página um dia mudar de domínio, os pontos a trocar são o bloco marcado por comentário no
+`<head>` do `index.html` e o `sitemap.xml`.
+
 ### Antes de submeter ao Search Console
 
-- **O canonical e as URLs absolutas do OG apontam para `nossalavoura.com.br/45anos`**, que é
-  onde a página vai morar. Enquanto ela estiver só no `.vercel.app`, o preview de
-  compartilhamento não renderiza, porque a imagem é buscada num caminho que ainda não existe.
-  É proposital: canonical de staging faria o Google indexar a URL errada. Assim que o domínio
-  estiver ligado, tudo funciona sem tocar em nada.
 - **Título com 78 caracteres e description com 166** — ambos vêm da copy aprovada e vão
   truncar no resultado de busca (o corte fica perto de 60 e 155). Mantive como está por serem
   copy fechada; encurtar é decisão de vocês.
