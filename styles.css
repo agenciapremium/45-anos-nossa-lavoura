@@ -230,7 +230,9 @@ img{height:auto}
 .manif__fig{margin:0}
 .manif__fig img{
   width:100%;border-radius:var(--radius-surface);
-  aspect-ratio:4/5;object-fit:cover;object-position:50% 78%;
+  /* Proporção nativa de cada arquivo: a foto já vem enquadrada
+     para o lugar, então não há recorte por cima. */
+  aspect-ratio:899/1599;object-fit:cover;
 }
 .manif__fig figcaption{
   margin-top:var(--space-4);font-size:var(--text-body-sm);
@@ -538,7 +540,7 @@ img{height:auto}
   .cats__grid{grid-template-columns:repeat(2,1fr)}
   .manif__grid{grid-template-columns:1fr;gap:var(--space-6)}
   .manif__fig{order:2}
-  .manif__fig img{aspect-ratio:16/10}
+  .manif__fig img{aspect-ratio:1200/675}
 }
 
 @media(max-width:760px){

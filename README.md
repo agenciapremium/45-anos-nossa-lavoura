@@ -39,7 +39,7 @@ tokens.css          # tokens do design system, cópia literal — não editar
 styles.css          # estilos da página, só consomem os tokens acima
 main.js             # nav, reveal, contadores, contagem regressiva, player e scroll-scrub
 assets/
-  img/              # pastagem, selo estático e a imagem de compartilhamento (KV)
+  img/              # pastagem, unidade de Jaru, selo e a imagem de compartilhamento (KV)
   fonts/            # Parkinsans e Hanken Grotesk em WOFF2
   svg/              # octógonos e ícones da marca
   video/            # onde entra o VT (ver abaixo)
@@ -241,7 +241,10 @@ Estes pontos vêm dos `[APURAR]` da copy e das decisões que tomei na ausência 
   rodapé vai para o mesmo destino com `utm_medium=footer`, para separar os dois na análise.
 - **"Ler o regulamento completo"** ainda aponta para `nossalavoura.com.br`. Falta a URL final
   do regulamento do Acelera no Campo 3.0.
-- **Fotografia.** Existe uma única foto de rebanho no material. Ela sustenta o hero e o
+- **Fotografia.** Além da foto de rebanho, entrou a fachada da unidade de Jaru, na seção
+  "Nossa história", em duas versões: retrato (899×1599) para a coluna do desktop e paisagem
+  (1200×675) para quando a seção empilha no mobile. Cada uma é usada na proporção nativa, sem
+  recorte por cima. As duas foram reencodadas de 901 KB somados para 228 KB. Ela sustenta o hero e o
   manifesto. Os três blocos de gratidão são tipográficos, porque repetir a mesma imagem em três
   cards denunciaria placeholder — a copy pede "fotografia própria" em cada bloco. Quando as
   fotos chegarem, cada `.gcard` recebe um bloco de imagem de 168px encostado no topo, como

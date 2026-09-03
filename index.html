@@ -199,8 +199,15 @@
 <section class="band band--veil manif" id="historia">
   <div class="wrap manif__grid">
     <figure class="manif__fig" data-reveal>
-      <img src="assets/img/pasto-1600.webp" alt="Rebanho nelore em pastagem ao entardecer, na região atendida pelas lojas Nossa Lavoura em Rondônia" width="1600" height="1067" loading="lazy" decoding="async">
-      <figcaption>O campo que a Nossa Lavoura acompanha há 45 anos.</figcaption>
+      <!-- Duas versões da mesma foto: retrato na coluna do desktop,
+           paisagem quando a seção empilha no mobile. -->
+      <picture>
+        <source media="(max-width:900px)" srcset="assets/img/unidade_jaru_mobile.webp" width="1200" height="675">
+        <img src="assets/img/unidade_jaru_desktop.webp"
+             alt="Fachada da loja Nossa Lavoura em Jaru ao fim da tarde, com o letreiro da marca e o da Supremax"
+             width="899" height="1599" loading="lazy" decoding="async">
+      </picture>
+      <figcaption>A unidade de Jaru hoje. Foi nessa cidade que a história começou.</figcaption>
     </figure>
 
     <div class="manif__txt">
