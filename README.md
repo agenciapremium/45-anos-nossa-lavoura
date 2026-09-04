@@ -226,9 +226,9 @@ Estes pontos vêm dos `[APURAR]` da copy e das decisões que tomei na ausência 
 - **Redes sociais no rodapé** — o handle vigente ainda é o do nome anterior e precisa ser
   confirmado antes de virar link.
 - **Anos dos marcos antigos** na linha do tempo — "O começo, em Jaru" e "A expansão pelo
-  interior" entraram só com título de capítulo, como a copy determina. 2003, 2025 e 2026
+  interior" entraram só com título de capítulo, como a copy determina. 2023, 2025 e 2026
   estão com ano.
-- **Falta a descrição do marco de 2003, "Entrada da Axia".** O marco de Pimenta Bueno saiu no
+- **Falta a descrição do marco de 2023, "Entrada da Axia".** O marco de Pimenta Bueno saiu no
   lugar dele. Deixei o card sem texto de apoio de propósito: não sei o que a entrada da Axia
   representou e não ia inventar. São duas ou três linhas, como nos outros marcos.
 
