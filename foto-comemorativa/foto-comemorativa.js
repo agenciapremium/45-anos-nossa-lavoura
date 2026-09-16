@@ -1,5 +1,5 @@
 /* =========================================================
-   FIGURINHAS DOS 45 ANOS
+   FOTO COMEMORATIVA DOS 45 ANOS
    Porta para JS puro o motor da "Moldura Perfil" do projeto
    utilidades-nossa-lavoura (useMolduraEngine + CameraModal):
    a foto é recortada na janela da moldura e a moldura é
@@ -19,14 +19,14 @@
       rotulo: 'Foto de perfil',
       w: 1080, h: 1080,
       janela: { tipo: 'circulo', cx: 526, cy: 564, r: 507.5 },
-      moldura: '/figurinhas/assets/moldura-perfil.webp',
+      moldura: '/foto-comemorativa/assets/moldura-perfil.webp',
       arquivo: 'nossa-lavoura-45-anos-perfil.jpg'
     },
     story: {
       rotulo: 'Story',
       w: 1080, h: 1920,
       janela: { tipo: 'retangulo', x: 68, y: 80, w: 944, h: 1759 },
-      moldura: '/figurinhas/assets/moldura-story.webp',
+      moldura: '/foto-comemorativa/assets/moldura-story.webp',
       arquivo: 'nossa-lavoura-45-anos-story.jpg'
     }
   };

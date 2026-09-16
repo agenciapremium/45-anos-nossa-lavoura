@@ -1,5 +1,5 @@
 /* =========================================================
-   FIGURINHAS DOS 45 ANOS — molduras de perfil e story
+   FOTO COMEMORATIVA DOS 45 ANOS — molduras de perfil e story
    Consome /tokens.css (Nossa Lavoura 45 Anos Design System).
    Mesmo chão terra da landing, superfícies creme para o conteúdo.
    ========================================================= */
@@ -57,7 +57,7 @@ img{height:auto}
 .topo .eyebrow{margin-bottom:var(--space-2)}
 .topo__h1{
   font-family:var(--font-display);font-weight:var(--weight-bold);
-  font-size:clamp(2rem,9vw,2.75rem);line-height:var(--leading-snug);
+  font-size:clamp(1.5rem,6.6vw,2.125rem);line-height:var(--leading-snug);
   letter-spacing:var(--tracking-display);color:var(--creme-500);
   margin:0;text-wrap:balance;
 }

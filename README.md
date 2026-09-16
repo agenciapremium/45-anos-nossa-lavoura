@@ -33,8 +33,8 @@ os headers de segurança e o redirecionamento dos endereços `.vercel.app` para 
 
 ```
 index.html          # a página inteira, seção por seção, comentada
-figurinhas/         # ferramenta de molduras de perfil e story (ver abaixo)
-sitemap.xml         # landing e /figurinhas
+foto-comemorativa/  # ferramenta de molduras de perfil e story (ver abaixo)
+sitemap.xml         # landing e /foto-comemorativa
 robots.txt          # aponta para o sitemap
 tokens.css          # tokens do design system, cópia literal — não editar
 styles.css          # estilos da página, só consomem os tokens acima
@@ -149,7 +149,7 @@ tarja de campanha e o player do VT — nenhum listener de scroll na página.
 
 ---
 
-## Figurinhas dos 45 anos (`/figurinhas`)
+## Foto comemorativa dos 45 anos (`/foto-comemorativa`)
 
 Ferramenta para colocar a própria foto na moldura do aniversário e baixar ou compartilhar
 como **foto de perfil** (1080×1080) ou **story** (1080×1920). Mesma mecânica da Moldura
@@ -157,16 +157,16 @@ Perfil do projeto [utilidades-nossa-lavoura](https://github.com/agenciapremium/u
 portada de Next.js/React para HTML, CSS e JS puros, no padrão deste site.
 
 ```
-figurinhas/
-  index.html          # duas telas: escolha (formato + foto) e ajuste
-  figurinhas.css      # consome /tokens.css, sem hex cru
-  figurinhas.js       # motor de canvas, gestos, exportação e câmera
+foto-comemorativa/
+  index.html                  # duas telas: escolha (formato + foto) e ajuste
+  foto-comemorativa.css       # consome /tokens.css, sem hex cru
+  foto-comemorativa.js        # motor de canvas, gestos, exportação e câmera
   assets/
-    moldura-perfil.webp   # 1080×1080, janela circular transparente
-    moldura-story.webp    # 1080×1920, janela retangular transparente
-    preview-perfil.webp   # cards do seletor
+    moldura-perfil.webp       # 1080×1080, janela circular transparente
+    moldura-story.webp        # 1080×1920, janela retangular transparente
+    preview-perfil.webp       # cards do seletor
     preview-story.webp
-    og-figurinhas.jpg     # imagem de compartilhamento do link
+    og-foto-comemorativa.jpg  # imagem de compartilhamento do link
 ```
 
 **Como funciona.** A foto é recortada na janela da moldura e a moldura é desenhada por
@@ -217,10 +217,14 @@ resto de `docs/ASSETS`). Os passos:
    sem isso, a foto vaza por eles.
 3. Converter com `cwebp -q 90 -alpha_q 100 -m 6` — `alpha_q 100` mantém a borda da janela
    sem perda.
-4. Medir de novo a janela e atualizar `FORMATOS` em `figurinhas.js`.
+4. Medir de novo a janela e atualizar `FORMATOS` em `foto-comemorativa.js`.
 
-**Caminhos absolutos.** A página referencia `/tokens.css`, `/figurinhas/...` e `/assets/...`
-com barra inicial. Com `trailingSlash: false` ela responde em `/figurinhas`, sem barra, e um
+**Endereço antigo.** A ferramenta estreou em `/figurinhas`. Esse caminho, e tudo abaixo dele,
+redireciona com 308 para `/foto-comemorativa` (em `vercel.json`), para links já compartilhados
+não caírem em 404.
+
+**Caminhos absolutos.** A página referencia `/tokens.css`, `/foto-comemorativa/...` e `/assets/...`
+com barra inicial. Com `trailingSlash: false` ela responde em `/foto-comemorativa`, sem barra, e um
 caminho relativo resolveria na raiz do site.
 
 ## SEO
