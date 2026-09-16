@@ -91,19 +91,27 @@ img{height:auto}
 .acoes{display:flex;flex-direction:column;gap:var(--space-3)}
 
 /* ---------- Seletor de formato ---------- */
-.formatos{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)}
+/* Cada preview na proporção real do formato, com a mesma altura:
+   as colunas guardam a razão 1 : 0,5625 (9/16), então o quadrado e o
+   vertical terminam na mesma linha e nenhum vira miniatura com faixas. */
+.formatos{
+  display:grid;gap:var(--space-4);
+  grid-template-columns:minmax(0,1fr) minmax(0,.5625fr);
+}
 .formato{
   display:flex;flex-direction:column;align-items:stretch;gap:var(--space-2);
   padding:0;border:0;background:none;text-align:left;cursor:pointer;
   font:inherit;color:inherit;
 }
 .formato__prev{
-  display:grid;place-items:center;aspect-ratio:4/5;overflow:hidden;
-  border-radius:var(--radius-md);background:var(--terra-500);
+  display:block;overflow:hidden;
+  border-radius:var(--radius-md);background:var(--creme-700);
   outline:var(--border-width-hair) solid var(--border-hairline);
   transition:outline-color var(--dur-fast) var(--ease-standard);
 }
-.formato__prev img{width:100%;height:100%;object-fit:contain}
+.formato[data-formato="perfil"] .formato__prev{aspect-ratio:1/1}
+.formato[data-formato="story"] .formato__prev{aspect-ratio:9/16}
+.formato__prev img{width:100%;height:100%;object-fit:cover}
 .formato[aria-checked="true"] .formato__prev{outline:3px solid var(--lima-500);outline-offset:0}
 .formato__nome{font-family:var(--font-body);font-weight:var(--weight-bold);font-size:var(--text-body-md);color:var(--text-strong)}
 .formato__uso{font-size:var(--text-body-sm);color:var(--text-muted);margin-top:calc(var(--space-2) * -1)}
