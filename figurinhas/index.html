@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Figurinhas dos 45 anos | Nossa Lavoura</title>
+<meta name="description" content="Coloque sua foto na moldura dos 45 anos da Nossa Lavoura e use no perfil do WhatsApp e do Instagram ou no seu story. Grátis, direto do celular.">
+<meta name="theme-color" content="#2a1512">
+<link rel="canonical" href="https://45anosnossalavoura.agpremium.com.br/figurinhas">
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Nossa Lavoura">
+<meta property="og:url" content="https://45anosnossalavoura.agpremium.com.br/figurinhas">
+<meta property="og:title" content="Figurinhas dos 45 anos da Nossa Lavoura">
+<meta property="og:description" content="Sua foto na moldura dos 45 anos, pronta para o perfil ou para o story.">
+<meta property="og:image" content="https://45anosnossalavoura.agpremium.com.br/figurinhas/assets/og-figurinhas.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Exemplos da moldura dos 45 anos da Nossa Lavoura: foto de perfil redonda e story vertical.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://45anosnossalavoura.agpremium.com.br/figurinhas/assets/og-figurinhas.jpg">
+
+<link rel="icon" href="/assets/img/selo-600.webp">
+<link rel="apple-touch-icon" href="/assets/img/selo-600.webp">
+
+<!-- Caminhos absolutos: com trailingSlash:false a página responde em
+     /figurinhas (sem barra), e um caminho relativo resolveria na raiz. -->
+<link rel="preload" href="/assets/fonts/Parkinsans-Bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/HankenGrotesk-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/tokens.css">
+<link rel="stylesheet" href="/figurinhas/figurinhas.css">
+</head>
+<body>
+
+<main class="app">
+
+  <!-- ================= TELA 1 · escolha ================= -->
+  <section class="tela" id="telaEscolha" aria-labelledby="titulo">
+    <header class="topo">
+      <img class="topo__selo" src="/assets/img/selo-600.webp" alt="Selo 45 anos Nossa Lavoura" width="600" height="501" decoding="async">
+      <p class="eyebrow">Nossa Lavoura · 45 anos</p>
+      <h1 class="topo__h1" id="titulo">Figurinhas dos 45 anos</h1>
+      <p class="topo__lead">Coloque sua foto na moldura do aniversário e use no seu perfil ou no seu story.</p>
+    </header>
+
+    <section class="passo" aria-labelledby="passo1">
+      <div class="passo__cab">
+        <span class="passo__num" aria-hidden="true">1</span>
+        <h2 class="passo__t" id="passo1">Escolha o formato</h2>
+      </div>
+
+      <div class="formatos" role="radiogroup" aria-label="Formato da figurinha">
+        <button class="formato" type="button" role="radio" aria-checked="true" data-formato="perfil">
+          <span class="formato__prev">
+            <img src="/figurinhas/assets/preview-perfil.webp" alt="" width="640" height="640" decoding="async">
+          </span>
+          <span class="formato__nome">Foto de perfil</span>
+          <span class="formato__uso">WhatsApp e Instagram</span>
+        </button>
+        <button class="formato" type="button" role="radio" aria-checked="false" data-formato="story">
+          <span class="formato__prev">
+            <img src="/figurinhas/assets/preview-story.webp" alt="" width="540" height="960" decoding="async">
+          </span>
+          <span class="formato__nome">Story</span>
+          <span class="formato__uso">Instagram e WhatsApp</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="passo" aria-labelledby="passo2">
+      <div class="passo__cab">
+        <span class="passo__num" aria-hidden="true">2</span>
+        <h2 class="passo__t" id="passo2">Adicione sua foto</h2>
+      </div>
+      <p class="passo__txt">Escolha uma foto da galeria ou tire uma agora. No próximo passo você ajusta o tamanho e a posição.</p>
+
+      <div class="acoes">
+        <label class="btn btn--lg btn--primary">
+          <input id="inputFoto" type="file" accept="image/*" hidden>
+          Escolher da galeria
+        </label>
+        <button class="btn btn--lg btn--secondary" type="button" id="abrirCamera">Tirar foto agora</button>
+      </div>
+    </section>
+
+    <p class="privacidade">Sua foto não sai do seu aparelho: a moldura é aplicada no próprio navegador, sem envio para nenhum servidor.</p>
+  </section>
+
+  <!-- ================= TELA 2 · ajuste ================= -->
+  <section class="tela" id="telaAjuste" hidden aria-labelledby="tituloAjuste">
+    <header class="topo topo--compacto">
+      <p class="eyebrow" id="rotuloFormato">Foto de perfil · pré-visualização</p>
+      <h1 class="topo__h1" id="tituloAjuste">Ajuste sua foto</h1>
+    </header>
+
+    <div class="palco">
+      <canvas id="tela" width="1080" height="1080" tabindex="0"
+              role="img" aria-label="Pré-visualização da sua foto na moldura dos 45 anos. Use as setas para mover e as teclas mais e menos para aproximar."></canvas>
+    </div>
+
+    <div class="zoom">
+      <button class="zoom__btn" type="button" id="zoomMenos" aria-label="Afastar">−</button>
+      <button class="zoom__btn" type="button" id="zoomMais" aria-label="Aproximar">+</button>
+    </div>
+    <p class="dica">Arraste para posicionar · use dois dedos para aproximar</p>
+
+    <div class="troca" role="radiogroup" aria-label="Formato">
+      <button class="troca__btn" type="button" role="radio" aria-checked="true" data-formato="perfil">Perfil</button>
+      <button class="troca__btn" type="button" role="radio" aria-checked="false" data-formato="story">Story</button>
+    </div>
+
+    <div class="acoes">
+      <button class="btn btn--lg btn--primary" type="button" id="compartilhar" hidden>Compartilhar</button>
+      <button class="btn btn--lg btn--primary" type="button" id="baixar">Baixar imagem</button>
+      <button class="btn btn--lg btn--texto" type="button" id="trocarFoto">Trocar foto</button>
+    </div>
+  </section>
+
+  <footer class="rodape">
+    <a href="/">Conheça os 45 anos da Nossa Lavoura</a>
+    <p>Nossa Lavoura, amiga de quem planta, cria e produz</p>
+  </footer>
+</main>
+
+<!-- ================= Câmera ================= -->
+<div class="camera" id="camera" hidden role="dialog" aria-modal="true" aria-label="Câmera">
+  <button class="camera__fechar" type="button" id="fecharCamera" aria-label="Fechar câmera">×</button>
+  <p class="camera__erro" id="erroCamera" hidden></p>
+  <video class="camera__video" id="video" autoplay playsinline muted></video>
+  <div class="camera__acoes">
+    <button class="btn btn--on-dark" type="button" id="virarCamera">Trocar câmera</button>
+    <button class="btn btn--lg btn--primary" type="button" id="capturar">Capturar</button>
+  </div>
+</div>
+
+<script src="/figurinhas/figurinhas.js" defer></script>
+</body>
+</html>

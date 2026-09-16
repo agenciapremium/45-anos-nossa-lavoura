@@ -33,7 +33,8 @@ os headers de segurança e o redirecionamento dos endereços `.vercel.app` para 
 
 ```
 index.html          # a página inteira, seção por seção, comentada
-sitemap.xml         # uma URL, com extensão de imagem
+figurinhas/         # ferramenta de molduras de perfil e story (ver abaixo)
+sitemap.xml         # landing e /figurinhas
 robots.txt          # aponta para o sitemap
 tokens.css          # tokens do design system, cópia literal — não editar
 styles.css          # estilos da página, só consomem os tokens acima
@@ -147,6 +148,80 @@ tarja de campanha e o player do VT — nenhum listener de scroll na página.
   `--text-display` — para os dois botões caberem na dobra.
 
 ---
+
+## Figurinhas dos 45 anos (`/figurinhas`)
+
+Ferramenta para colocar a própria foto na moldura do aniversário e baixar ou compartilhar
+como **foto de perfil** (1080×1080) ou **story** (1080×1920). Mesma mecânica da Moldura
+Perfil do projeto [utilidades-nossa-lavoura](https://github.com/agenciapremium/utilidades-nossa-lavoura),
+portada de Next.js/React para HTML, CSS e JS puros, no padrão deste site.
+
+```
+figurinhas/
+  index.html          # duas telas: escolha (formato + foto) e ajuste
+  figurinhas.css      # consome /tokens.css, sem hex cru
+  figurinhas.js       # motor de canvas, gestos, exportação e câmera
+  assets/
+    moldura-perfil.webp   # 1080×1080, janela circular transparente
+    moldura-story.webp    # 1080×1920, janela retangular transparente
+    preview-perfil.webp   # cards do seletor
+    preview-story.webp
+    og-figurinhas.jpg     # imagem de compartilhamento do link
+```
+
+**Como funciona.** A foto é recortada na janela da moldura e a moldura é desenhada por
+cima. Arrasta com o dedo ou o mouse, aproxima com pinça, roda do mouse ou os botões, e pelo
+teclado com setas e `+`/`−`. A troca entre perfil e story reenquadra a foto na janela nova.
+Tudo acontece no navegador: a foto não é enviada para lugar nenhum, e a página diz isso.
+
+**Diferenças em relação à referência:**
+
+- As molduras de origem já vinham com a janela transparente, então não houve o passo de
+  "vazar" o círculo branco que o `prepare-frames.mjs` fazia.
+- As molduras chegaram com 1360×1359 e 1081×1921. Foram normalizadas para 1080×1080 e
+  1080×1920, que são as medidas que WhatsApp e Instagram esperam.
+- A exportação é **JPEG** (qualidade 0,92) em vez de PNG: é foto, então fica umas quatro
+  vezes menor, e é o formato que os apps aceitam sem conversão.
+- Fotos de celular são reduzidas para 2400px no lado maior ao carregar. Redesenhar 12 MP a
+  cada movimento do dedo trava aparelho simples; a saída tem 1080 de largura, então sobra.
+- Botões seguem o `Button.jsx` do design system dos 45 anos (Hanken Bold em caixa alta,
+  sem pill) e não há ícones além de `×`, `+` e `−` — o sistema só admite os quatro
+  pictogramas da marca.
+- Baixar e compartilhar são ações separadas. Na referência, baixar também abria a folha de
+  compartilhamento.
+
+**Geometria das janelas** (medida por varredura de alpha, em `FORMATOS` no JS):
+
+| Formato | Janela |
+|---|---|
+| perfil | círculo, centro (526, 564), raio 507,5 |
+| story | retângulo, x 68, y 80, 944×1759 |
+
+A foto passa 6px por baixo da borda da janela (`SANGRIA`) para não aparecer costura.
+
+**Otimização.** As quatro imagens de origem somavam 3 MB; em WebP ficaram em 191 KB.
+
+| Arquivo | Origem | WebP |
+|---|---|---|
+| moldura de perfil | 215 KB | 72 KB |
+| moldura de story | 234 KB | 52 KB |
+| preview de perfil | 883 KB | 31 KB |
+| preview de story | 1.668 KB | 36 KB |
+
+**Se as molduras mudarem.** As fontes ficam em `docs/ASSETS/moldura/` (fora do git, como o
+resto de `docs/ASSETS`). Os passos:
+
+1. Redimensionar para 1080×1080 e 1080×1920.
+2. Forçar alpha 255 em tudo que está fora da janela (com 6px de folga). As exportações de
+   origem tinham um fio de pixels quase opacos na borda da imagem e nas emendas das formas;
+   sem isso, a foto vaza por eles.
+3. Converter com `cwebp -q 90 -alpha_q 100 -m 6` — `alpha_q 100` mantém a borda da janela
+   sem perda.
+4. Medir de novo a janela e atualizar `FORMATOS` em `figurinhas.js`.
+
+**Caminhos absolutos.** A página referencia `/tokens.css`, `/figurinhas/...` e `/assets/...`
+com barra inicial. Com `trailingSlash: false` ela responde em `/figurinhas`, sem barra, e um
+caminho relativo resolveria na raiz do site.
 
 ## SEO
 
