@@ -1,0 +1,12 @@
+/* =========================================================
+   BASE · comum a todas as rotas
+
+   Só os tokens do design system. O Tailwind não entra aqui de
+   propósito: a landing dos 45 anos e a foto comemorativa são
+   reconstruções fiéis das páginas estáticas e consomem os tokens
+   direto, sem nenhuma camada de reset por cima. O Tailwind (com o
+   mesmo tema, traduzido dos tokens) é carregado pelo layout de
+   `/palestras`, em `app/globals.css`.
+   ========================================================= */
+
+@import '../tokens.css';
