@@ -1,0 +1,204 @@
+/* =========================================================
+   FOTO COMEMORATIVA DOS 45 ANOS — molduras de perfil e story
+   Consome /tokens.css (Nossa Lavoura 45 Anos Design System).
+   Mesmo chão terra da landing, superfícies creme para o conteúdo.
+   ========================================================= */
+
+body{
+  background:var(--surface-inverse-deep);
+  color:var(--text-on-inverse);
+  min-height:100svh;
+}
+img,canvas,video{display:block;max-width:100%}
+img{height:auto}
+[hidden]{display:none!important}
+
+.app{
+  width:100%;max-width:520px;margin-inline:auto;
+  padding:var(--space-6) var(--space-4) var(--space-7);
+  display:flex;flex-direction:column;min-height:100svh;
+}
+
+/* ---------- Tipografia ---------- */
+.eyebrow{
+  font-family:var(--font-body);font-weight:var(--weight-bold);
+  font-size:var(--text-label);letter-spacing:var(--tracking-eyebrow);
+  text-transform:uppercase;color:var(--lima-500);margin:0;
+}
+
+/* ---------- Botões (espelham components/core/Button.jsx) ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  gap:var(--space-2);width:100%;
+  font-family:var(--font-body);font-weight:var(--weight-bold);
+  font-size:var(--text-body-md);letter-spacing:0.06em;
+  text-transform:uppercase;line-height:1;text-decoration:none;
+  padding:14px 26px;min-height:48px;
+  border-radius:var(--radius-control);
+  border:var(--border-width-thick) solid transparent;
+  cursor:pointer;transition:var(--transition-control);
+}
+.btn--lg{font-size:var(--text-body-lg);padding:18px 32px;min-height:56px;border-radius:var(--radius-md)}
+.btn:active{transform:translateY(1px)}
+.btn--primary{background:var(--lima-500);color:var(--text-on-accent);border-color:var(--lima-500)}
+.btn--primary:hover{background:var(--lima-600);border-color:var(--lima-600)}
+.btn--secondary{background:var(--terra-700);color:var(--creme-500);border-color:var(--terra-700)}
+.btn--secondary:hover{background:var(--terra-900);border-color:var(--terra-900)}
+.btn--on-dark{background:var(--creme-500);color:var(--terra-900);border-color:var(--creme-500)}
+.btn--on-dark:hover{background:var(--lima-500);border-color:var(--lima-500)}
+.btn--texto{background:transparent;color:var(--creme-500);border-color:transparent}
+.btn--texto:hover{color:var(--lima-500)}
+/* Um <label> fazendo papel de botão precisa do anel de foco do input. */
+.btn:has(input:focus-visible){outline:3px solid var(--focus-ring);outline-offset:2px}
+
+/* ---------- Topo ---------- */
+.topo{text-align:center;padding-bottom:var(--space-6)}
+.topo__selo{width:132px;margin:0 auto var(--space-4);filter:drop-shadow(var(--shadow-lifted))}
+.topo .eyebrow{margin-bottom:var(--space-2)}
+.topo__h1{
+  font-family:var(--font-display);font-weight:var(--weight-bold);
+  font-size:clamp(1.5rem,6.6vw,2.125rem);line-height:var(--leading-snug);
+  letter-spacing:var(--tracking-display);color:var(--creme-500);
+  margin:0;text-wrap:balance;
+}
+.topo__lead{
+  margin:var(--space-3) auto 0;max-width:34ch;
+  font-size:var(--text-body-lg);font-weight:var(--weight-light);
+  color:var(--text-on-inverse-muted);
+}
+.topo--compacto{padding-bottom:var(--space-5)}
+.topo--compacto .topo__h1{font-size:clamp(1.75rem,7.5vw,2.25rem)}
+
+/* ---------- Passos ---------- */
+.passo{
+  background:var(--surface-card);color:var(--text-body);
+  border-radius:var(--radius-card);
+  padding:var(--space-5);margin-bottom:var(--space-4);
+}
+.passo__cab{display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4)}
+.passo__num{
+  flex:none;display:grid;place-items:center;
+  width:32px;height:32px;border-radius:var(--radius-pill);
+  background:var(--lima-500);color:var(--terra-900);
+  font-family:var(--font-display);font-weight:var(--weight-bold);font-size:var(--text-body-lg);
+}
+.passo__t{
+  margin:0;font-family:var(--font-display);font-weight:var(--weight-bold);
+  font-size:var(--text-h3);letter-spacing:var(--tracking-display);color:var(--text-strong);
+}
+.passo__txt{margin:0 0 var(--space-4);font-size:var(--text-body-md);color:var(--text-body)}
+
+.acoes{display:flex;flex-direction:column;gap:var(--space-3)}
+
+/* ---------- Seletor de formato ---------- */
+/* Cada preview na proporção real do formato, com a mesma altura:
+   as colunas guardam a razão 1 : 0,5625 (9/16), então o quadrado e o
+   vertical terminam na mesma linha e nenhum vira miniatura com faixas. */
+.formatos{
+  display:grid;gap:var(--space-4);
+  grid-template-columns:minmax(0,1fr) minmax(0,.5625fr);
+}
+.formato{
+  display:flex;flex-direction:column;align-items:stretch;gap:var(--space-2);
+  padding:0;border:0;background:none;text-align:left;cursor:pointer;
+  font:inherit;color:inherit;
+}
+.formato__prev{
+  display:block;overflow:hidden;
+  border-radius:var(--radius-md);background:var(--creme-700);
+  outline:var(--border-width-hair) solid var(--border-hairline);
+  transition:outline-color var(--dur-fast) var(--ease-standard);
+}
+.formato[data-formato="perfil"] .formato__prev{aspect-ratio:1/1}
+.formato[data-formato="story"] .formato__prev{aspect-ratio:9/16}
+.formato__prev img{width:100%;height:100%;object-fit:cover}
+.formato[aria-checked="true"] .formato__prev{outline:3px solid var(--lima-500);outline-offset:0}
+.formato__nome{font-family:var(--font-body);font-weight:var(--weight-bold);font-size:var(--text-body-md);color:var(--text-strong)}
+.formato__uso{font-size:var(--text-body-sm);color:var(--text-muted);margin-top:calc(var(--space-2) * -1)}
+
+.privacidade{
+  margin:var(--space-2) 0 0;text-align:center;
+  font-size:var(--text-body-sm);color:var(--text-on-inverse-muted);
+}
+
+/* ---------- Palco de ajuste ---------- */
+.palco{
+  display:flex;justify-content:center;
+  margin-bottom:var(--space-4);
+}
+/* width/height auto + max nos dois eixos: o canvas encolhe mantendo a
+   proporção, e o story nunca empurra os botões para fora da tela. */
+.palco canvas{
+  width:auto;height:auto;max-width:100%;max-height:62svh;
+  border-radius:var(--radius-card);
+  box-shadow:var(--shadow-lifted);
+  touch-action:none;cursor:grab;
+}
+.palco canvas:active{cursor:grabbing}
+.palco canvas:focus-visible{outline:3px solid var(--focus-ring);outline-offset:3px}
+
+.zoom{display:flex;justify-content:center;gap:var(--space-3)}
+.zoom__btn{
+  width:48px;height:48px;border-radius:var(--radius-control);
+  border:var(--border-width-thick) solid var(--creme-500);
+  background:transparent;color:var(--creme-500);
+  font-family:var(--font-body);font-weight:var(--weight-bold);font-size:1.5rem;line-height:1;
+  cursor:pointer;transition:var(--transition-control);
+}
+.zoom__btn:hover{background:var(--creme-500);color:var(--terra-900)}
+.zoom__btn:active{transform:translateY(1px)}
+.dica{
+  margin:var(--space-3) 0 var(--space-5);text-align:center;
+  font-size:var(--text-body-sm);color:var(--text-on-inverse-muted);
+}
+
+.troca{
+  display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);
+  padding:var(--space-1);margin-bottom:var(--space-5);
+  background:var(--terra-700);border-radius:var(--radius-control);
+}
+.troca__btn{
+  min-height:44px;border:0;border-radius:var(--radius-sm);
+  background:transparent;color:var(--creme-500);cursor:pointer;
+  font-family:var(--font-body);font-weight:var(--weight-bold);
+  font-size:var(--text-body-sm);letter-spacing:0.06em;text-transform:uppercase;
+  transition:var(--transition-control);
+}
+.troca__btn[aria-checked="true"]{background:var(--lima-500);color:var(--terra-900)}
+
+/* ---------- Rodapé ---------- */
+.rodape{
+  margin-top:auto;padding-top:var(--space-7);text-align:center;
+  font-size:var(--text-body-sm);color:var(--text-on-inverse-muted);
+}
+.rodape a{color:var(--lima-500);font-weight:var(--weight-bold)}
+.rodape p{margin:var(--space-2) 0 0}
+
+/* ---------- Câmera ---------- */
+.camera{
+  position:fixed;inset:0;z-index:100;
+  background:var(--terra-900);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:var(--space-5);gap:var(--space-5);
+}
+.camera__video{
+  width:100%;max-width:480px;max-height:66svh;
+  border-radius:var(--radius-card);object-fit:contain;background:var(--terra-900);
+}
+.camera__video.espelho{transform:scaleX(-1)}
+.camera__acoes{display:flex;flex-direction:column;gap:var(--space-3);width:100%;max-width:480px}
+.camera__fechar{
+  position:absolute;top:var(--space-3);right:var(--space-3);
+  width:48px;height:48px;border:0;border-radius:var(--radius-control);
+  background:transparent;color:var(--creme-500);
+  font-size:2rem;line-height:1;cursor:pointer;
+}
+.camera__erro{
+  margin:0;max-width:420px;text-align:center;
+  padding:var(--space-4);border-radius:var(--radius-card);
+  border:var(--border-width-thick) solid var(--lima-500);color:var(--creme-500);
+}
+
+@media(min-width:720px){
+  .app{padding-top:var(--space-8)}
+}

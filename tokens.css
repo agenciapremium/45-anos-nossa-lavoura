@@ -2,16 +2,17 @@
    TOKENS · Nossa Lavoura 45 Anos Design System
    Copiado na íntegra de docs/Nossa Lavoura 45 Anos Design System/tokens/.
    NÃO EDITAR À MÃO: reimportar do design system quando ele mudar.
-   Única adaptação: fonts.css aponta para os WOFF2 em assets/fonts/
-   em vez dos TTF originais.
+   Adaptações: as fontes são carregadas por next/font/local (ver abaixo)
+   e os tokens são espelhados no tema do Tailwind em app/globals.css.
    ========================================================= */
 
-/* ---------- fonts (adaptado: TTF -> WOFF2) ---------- */
-@font-face{font-family:"Parkinsans";src:url("assets/fonts/Parkinsans-Light.woff2") format("woff2");font-weight:300;font-style:normal;font-display:swap}
-@font-face{font-family:"Parkinsans";src:url("assets/fonts/Parkinsans-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
-@font-face{font-family:"Hanken Grotesk";src:url("assets/fonts/HankenGrotesk-Light.woff2") format("woff2");font-weight:300;font-style:normal;font-display:swap}
-@font-face{font-family:"Hanken Grotesk";src:url("assets/fonts/HankenGrotesk-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:"Hanken Grotesk";src:url("assets/fonts/HankenGrotesk-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+/* ---------- fonts ----------
+   As famílias são carregadas por `next/font/local` em `app/fontes.ts`,
+   a partir dos WOFF2 em `public/assets/fonts/`. O Next expõe cada família
+   como uma CSS variable (`--fonte-parkinsans`, `--fonte-hanken`), que os
+   tokens de tipografia abaixo consomem. Não há `@font-face` aqui: duplicá-lo
+   faria o navegador baixar as fontes duas vezes.
+   ---------------------------------- */
 
 /* ---------- colors.css ---------- */
 :root{
@@ -73,8 +74,8 @@
 
 /* ---------- typography.css ---------- */
 :root{
---font-display:"Parkinsans","Hanken Grotesk",system-ui,sans-serif;
---font-body:"Hanken Grotesk",system-ui,sans-serif;
+--font-display:var(--fonte-parkinsans),"Hanken Grotesk",system-ui,sans-serif;
+--font-body:var(--fonte-hanken),system-ui,sans-serif;
 
 --weight-light:300;
 --weight-regular:400;

@@ -13,3 +13,14 @@ docs/kv.png
 # não os binários — o KV e o selo já estão otimizados em assets/.
 docs/Nossa Lavoura 45 Anos Design System/assets/
 docs/Nossa Lavoura 45 Anos Design System/uploads/
+
+# Variáveis de ambiente (credenciais Neon, chaves de API)
+.env
+.env.*
+!.env.example
+
+# Next.js
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo

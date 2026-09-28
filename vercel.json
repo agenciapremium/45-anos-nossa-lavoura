@@ -1,67 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "redirects": [
+  "framework": "nextjs",
+  "crons": [
     {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "45-anos-nossa-lavoura.vercel.app"
-        }
-      ],
-      "destination": "https://45anosnossalavoura.agpremium.com.br/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "45-anos-nossa-lavoura-agencia-premium.vercel.app"
-        }
-      ],
-      "destination": "https://45anosnossalavoura.agpremium.com.br/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/figurinhas",
-      "destination": "/foto-comemorativa",
-      "permanent": true
-    },
-    {
-      "source": "/figurinhas/:path*",
-      "destination": "/foto-comemorativa/:path*",
-      "permanent": true
-    }
-  ],
-  "headers": [
-    {
-      "source": "/assets/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "SAMEORIGIN"
-        }
-      ]
+      "path": "/api/cron/expirar-convites",
+      "schedule": "5 4 * * *"
     }
   ]
 }
