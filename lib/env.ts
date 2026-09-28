@@ -41,6 +41,15 @@ const esquema = z.object({
   /**
    * Origem pública desta instalação, usada para montar o link do convite
    * (`{origem}/palestras/c/{codigo}`). Varia por ambiente.
+   *
+   * Em produção é obrigatória e explícita: o link do convite vai para o
+   * WhatsApp de produtores e precisa apontar para o domínio da campanha,
+   * não para uma URL de deploy.
+   *
+   * Fora de produção, a Vercel é quem sabe a origem — e ela muda a cada
+   * deploy. Sem o fallback abaixo, cada branch precisaria da própria
+   * variável no painel, e foi exatamente isso que derrubou o primeiro
+   * preview desta branch. Ver `origemDaVercel()`.
    */
   APP_BASE_URL: z
     .string()
@@ -108,13 +117,36 @@ export type Ambiente = z.infer<typeof esquema>;
 
 let cache: Ambiente | null = null;
 
+/**
+ * Origem que a Vercel expõe ao build e ao runtime, usada como padrão de
+ * `APP_BASE_URL` fora de produção.
+ *
+ * Prefere `VERCEL_BRANCH_URL`, que é estável enquanto a branch existir, a
+ * `VERCEL_URL`, que muda a cada deploy: um link mágico ou um convite
+ * gerado num preview continua abrindo depois do deploy seguinte.
+ *
+ * Em produção devolve `undefined` de propósito, para que a ausência de
+ * `APP_BASE_URL` falhe alto em vez de publicar convites apontando para
+ * uma URL de deploy.
+ */
+function origemDaVercel(): string | undefined {
+  if (process.env.VERCEL_ENV === 'production') return undefined;
+  const host = process.env.VERCEL_BRANCH_URL ?? process.env.VERCEL_URL;
+  return host ? `https://${host}` : undefined;
+}
+
 function ler(): Ambiente {
+  const origem = process.env.APP_BASE_URL ?? origemDaVercel();
+
   const resultado = esquema.safeParse({
     DATABASE_URL: process.env.DATABASE_URL,
-    APP_BASE_URL: process.env.APP_BASE_URL,
+    APP_BASE_URL: origem,
     CRON_SECRET: process.env.CRON_SECRET,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
-    BETTER_AUTH_URL: process.env.BETTER_AUTH_URL ?? process.env.APP_BASE_URL,
+    // Cai na origem JÁ RESOLVIDA, não na variável bruta: do contrário o
+    // fallback da Vercel valeria para o link do convite e não para o
+    // Better Auth, e o preview quebraria só aqui.
+    BETTER_AUTH_URL: process.env.BETTER_AUTH_URL ?? origem,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     EMAIL_FROM: process.env.EMAIL_FROM,
   });
