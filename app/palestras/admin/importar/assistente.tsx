@@ -20,11 +20,11 @@ import {
 import { formatarCpf } from '@/lib/palestras/cpf';
 import {
   confirmarImportacao,
-  ESTADO_INICIAL,
   previsualizar,
   type Contagens,
   type EstadoDaImportacao,
 } from './acoes';
+import { ESTADO_INICIAL } from './estado';
 
 function BotaoEnviar({ rotulo, rotuloPendente }: { rotulo: string; rotuloPendente: string }) {
   const { pending } = useFormStatus();

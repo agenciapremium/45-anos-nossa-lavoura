@@ -19,7 +19,10 @@ import {
 } from '@/lib/palestras/confirmacao';
 import { mascaraProgressiva } from '@/lib/palestras/cpf';
 import type { Trecho } from '@/lib/palestras/consentimento';
-import { confirmar, ESTADO_INICIAL } from './acoes';
+import {
+  confirmar,
+} from './acoes';
+import { ESTADO_INICIAL } from './estado';
 
 /* =========================================================
    Formulário de confirmação

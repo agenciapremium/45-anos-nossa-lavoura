@@ -36,8 +36,6 @@ export type EstadoDoAcesso = {
   tom?: 'erro' | 'aviso' | 'informacao';
 };
 
-export const ESTADO_INICIAL: EstadoDoAcesso = {};
-
 function texto(dados: FormData, campo: string): string {
   const valor = dados.get(campo);
   return typeof valor === 'string' ? valor.trim() : '';

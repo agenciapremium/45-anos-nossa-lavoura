@@ -6,11 +6,10 @@ import { useFormStatus } from 'react-dom';
 import { Aviso, Botao, LinkBotao, Selo } from '@/components/ui';
 import type { EstadoDeConvite } from '@/lib/db/schema';
 import {
-  ANOTACAO_INICIAL,
-  CANCELAMENTO_PAINEL_INICIAL,
   cancelarConvitePeloPainel,
   definirAnotacaoDeEnvio,
 } from './acoes';
+import { ANOTACAO_INICIAL, CANCELAMENTO_PAINEL_INICIAL } from './estado';
 
 /* =========================================================
    Uma linha da lista de convites

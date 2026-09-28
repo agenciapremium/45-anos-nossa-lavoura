@@ -4,7 +4,10 @@ import { useActionState, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 
 import { Aviso, Botao, LinkBotao, Selo } from '@/components/ui';
-import { CANCELAMENTO_INICIAL, cancelar } from './acoes';
+import {
+  cancelar,
+} from './acoes';
+import { CANCELAMENTO_INICIAL } from './estado';
 
 /* =========================================================
    Ingresso digital

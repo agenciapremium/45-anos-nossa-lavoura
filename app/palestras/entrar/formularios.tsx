@@ -6,7 +6,6 @@ import { Ajuda, Aviso, Botao, Campo, Grupo } from '@/components/ui';
 import { mascaraProgressiva } from '@/lib/palestras/cpf';
 
 import {
-  ESTADO_INICIAL,
   acaoDeCpfENascimento,
   acaoDeDefinirSenha,
   acaoDeLinkMagico,
@@ -17,6 +16,7 @@ import {
   acaoDeVerificarCodigo,
   type EstadoDoAcesso,
 } from './acoes';
+import { ESTADO_INICIAL } from './estado';
 
 /* =========================================================
    Formulários das telas de acesso

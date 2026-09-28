@@ -35,8 +35,6 @@ export type EstadoDaConfirmacao = {
   erros?: ErrosPorCampo;
 };
 
-export const ESTADO_INICIAL: EstadoDaConfirmacao = { ok: false };
-
 export async function confirmar(
   _anterior: EstadoDaConfirmacao,
   dados: FormData,
@@ -91,8 +89,6 @@ export type EstadoDoCancelamento = {
   concluido?: boolean;
   mensagem?: string;
 };
-
-export const CANCELAMENTO_INICIAL: EstadoDoCancelamento = { ok: false };
 
 /**
  * Cancela a confirmação — só a partir do dispositivo do titular.
