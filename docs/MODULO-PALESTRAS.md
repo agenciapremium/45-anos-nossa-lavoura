@@ -87,6 +87,55 @@ Duas decisões de `fundacao` que continuam valendo:
 
 Todas as telas administrativas levam `noindex, nofollow`.
 
+### O primeiro Admin
+
+Há um problema de ovo e galinha: as telas de cadastro de usuário exigem
+sessão de Admin, e um banco novo começa sem nenhum usuário. Alguém precisa
+ser o primeiro, e é por `scripts/criar-admin.ts`:
+
+```sh
+npm run admin:criar -- --nome "Fulano de Tal" \
+  --email "fulano@agpremium.com.br" \
+  --cpf "000.000.000-00" --nascimento "01/01/1990"
+```
+
+O script cria (ou promove) o usuário com papel `admin` e **imprime no
+terminal um link de primeiro acesso**, para a pessoa definir a própria
+senha. O link sai do fluxo oficial de redefinição do Better Auth — mesmo
+token, mesma validade, mesmo uso único —, só que impresso em vez de
+enviado por e-mail. Assim o primeiro acesso não fica refém do Resend
+estar configurado, e quem roda o script não fica sabendo a senha de
+ninguém.
+
+`cpf` e `data_nascimento` são obrigatórios no esquema, e o CPF é conferido
+pelo dígito verificador antes de qualquer escrita. É idempotente pelo CPF:
+rodar de novo atualiza o cadastro e emite um link novo.
+
+Depois do primeiro Admin, todo o resto entra pela interface ou pela
+importação de CSV.
+
+### Usuários de teste
+
+Os scripts de integração criam usuários para exercitar papéis e escopo, e
+não conseguem se apagar: quem fez check-in ou cancelou um convite virou
+`ator_id` de uma linha de auditoria, e a auditoria é imutável por gatilho.
+
+O resíduo **não é cosmético**. São contas ativas, algumas com papel
+`admin`, num banco que preview e produção compartilham — e as de papel
+`colaborador` e `recepcao` aceitam login por CPF e data de nascimento,
+com datas redondas e previsíveis.
+
+Como não dá para apagar, desativa-se:
+
+```sh
+npm run usuarios:desativar-teste             # mostra o que faria
+npm run usuarios:desativar-teste -- --aplicar
+```
+
+Rode **depois de cada rodada de integração**, antes de qualquer uso sério
+do ambiente. É reversível: os próprios scripts recriam ou reativam o que
+precisarem.
+
 ---
 
 ## Banco de dados

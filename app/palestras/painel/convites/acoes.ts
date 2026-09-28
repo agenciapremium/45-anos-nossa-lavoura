@@ -29,10 +29,6 @@ export type EstadoDoCancelamentoPainel = {
   mensagem?: string;
 };
 
-export const CANCELAMENTO_PAINEL_INICIAL: EstadoDoCancelamentoPainel = {
-  ok: false,
-};
-
 export async function cancelarConvitePeloPainel(
   _anterior: EstadoDoCancelamentoPainel,
   dados: FormData,
@@ -83,7 +79,6 @@ export async function cancelarConvitePeloPainel(
    --------------------------------------------------------- */
 
 export type EstadoDaAnotacao = { ok: boolean; mensagem?: string };
-export const ANOTACAO_INICIAL: EstadoDaAnotacao = { ok: false };
 
 export async function definirAnotacaoDeEnvio(
   _anterior: EstadoDaAnotacao,

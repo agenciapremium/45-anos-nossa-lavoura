@@ -29,8 +29,6 @@ import { marcarDispositivoDoTitular } from '../c/[codigo]/titular';
 
 export type EstadoDaRecuperacao = { ok: boolean; mensagem?: string };
 
-export const ESTADO_INICIAL: EstadoDaRecuperacao = { ok: false };
-
 export async function recuperar(
   _anterior: EstadoDaRecuperacao,
   dados: FormData,

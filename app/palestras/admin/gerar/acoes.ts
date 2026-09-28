@@ -21,8 +21,6 @@ export type EstadoDaGeracao = {
   };
 };
 
-export const ESTADO_INICIAL: EstadoDaGeracao = { ok: false };
-
 /**
  * Traduz o formulário e chama o serviço.
  *

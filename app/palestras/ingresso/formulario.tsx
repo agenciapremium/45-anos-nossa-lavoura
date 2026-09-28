@@ -5,7 +5,10 @@ import { useFormStatus } from 'react-dom';
 
 import { Aviso, Botao, Campo, Grupo } from '@/components/ui';
 import { mascaraProgressiva } from '@/lib/palestras/cpf';
-import { ESTADO_INICIAL, recuperar } from './acoes';
+import {
+  recuperar,
+} from './acoes';
+import { ESTADO_INICIAL } from './estado';
 
 /**
  * Repetido de `lib/palestras/codigo.ts` de propósito.

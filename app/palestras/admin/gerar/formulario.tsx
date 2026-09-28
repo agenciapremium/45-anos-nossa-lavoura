@@ -15,7 +15,10 @@ import {
   Tabela,
   Vazio,
 } from '@/components/ui';
-import { ESTADO_INICIAL, gerarLotes } from './acoes';
+import {
+  gerarLotes,
+} from './acoes';
+import { ESTADO_INICIAL } from './estado';
 
 export type PalestraDisponivel = {
   id: string;

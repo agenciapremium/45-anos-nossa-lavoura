@@ -48,8 +48,6 @@ export type EstadoDaImportacao = {
   }[];
 };
 
-export const ESTADO_INICIAL: EstadoDaImportacao = { etapa: 'inicial' };
-
 export async function previsualizar(
   _anterior: EstadoDaImportacao,
   dados: FormData,
