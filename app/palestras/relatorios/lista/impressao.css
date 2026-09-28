@@ -1,0 +1,131 @@
+/* =========================================================
+   CSS de impressão da lista de confirmados (task 7.1)
+
+   A4 retrato. `@page` só existe na impressão — na tela, esta mesma
+   marcação aparece como uma prévia central, para conferir antes de mandar
+   para a impressora de verdade.
+
+   Duas peças que dependem do motor de impressão do Chrome/Edge (a família
+   que a recepção deve usar, ver docs):
+   - `thead { display: table-header-group }` repete o cabeçalho da tabela
+     em cada página quebrada.
+   - `@page { @bottom-right { content: counter(page) … } }` numera as
+     páginas — só é possível declarar isso dentro da margem da `@page`,
+     não no fluxo normal do documento.
+   ========================================================= */
+
+@page {
+  size: A4 portrait;
+  margin: 16mm 12mm 20mm 12mm;
+}
+
+@media print {
+  @page {
+    @bottom-right {
+      content: 'Página ' counter(page) ' de ' counter(pages);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 9pt;
+      color: #3d201b;
+    }
+  }
+}
+
+.folha-de-impressao {
+  max-width: 190mm;
+  margin: 0 auto;
+  padding: 20px;
+  color: #2a1512;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #fff;
+}
+
+@media screen {
+  .folha-de-impressao {
+    margin-top: 20px;
+    margin-bottom: 40px;
+    box-shadow: 0 0 0 1px #ddd, 0 8px 24px rgba(42, 21, 18, 0.12);
+  }
+}
+
+.cabecalho-impressao {
+  margin-bottom: 18px;
+  border-bottom: 2px solid #3d201b;
+  padding-bottom: 10px;
+}
+.cabecalho-impressao .selo-texto {
+  margin: 0;
+  font-size: 10pt;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: bold;
+  color: #4e8c2b;
+}
+.cabecalho-impressao h1 {
+  margin: 4px 0;
+  font-size: 18pt;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.cabecalho-impressao p {
+  margin: 2px 0;
+  font-size: 10.5pt;
+}
+.cabecalho-impressao .totais {
+  margin-top: 8px;
+  font-size: 11pt;
+  font-weight: bold;
+}
+
+.tabela-de-impressao {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9.5pt;
+}
+.tabela-de-impressao thead {
+  display: table-header-group;
+}
+.tabela-de-impressao tr {
+  break-inside: avoid;
+}
+.tabela-de-impressao th,
+.tabela-de-impressao td {
+  border: 1px solid #3d201b;
+  padding: 4px 6px;
+  text-align: left;
+  vertical-align: middle;
+}
+.tabela-de-impressao th {
+  background: #f6eec6;
+}
+.tabela-de-impressao .col-numero {
+  width: 32px;
+  text-align: right;
+}
+.tabela-de-impressao .col-marca {
+  width: 64px;
+  text-align: center;
+}
+.caixa-de-marcacao {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid #2a1512;
+}
+
+/* "Gerado em …" repetido em cada página. `position: fixed` dentro de
+   impressão é o truque padrão para isso no Chrome/Edge — Firefox e Safari
+   têm suporte mais inconsistente, por isso a impressão de prova (task 7.8)
+   deve ser feita no navegador que a recepção vai usar de fato. */
+.rodape-fixo {
+  display: none;
+}
+@media print {
+  .rodape-fixo {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-size: 8pt;
+    color: #3d201b;
+  }
+}
