@@ -17,6 +17,12 @@
  *
   *   npm run admin:criar -- --nome "..." --email "..." \
  *     --cpf "000.000.000-00" --nascimento "DD/MM/AAAA"
+ *
+ * `--url` define a origem do link impresso. Sem ela vale o `APP_BASE_URL`
+ * do ambiente, que em geral é localhost — e o link precisa apontar para
+ * onde a pessoa vai abrir:
+ *
+ *   npm run admin:criar -- ... --url "https://preview.exemplo.vercel.app"
  */
 import { config } from 'dotenv';
 import { desc, eq, gt } from 'drizzle-orm';
@@ -33,6 +39,9 @@ async function principal() {
   const email = argumento('email')?.trim().toLowerCase();
   const cpfBruto = argumento('cpf');
   const nascimentoBruto = argumento('nascimento');
+  // O link precisa apontar para o ambiente onde a pessoa vai abrir, que
+  // raramente é o APP_BASE_URL de quem roda o script (em geral localhost).
+  const baseInformada = argumento('url')?.replace(/\/+$/, '');
 
   const faltando = [
     ['--nome', nome],
@@ -163,7 +172,8 @@ async function principal() {
       process.exit(1);
     }
 
-    const url = `${env().APP_BASE_URL}/palestras/entrar/senha/nova?t=${encodeURIComponent(registro.value)}`;
+    const base = baseInformada ?? env().APP_BASE_URL;
+    const url = `${base}/palestras/entrar/senha/nova?t=${encodeURIComponent(registro.value)}`;
 
     console.log('\n--- Link de primeiro acesso, de uso único ---');
     console.log(url);

@@ -15,6 +15,7 @@
     "expirar-convites": "node --conditions react-server --import tsx scripts/expirar-convites.ts",
     "palestras:cadastrar": "node --conditions react-server --import tsx scripts/cadastrar-palestras.ts",
     "admin:criar": "node --conditions react-server --import tsx scripts/criar-admin.ts",
+    "usuarios:desativar-teste": "node --conditions react-server --import tsx scripts/desativar-usuarios-de-teste.ts",
     "test:integracao": "node --conditions react-server --import tsx scripts/integracao.ts",
     "test:integracao:confirmacao": "node --conditions react-server --import tsx scripts/integracao-confirmacao.ts",
     "test:acesso": "node --conditions react-server --import tsx scripts/integracao-acesso.ts",

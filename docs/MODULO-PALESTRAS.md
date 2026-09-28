@@ -114,6 +114,28 @@ rodar de novo atualiza o cadastro e emite um link novo.
 Depois do primeiro Admin, todo o resto entra pela interface ou pela
 importação de CSV.
 
+### Usuários de teste
+
+Os scripts de integração criam usuários para exercitar papéis e escopo, e
+não conseguem se apagar: quem fez check-in ou cancelou um convite virou
+`ator_id` de uma linha de auditoria, e a auditoria é imutável por gatilho.
+
+O resíduo **não é cosmético**. São contas ativas, algumas com papel
+`admin`, num banco que preview e produção compartilham — e as de papel
+`colaborador` e `recepcao` aceitam login por CPF e data de nascimento,
+com datas redondas e previsíveis.
+
+Como não dá para apagar, desativa-se:
+
+```sh
+npm run usuarios:desativar-teste             # mostra o que faria
+npm run usuarios:desativar-teste -- --aplicar
+```
+
+Rode **depois de cada rodada de integração**, antes de qualquer uso sério
+do ambiente. É reversível: os próprios scripts recriam ou reativam o que
+precisarem.
+
 ---
 
 ## Banco de dados
