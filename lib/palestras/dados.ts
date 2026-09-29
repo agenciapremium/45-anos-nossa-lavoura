@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { and, asc, count, eq, ilike, inArray, isNotNull, sql, type SQL } from 'drizzle-orm';
+import { and, asc, count, eq, ilike, inArray, isNotNull, isNull, sql, type SQL } from 'drizzle-orm';
 
 import { db } from '@/lib/db';
 import {
@@ -116,8 +116,14 @@ export type ConviteNoEscopo = {
   eventoLocalNome: string;
   eventoPrazo: Date;
   eventoMensagemTemplate: string;
-  colaboradorId: string;
-  colaboradorNome: string;
+  /**
+   * Nulo no convite avulso (`convites-avulsos`, D1 e D3 do design): gerado
+   * direto pelo Admin, sem colaborador de origem. `colaboradorNome`,
+   * `lojaId`, `lojaNome` e `regionalId` acompanham a mesma nulidade, porque
+   * vêm todos do colaborador que não existe.
+   */
+  colaboradorId: string | null;
+  colaboradorNome: string | null;
   lojaId: string | null;
   lojaNome: string | null;
   /** Da loja do colaborador. Usado para o filtro de regional da lista (3.2). */
@@ -168,8 +174,8 @@ function linhaParaConviteNoEscopo(
     eventoLocalNome: string;
     prazo: string | Date;
     eventoMensagemTemplate: string;
-    colaboradorId: string;
-    colaboradorNome: string;
+    colaboradorId: string | null;
+    colaboradorNome: string | null;
     lojaId: string | null;
     lojaNome: string | null;
     regionalId: string | null;
@@ -221,6 +227,14 @@ export async function convitesNoEscopo(
     regionalId?: string;
     lojaId?: string;
     colaboradorId?: string;
+    /**
+     * Só os avulsos (tarefa 2.4): convites sem colaborador. É o filtro que
+     * a tela usa para a origem "Avulso", sempre um recorte a mais sobre o
+     * que o escopo já alcança, nunca uma ampliação (só o Admin alcança
+     * avulso para começo, então este filtro não faz diferença nenhuma para
+     * os demais papéis).
+     */
+    semColaborador?: boolean;
   } = {},
 ): Promise<ConviteNoEscopo[]> {
   conferirPapel(escopo, 'verConvitesEConfirmacoes');
@@ -236,12 +250,17 @@ export async function convitesNoEscopo(
   if (filtro.regionalId) condicoes.push(eq(loja.regionalId, filtro.regionalId));
   if (filtro.lojaId) condicoes.push(eq(user.lojaId, filtro.lojaId));
   if (filtro.colaboradorId) condicoes.push(eq(convite.colaboradorId, filtro.colaboradorId));
+  if (filtro.semColaborador) condicoes.push(isNull(convite.colaboradorId));
 
+  // `leftJoin` em `user` (D3 do design): um `innerJoin` descartaria em
+  // silêncio o convite avulso (`colaboradorId` nulo) de toda leitura, Admin
+  // incluído. `colaboradorNome`, `lojaId`, `lojaNome` e `regionalId` saem
+  // nulos para esse convite: a tela decide o texto de origem (D7).
   const linhas = await db()
     .select(colunasDoConvite())
     .from(convite)
     .innerJoin(evento, eq(evento.id, convite.eventoId))
-    .innerJoin(user, eq(user.id, convite.colaboradorId))
+    .leftJoin(user, eq(user.id, convite.colaboradorId))
     .leftJoin(loja, eq(loja.id, user.lojaId))
     .leftJoin(checkin, eq(checkin.conviteId, convite.id))
     .where(and(...condicoes.filter(Boolean)))
@@ -279,11 +298,18 @@ export async function conviteNoEscopo(
       : eq(convite.codigo, identificador.codigo as string),
   ];
 
+  // `leftJoin` pelo mesmo motivo de `convitesNoEscopo` (D3 do design): esta
+  // função alimenta o detalhe do convite (`conviteId/[codigo]`), e o design
+  // só nomeia `convitesNoEscopo`/`confirmacoesNoEscopo` como "o ponto de
+  // ruptura", mas o requisito da spec é explícito ("Admin vê o avulso...
+  // no detalhe"), e este `select` compartilha `colunasDoConvite()` com a
+  // lista: um `innerJoin` aqui devolveria 404 para o Admin abrir o próprio
+  // convite avulso pelo código. Decisão tomada nesta implementação.
   const [linha] = await db()
     .select(colunasDoConvite())
     .from(convite)
     .innerJoin(evento, eq(evento.id, convite.eventoId))
-    .innerJoin(user, eq(user.id, convite.colaboradorId))
+    .leftJoin(user, eq(user.id, convite.colaboradorId))
     .leftJoin(loja, eq(loja.id, user.lojaId))
     .leftJoin(checkin, eq(checkin.conviteId, convite.id))
     .where(and(...condicoes.filter(Boolean)))
@@ -422,7 +448,8 @@ export type ConfirmacaoNoEscopo = {
   atividade: string | null;
   eventoId: string;
   eventoCidade: string;
-  colaboradorNome: string;
+  /** Nulo quando a confirmação é de um convite avulso (D1/D3 do design). */
+  colaboradorNome: string | null;
   lojaNome: string | null;
   confirmadoEm: Date;
 };
@@ -453,6 +480,9 @@ export async function confirmacoesNoEscopo(
   if (filtro.conviteId) condicoes.push(eq(confirmacao.conviteId, filtro.conviteId));
   if (filtro.lojaId) condicoes.push(eq(user.lojaId, filtro.lojaId));
 
+  // `leftJoin` em `user` pelo mesmo motivo de `convitesNoEscopo` (D3 do
+  // design): sem ele, a confirmação de um convite avulso desapareceria do
+  // funil e do resumo do Admin, em silêncio.
   const linhas = await db()
     .select({
       conviteId: confirmacao.conviteId,
@@ -473,7 +503,7 @@ export async function confirmacoesNoEscopo(
     .from(confirmacao)
     .innerJoin(convite, eq(convite.id, confirmacao.conviteId))
     .innerJoin(evento, eq(evento.id, convite.eventoId))
-    .innerJoin(user, eq(user.id, convite.colaboradorId))
+    .leftJoin(user, eq(user.id, convite.colaboradorId))
     .leftJoin(loja, eq(loja.id, user.lojaId))
     .where(and(...condicoes.filter(Boolean)))
     .orderBy(asc(confirmacao.nome))
@@ -913,6 +943,13 @@ export async function buscarConfirmadosPorNome(
 }
 
 /** Uma linha da lista impressa: só o que a spec autoriza no papel que circula pelo salão. */
+/**
+ * O que aparece no lugar da loja e do colaborador quando o convite é
+ * avulso, gerado direto pela administração (D7 de `convites-avulsos`).
+ * Campo em branco na folha da porta parece defeito; isto diz a verdade.
+ */
+export const ORIGEM_AVULSA = 'Administração';
+
 export type LinhaDeImpressao = {
   conviteId: string;
   titular: string;
@@ -953,7 +990,7 @@ export async function listaDeImpressao(
     );
   }
 
-  return db()
+  const linhas = await db()
     .select({
       conviteId: confirmacao.conviteId,
       titular: confirmacao.nome,
@@ -964,11 +1001,24 @@ export async function listaDeImpressao(
     })
     .from(confirmacao)
     .innerJoin(convite, eq(convite.id, confirmacao.conviteId))
-    .innerJoin(user, eq(user.id, convite.colaboradorId))
+    // `leftJoin`, e não `innerJoin`: convite avulso não tem colaborador, e
+    // um join interno aqui apagaria da FOLHA DA PORTA quem confirmou por
+    // um link da administração. A pessoa chegaria com ingresso válido e
+    // não estaria na lista de contingência. Ver D3 do design de
+    // `convites-avulsos`: leitura usa left, recorte por origem usa inner.
+    .leftJoin(user, eq(user.id, convite.colaboradorId))
     .leftJoin(loja, eq(loja.id, user.lojaId))
     .where(and(...condicoes.filter(Boolean)))
     .orderBy(asc(confirmacao.nome))
     .limit(2000);
+
+  // D7: na folha da porta, origem nunca fica em branco. Sem colaborador,
+  // as duas colunas dizem de onde o convite veio de verdade.
+  return linhas.map((l) => ({
+    ...l,
+    lojaNome: l.colaboradorNome === null ? ORIGEM_AVULSA : l.lojaNome,
+    colaboradorNome: l.colaboradorNome ?? ORIGEM_AVULSA,
+  }));
 }
 
 /**
@@ -1054,7 +1104,11 @@ export async function dadosParaExportacaoCsv(
     })
     .from(convite)
     .innerJoin(evento, eq(evento.id, convite.eventoId))
-    .innerJoin(user, eq(user.id, convite.colaboradorId))
+    // `leftJoin` pelo mesmo motivo da lista impressa: o CSV é a leitura
+    // completa da palestra, e convite avulso não tem colaborador. Com
+    // join interno, ele sumiria da exportação sem nenhum sinal, e a
+    // planilha fecharia com menos linhas que o total da tela.
+    .leftJoin(user, eq(user.id, convite.colaboradorId))
     .leftJoin(loja, eq(loja.id, user.lojaId))
     .leftJoin(regional, eq(regional.id, loja.regionalId))
     .leftJoin(confirmacao, eq(confirmacao.conviteId, convite.id))
@@ -1067,9 +1121,11 @@ export async function dadosParaExportacaoCsv(
   return linhas.map((l) => ({
     codigo: l.codigo,
     estado: estadoEfetivo(l.estadoGravado as EstadoDeConvite, new Date(l.prazo), referencia),
-    regionalNome: l.regionalNome,
-    lojaNome: l.lojaNome,
-    colaboradorNome: l.colaboradorNome,
+    // Mesma regra da lista impressa: sem colaborador, a origem da linha é
+    // a administração, e a planilha diz isso em vez de vir vazia.
+    regionalNome: l.colaboradorNome === null ? ORIGEM_AVULSA : l.regionalNome,
+    lojaNome: l.colaboradorNome === null ? ORIGEM_AVULSA : l.lojaNome,
+    colaboradorNome: l.colaboradorNome ?? ORIGEM_AVULSA,
     titularNome: l.titularNome,
     titularCpf: l.titularCpf,
     titularWhatsapp: l.titularWhatsapp,

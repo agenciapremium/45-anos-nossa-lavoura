@@ -294,10 +294,22 @@ export const lote = pgTable(
     eventoId: text('evento_id')
       .notNull()
       .references(() => evento.id, { onDelete: 'restrict' }),
-    colaboradorId: text('colaborador_id')
-      .notNull()
-      .references(() => user.id, { onDelete: 'restrict' }),
+    /**
+     * Anulável desde `convites-avulsos` (D1 do design): lote avulso não tem
+     * colaborador. `DROP NOT NULL`, sem reescrita de tabela nem impacto em
+     * lote existente, todos gerados por colaborador.
+     */
+    colaboradorId: text('colaborador_id').references(() => user.id, {
+      onDelete: 'restrict',
+    }),
     quantidade: integer('quantidade').notNull(),
+    /**
+     * Rótulo de leitura do lote avulso (D4 do design): "Imprensa",
+     * "Patrocinador Virbac"... Opcional, com "Avulso" como padrão na
+     * ausência (decisão da cliente, 29/09/2026). Sempre nulo em lote com
+     * colaborador; a tela não oferece o campo nesse caminho.
+     */
+    rotulo: text('rotulo'),
     criadoPor: text('criado_por').references(() => user.id, {
       onDelete: 'set null',
     }),
@@ -318,9 +330,16 @@ export const convite = pgTable(
     eventoId: text('evento_id')
       .notNull()
       .references(() => evento.id, { onDelete: 'restrict' }),
-    colaboradorId: text('colaborador_id')
-      .notNull()
-      .references(() => user.id, { onDelete: 'restrict' }),
+    /**
+     * Anulável desde `convites-avulsos` (D1 do design): convite sem
+     * colaborador é o convite avulso, gerado direto pelo Admin para
+     * imprensa, patrocinador, autoridade ou convidado do Grupo, sem
+     * contaminar o número de nenhum colaborador. `DROP NOT NULL`: convite
+     * existente continua com colaborador, nada é reescrito.
+     */
+    colaboradorId: text('colaborador_id').references(() => user.id, {
+      onDelete: 'restrict',
+    }),
     loteId: text('lote_id').references(() => lote.id, { onDelete: 'set null' }),
     estado: text('estado').notNull().default('disponivel'),
     enviadoPara: text('enviado_para'),

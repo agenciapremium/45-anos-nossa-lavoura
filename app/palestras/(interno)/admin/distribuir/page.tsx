@@ -60,9 +60,13 @@ export default async function Distribuir() {
 
     const referencia = agora();
     for (const l of linhas) {
+      // Convite avulso (`colaboradorId` nulo, `convites-avulsos`) não tem
+      // colaborador para distribuir: esta tela é por colaborador, o avulso
+      // fica fora dela mesma como fica fora do PDF por pessoa (D8 do design).
       if (
+        !l.colaboradorId ||
         estadoEfetivo(l.estado as never, new Date(l.prazo), referencia) !==
-        'disponivel'
+          'disponivel'
       ) {
         continue;
       }
