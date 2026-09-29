@@ -57,6 +57,16 @@ folha impressa de contingência, nem na planilha. As duas viraram `leftJoin`. A 
 vale, e que o teste agora guarda função por função, é: **leitura usa `leftJoin`, recorte
 por origem usa `innerJoin`**.
 
+**Segunda correção, 29/09/2026, na implementação do grupo 6:** havia um SEXTO `innerJoin` em
+`user`, fora de `dados.ts` — no `select` que monta o resultado verde do check-in, em
+`lib/palestras/servicos/checkin.ts`. Ali o efeito não era um número menor: a consulta não
+devolvia linha, o serviço caía no `if (!dadosDoTitular) throw new RecusaDeCheckin('invalido')`,
+e o `throw` desfazia a transação inteira. Um convidado que confirmasse por convite avulso
+levaria **tela vermelha na portaria**, com o check-in não gravado, e a recepção não teria como
+saber que o problema era do sistema e não do ingresso. Corrigido para `leftJoin`, com o rótulo
+do lote passando a viajar no resultado. Lição para o resto da change: a busca por `innerJoin`
+em `user` precisava sair de `dados.ts` e varrer `lib/palestras/servicos/` também.
+
 Os recortes por origem (`resumoPorRegional`, `resumoPorLoja`, `resumoPorColaborador`) **continuam com `innerJoin`**: é o que mantém o avulso fora deles por construção, sem `WHERE` extra. A soma desses recortes passa a ser menor que o total da palestra, e isso é correto; a tela é que precisa dizer.
 
 *Alternativa considerada:* deixar `innerJoin` e acrescentar um `OR colaborador_id IS NULL` em cada consulta. Espalharia a regra por sete lugares e quebraria de novo no próximo `join` que alguém escrevesse.
@@ -123,6 +133,13 @@ ser publicado, e o código só é enviado depois de ela ter passado.
 
 - **Rótulo é opcional**, com "Avulso" como padrão na ausência. Confirmado.
 - **Só o Admin gera avulso.** Confirmado. Gerente regional gerando para a própria regional fica fora: exigiria o convite carregar regional sem ter colaborador, o que desmonta D2 e seria outra change.
+
+## Decisões tomadas na implementação (29/09/2026)
+
+- **O texto de origem virou um módulo puro.** `lib/palestras/origem.ts`, sem `server-only`, com `ORIGEM_AVULSA`, `ROTULO_AVULSO_PADRAO` e `origemDoConvite()`. Sem ele, seis lugares decidiriam por conta própria o que mostrar quando o colaborador é nulo: a consulta, a lista (Client Component), o detalhe, a lista impressa, o CSV e o check-in. `dados.ts` reexporta `ORIGEM_AVULSA` para não quebrar quem já o importava de lá.
+- **O convite avulso não tem WhatsApp em lugar nenhum**, não só na tela do lote: também não na linha da lista de convites, nem no PDF do lote. A spec só proíbe na tela do lote, mas o motivo (não há remetente) vale igual nos outros dois, e o mockup aprovado mostra apenas "Copiar". De passagem, `AcoesDeEnvio` desenhava um botão com `href="#"` quando faltava o link: agora esconde o botão.
+- **A aba por colaborador deixou de tomar a tela quando não há colaborador.** Com a estrutura de lojas zerada, `/palestras/admin/gerar` mostrava só "Nenhum colaborador cadastrado" e não havia caminho para gerar nada. O aviso passou para dentro da aba dela, apontando para a aba avulsa.
+- **A limpeza da integração de operação passou a apagar os lotes antes do evento.** `palestra_lote.evento_id` é `on delete restrict` e `palestra_convite.lote_id` é `set null`: apagar os convites não apagava o lote, e o lote órfão barrava o `delete` do evento na rodada seguinte.
 
 ## Open Questions
 

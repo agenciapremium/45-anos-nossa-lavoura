@@ -66,7 +66,7 @@
 
 - [x] 8.1 Criar `tests/copy.test.ts` que falha quando um texto de interface contém travessão ou meia-risca, nomeando arquivo e trecho
 - [x] 8.2 Varrer `app/`, `components/` e os textos de `lib/palestras/` e substituir os travessões existentes por ` · `, dois-pontos, vírgula ou parênteses
-- [ ] 8.3 Rodar `npm run typecheck`, `npm test` e as integrações de confirmação, painel e operação (typecheck e npm test feitos; integrações não rodadas, ver relatório)
+- [x] 8.3 Rodar `npm run typecheck`, `npm test` e as integrações de confirmação, painel e operação (feito em 29/09/2026, junto da implementação de `convites-avulsos`: typecheck, 308 testes de unidade, `next build` e as cinco suítes de integração — `integracao`, `painel`, `operacao`, `acesso`, `confirmacao` — todas passando)
 - [x] 8.4 Atualizar `docs/PAINEL-COLABORADOR.md`, `docs/OPERACAO-EVENTO.md` e `docs/MODULO-PALESTRAS.md` com a navegação nova e a tela de métricas
 - [x] 8.5 Conferir cada tela contra o artboard correspondente do mockup aprovado
 - [x] 8.6 Conferir contraste, alvos de toque e foco visível nas telas do convidado e na porta do evento

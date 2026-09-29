@@ -195,7 +195,12 @@ const estilos = StyleSheet.create({
 export type LinhaDeConvitePdf = {
   codigo: string;
   url: string;
-  linkWhatsapp: string;
+  /**
+   * Nulo no lote avulso (`convites-avulsos`): a mensagem do sistema é
+   * assinada pelo colaborador que envia, e o convite avulso não tem
+   * remetente. Sem link, a linha sai só com o código e o endereço.
+   */
+  linkWhatsapp: string | null;
 };
 
 export type BlocoDePalestraPdf = {
@@ -209,10 +214,18 @@ export type BlocoDePalestraPdf = {
 };
 
 export type DadosDoPdf = {
+  /** Linha grande do cabeçalho: o colaborador, ou o rótulo do lote avulso. */
   colaborador: string;
+  /** Linha menor: a loja, ou "Administração" no lote avulso. */
   loja: string;
   geradoEm: string;
   blocos: BlocoDePalestraPdf[];
+  /**
+   * Lote avulso (requisito "Sem envio por WhatsApp"): tira o botão de cada
+   * linha e troca a instrução do topo, que fala de escolher o contato no
+   * WhatsApp. O PDF do lote avulso é para copiar endereço, não para enviar.
+   */
+  semWhatsapp?: boolean;
 };
 
 export function DocumentoDeDistribuicao({ dados }: { dados: DadosDoPdf }) {
@@ -245,11 +258,9 @@ export function DocumentoDeDistribuicao({ dados }: { dados: DadosDoPdf }) {
 
         <View style={estilos.instrucoes}>
           <Text>
-            Cada linha é um convite diferente, pessoal e intransferível, válido
-            para uma pessoa e mais 1 acompanhante. Toque em “Enviar via
-            WhatsApp” para abrir a mensagem pronta e escolher o contato, ou
-            copie o endereço em texto. Não envie o mesmo link para duas
-            pessoas: ele trava no primeiro CPF que confirmar.
+            {dados.semWhatsapp
+              ? 'Cada linha é um convite diferente, pessoal e intransferível, válido para uma pessoa e mais 1 acompanhante. Copie o endereço em texto e envie pelo canal que preferir. Não envie o mesmo link para duas pessoas: ele trava no primeiro CPF que confirmar.'
+              : 'Cada linha é um convite diferente, pessoal e intransferível, válido para uma pessoa e mais 1 acompanhante. Toque em “Enviar via WhatsApp” para abrir a mensagem pronta e escolher o contato, ou copie o endereço em texto. Não envie o mesmo link para duas pessoas: ele trava no primeiro CPF que confirmar.'}
           </Text>
         </View>
 
@@ -279,9 +290,11 @@ export function DocumentoDeDistribuicao({ dados }: { dados: DadosDoPdf }) {
                     {/* Texto puro, selecionável, sem hifenização. */}
                     <Text style={estilos.url}>{c.url}</Text>
                   </View>
-                  <Link src={c.linkWhatsapp} style={estilos.botao}>
-                    Enviar via WhatsApp
-                  </Link>
+                  {c.linkWhatsapp ? (
+                    <Link src={c.linkWhatsapp} style={estilos.botao}>
+                      Enviar via WhatsApp
+                    </Link>
+                  ) : null}
                 </View>
               ))
             )}

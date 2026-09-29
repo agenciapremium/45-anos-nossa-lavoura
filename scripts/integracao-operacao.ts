@@ -52,6 +52,7 @@ async function main() {
     convite,
     evento,
     loja,
+    lote,
     regional,
     user,
   } = await import('@/lib/db/schema');
@@ -115,12 +116,14 @@ async function main() {
   /** Convite já `confirmado`, com confirmação ativa e token pronto para check-in. */
   async function novoConfirmado(
     eventoId: string,
-    colaboradorId: string,
+    /** Nulo é o convite avulso: gerado pela administração, sem colaborador. */
+    colaboradorId: string | null,
     extra: Partial<{
       cpf: string;
       acompanhanteNome: string | null;
       propriedade: string;
       nome: string;
+      loteId: string;
     }> = {},
   ) {
     const cpf = extra.cpf ?? proximoCpf();
@@ -130,6 +133,7 @@ async function main() {
         codigo: gerarCodigo(),
         eventoId,
         colaboradorId,
+        loteId: extra.loteId ?? null,
         estado: 'confirmado',
       })
       .returning({ id: convite.id, codigo: convite.codigo });
@@ -201,6 +205,24 @@ async function main() {
       await db().delete(checkin).where(inArray(checkin.conviteId, ids));
       await db().delete(confirmacao).where(inArray(confirmacao.conviteId, ids));
       await db().delete(convite).where(inArray(convite.id, ids));
+    }
+    // Os lotes vêm antes do evento: `palestra_lote.evento_id` é
+    // `on delete restrict`, e `palestra_convite.lote_id` é `set null`, então
+    // apagar os convites acima não apaga o lote — e o lote órfão barraria o
+    // `delete` do evento.
+    const eventosDeTeste = await db()
+      .select({ id: evento.id })
+      .from(evento)
+      .where(like(evento.cidade, `${MARCA}%`));
+    if (eventosDeTeste.length) {
+      await db()
+        .delete(lote)
+        .where(
+          inArray(
+            lote.eventoId,
+            eventosDeTeste.map((e) => e.id),
+          ),
+        );
     }
     await db().delete(evento).where(like(evento.cidade, `${MARCA}%`));
     // Admin e Recepção ficam de fora, por papel — não só os dois CPFs
@@ -934,6 +956,110 @@ async function main() {
     checar(
       !textoCsv.startsWith(BOM_UTF8 + BOM_UTF8),
       'o BOM aparece uma única vez',
+    );
+
+    /* =====================================================
+       12. Convite avulso na operação do evento
+           (`convites-avulsos`, requisitos "Check-in de convidado
+           avulso" e "Lista impressa com convidado avulso")
+
+       A regressão que esta seção existe para pegar é a pior possível:
+       com `innerJoin` em `user`, o `select` que monta o resultado verde
+       do check-in não devolvia linha para convite sem colaborador, o
+       serviço lançava `RecusaDeCheckin('invalido')`, a transação inteira
+       era desfeita e a portaria via TELA VERMELHA para alguém com
+       ingresso válido. Não havia campo em branco: havia entrada negada.
+       ===================================================== */
+    console.log('\n== 12. convite avulso na porta ==');
+
+    const [loteDoTeste] = await db()
+      .insert(lote)
+      .values({
+        eventoId: palestraHojeId,
+        colaboradorId: null,
+        quantidade: 1,
+        rotulo: `${MARCA} Imprensa`,
+        criadoPor: adminId,
+      })
+      .returning({ id: lote.id });
+
+    const cAvulso = await novoConfirmado(palestraHojeId, null, {
+      acompanhanteNome: `${MARCA} Acompanhante Avulso`,
+      nome: `${MARCA} Convidado Avulso`,
+      loteId: loteDoTeste!.id,
+    });
+
+    const rAvulso = await checkinPorToken(cAvulso.token, palestraHojeId, atorRecepcao);
+    checar(
+      rAvulso.ok && rAvulso.cor === 'verde',
+      'convite avulso confirmado passa no check-in: resultado VERDE',
+      rAvulso.ok ? '' : `veio ${rAvulso.cor}`,
+    );
+    if (rAvulso.ok) {
+      checar(
+        rAvulso.colaboradorNome === 'Administração',
+        'a origem é "Administração", não um campo vazio',
+        rAvulso.colaboradorNome,
+      );
+      checar(
+        rAvulso.lojaNome === 'Administração',
+        'a loja também diz "Administração"',
+        String(rAvulso.lojaNome),
+      );
+      checar(
+        rAvulso.rotuloDoLote === `${MARCA} Imprensa`,
+        'o rótulo do lote chega à portaria',
+        String(rAvulso.rotuloDoLote),
+      );
+      checar(
+        rAvulso.titular === `${MARCA} Convidado Avulso`,
+        'o titular é o do convite avulso',
+      );
+    }
+    checar(
+      (await estadoGravadoDe(cAvulso.conviteId)) === 'presente',
+      'o convite avulso passa a `presente`: a transação foi gravada, não desfeita',
+    );
+
+    // Segunda leitura do avulso: amarelo, como qualquer outro convite.
+    const rAvulsoDeNovo = await checkinPorToken(cAvulso.token, palestraHojeId, atorRecepcao);
+    checar(
+      !rAvulsoDeNovo.ok && rAvulsoDeNovo.cor === 'amarelo',
+      'segunda leitura do avulso: amarelo, comportamento idêntico ao dos outros',
+    );
+
+    // A folha da porta: o avulso precisa estar nela, com origem preenchida.
+    const listaComAvulso = await listaDeImpressao(escopoAdmin, palestraHojeId);
+    const linhaAvulsa = listaComAvulso.find((l) => l.titular === `${MARCA} Convidado Avulso`);
+    checar(Boolean(linhaAvulsa), 'o convidado avulso aparece na lista impressa');
+    checar(
+      linhaAvulsa?.colaboradorNome === 'Administração',
+      'na lista impressa, a coluna de colaborador diz "Administração"',
+      String(linhaAvulsa?.colaboradorNome),
+    );
+    checar(
+      linhaAvulsa?.lojaNome === 'Administração',
+      'e a coluna de loja também',
+      String(linhaAvulsa?.lojaNome),
+    );
+
+    // A planilha da palestra: o avulso entra, com as três colunas de origem
+    // preenchidas.
+    const csvComAvulso = await dadosParaExportacaoCsv(escopoAdmin, palestraHojeId);
+    const linhaCsvAvulsa = csvComAvulso.find((l) => l.codigo === cAvulso.codigo);
+    checar(Boolean(linhaCsvAvulsa), 'o convite avulso entra na exportação CSV');
+    checar(
+      linhaCsvAvulsa?.colaboradorNome === 'Administração' &&
+        linhaCsvAvulsa?.lojaNome === 'Administração' &&
+        linhaCsvAvulsa?.regionalNome === 'Administração',
+      'no CSV, regional, loja e colaborador dizem "Administração"',
+    );
+
+    // E o avulso continua invisível para quem não é Admin.
+    const listaDoGerente = await listaDeImpressao(escopoGerenteRegional, palestraHojeId);
+    checar(
+      !listaDoGerente.some((l) => l.titular === `${MARCA} Convidado Avulso`),
+      'o gerente regional NÃO vê o convidado avulso na lista dele',
     );
 
     /* =====================================================

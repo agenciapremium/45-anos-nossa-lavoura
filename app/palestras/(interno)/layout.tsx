@@ -44,7 +44,18 @@ export default async function LayoutInterno({
 
   return (
     <div className="flex min-h-screen bg-superficie text-texto">
-      <aside className="hidden w-64 flex-none flex-col bg-inverso-fundo text-texto-inverso lg:flex">
+      {/*
+        `sticky top-0 h-dvh`: o menu acompanha a rolagem em vez de crescer
+        com o conteúdo. Sem isto, o `<aside>` era só mais um item do flex e
+        esticava até a altura da página — numa tela longa (convites,
+        métricas), a identidade de quem está logado e o "Sair" ficavam no
+        pé do documento, longe da janela, e era preciso rolar até o fim
+        para sair do sistema. Com altura de viewport e `flex-1` no `<nav>`,
+        o rodapé de identidade fica sempre no fim da JANELA, e um menu
+        maior que a tela rola dentro do próprio `<nav>` (que já tem
+        `overflow-y-auto`), não junto com a página.
+      */}
+      <aside className="hidden w-64 flex-none flex-col bg-inverso-fundo text-texto-inverso lg:sticky lg:top-0 lg:flex lg:h-dvh">
         <CabecalhoDoMenu />
         <MenuLateral papel={atual.papel} />
         <IdentidadeDaSessao nome={atual.nome} papel={rotuloDoPapel} />

@@ -9,11 +9,13 @@ import {
   convite as tabelaConvite,
   evento as tabelaEvento,
   loja as tabelaLoja,
+  lote as tabelaLote,
   user as tabelaUser,
   type MetodoDeCheckin,
 } from '@/lib/db/schema';
 import { ACOES, type Ator } from '@/lib/palestras/auditoria';
 import { transicionarConvite } from '@/lib/palestras/estado-do-convite';
+import { ORIGEM_AVULSA, origemDoConvite } from '@/lib/palestras/origem';
 import { agora, formatarData, formatarHorario, mesmoDiaCivil } from '@/lib/tempo';
 
 /* =========================================================
@@ -46,6 +48,8 @@ export type ResultadoDoCheckin =
       acompanhante: string | null;
       lojaNome: string | null;
       colaboradorNome: string;
+      /** Rótulo do lote, só no convite avulso ("Imprensa"). */
+      rotuloDoLote: string | null;
       feitoEm: Date;
     }
   | {
@@ -110,6 +114,7 @@ type DadosDoCheckinAceito = {
   acompanhante: string | null;
   lojaNome: string | null;
   colaboradorNome: string;
+  rotuloDoLote: string | null;
   feitoEm: Date;
 };
 
@@ -170,17 +175,28 @@ async function executarCheckin(pedido: {
 
         // 4. Os dados do resultado verde: titular, acompanhante, loja e
         //    colaborador de origem (spec "resultado válido").
+        //
+        //    `leftJoin` em `user`, e não `innerJoin` (D3 e requisito
+        //    "Check-in de convidado avulso" de `convites-avulsos`): o
+        //    convite avulso não tem colaborador, e com join interno esta
+        //    consulta não devolvia linha nenhuma. O `if` abaixo então
+        //    lançava `RecusaDeCheckin('invalido')`, a transação inteira era
+        //    desfeita e a portaria via TELA VERMELHA para um convidado com
+        //    ingresso válido — pior que campo em branco. A origem passa a
+        //    ser "Administração" quando não há colaborador.
         const [dadosDoTitular] = await tx
           .select({
             titular: tabelaConfirmacao.nome,
             acompanhante: tabelaConfirmacao.acompanhanteNome,
             lojaNome: tabelaLoja.nome,
             colaboradorNome: tabelaUser.name,
+            rotuloDoLote: tabelaLote.rotulo,
           })
           .from(tabelaConfirmacao)
           .innerJoin(tabelaConvite, eq(tabelaConvite.id, tabelaConfirmacao.conviteId))
-          .innerJoin(tabelaUser, eq(tabelaUser.id, tabelaConvite.colaboradorId))
+          .leftJoin(tabelaUser, eq(tabelaUser.id, tabelaConvite.colaboradorId))
           .leftJoin(tabelaLoja, eq(tabelaLoja.id, tabelaUser.lojaId))
+          .leftJoin(tabelaLote, eq(tabelaLote.id, tabelaConvite.loteId))
           .where(eq(tabelaConfirmacao.conviteId, conviteAtualizado.id))
           .limit(1);
 
@@ -191,11 +207,21 @@ async function executarCheckin(pedido: {
           throw new RecusaDeCheckin('invalido');
         }
 
+        const origem = origemDoConvite({
+          colaboradorNome: dadosDoTitular.colaboradorNome,
+          lojaNome: dadosDoTitular.lojaNome,
+          loteRotulo: dadosDoTitular.rotuloDoLote,
+        });
+
         return {
           titular: dadosDoTitular.titular,
           acompanhante: dadosDoTitular.acompanhante,
-          lojaNome: dadosDoTitular.lojaNome,
-          colaboradorNome: dadosDoTitular.colaboradorNome,
+          // No convite avulso, as duas colunas dizem "Administração" e o
+          // rótulo do lote entra como detalhe: a portaria vê de onde o
+          // convite veio de verdade, nunca um campo vazio (D7).
+          lojaNome: origem.avulso ? ORIGEM_AVULSA : dadosDoTitular.lojaNome,
+          colaboradorNome: origem.titulo,
+          rotuloDoLote: origem.avulso ? origem.detalhe : null,
           feitoEm: new Date(linhaCheckin!.feitoEm),
         };
       },

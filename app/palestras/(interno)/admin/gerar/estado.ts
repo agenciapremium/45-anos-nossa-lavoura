@@ -7,6 +7,8 @@
  * `next build` não pega: só a primeira requisição pega.
  */
 
-import type { EstadoDaGeracao } from './acoes';
+import type { EstadoDaGeracao, EstadoDaGeracaoAvulsa } from './acoes';
 
 export const ESTADO_INICIAL: EstadoDaGeracao = { ok: false };
+
+export const ESTADO_AVULSO_INICIAL: EstadoDaGeracaoAvulsa = { ok: false };

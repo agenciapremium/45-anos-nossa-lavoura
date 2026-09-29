@@ -22,10 +22,12 @@ import type { Evento } from '@/lib/db/schema';
 import { contextoDePalestra } from '@/lib/palestras/contexto-de-palestra';
 import {
   lojasNoEscopo,
+  resumoAvulso,
   resumoNoEscopo,
   resumoPorColaborador,
   resumoPorRegional,
   type ResumoDeColaborador,
+  type ResumoDeContagem,
   type ResumoDeLoja,
   type ResumoDeRegional,
 } from '@/lib/palestras/dados';
@@ -36,7 +38,12 @@ import {
   serieDiariaDeConfirmacoes,
 } from '@/lib/palestras/metricas';
 import { exigirPapel } from '@/lib/palestras/sessao';
-import { calcularTaxas, formatarTaxa, totalGerados } from '@/lib/palestras/taxas';
+import {
+  calcularTaxas,
+  formatarTaxa,
+  totalConfirmados,
+  totalGerados,
+} from '@/lib/palestras/taxas';
 import { agora, formatarData, formatarHorario, mesmoDiaCivil, venceu } from '@/lib/tempo';
 
 export const metadata: Metadata = { title: 'Métricas' };
@@ -169,10 +176,22 @@ export default async function Metricas({
   let colaboradoresDaLoja: ResumoDeColaborador[] | null = null;
   let minhaLojaNome: string | null = null;
 
+  /*
+   * A linha que fecha a conta (tarefa 6.5 e requisito "Recorte por loja não
+   * inclui o avulso, e diz isso"). Os recortes por regional, por loja e por
+   * colaborador são `innerJoin` em `user` de propósito: é o que mantém o
+   * avulso fora deles por construção. O preço é que a soma das lojas fica
+   * menor que o total da palestra, e número que não fecha parece erro.
+   * `resumoAvulso` é a diferença, e só o Admin a enxerga — é o único papel
+   * que alcança convite avulso.
+   */
+  let avulsos: ResumoDeContagem | null = null;
+
   if (escopo.papel === 'admin') {
-    [regionais, lojasTop] = await Promise.all([
+    [regionais, lojasTop, avulsos] = await Promise.all([
       resumoPorRegional(escopo, { eventoId }),
       lojasComMelhorConversao(escopo, { eventoId, limite: 6 }),
+      resumoAvulso(escopo, { eventoId }),
     ]);
     nomeDaRegional = new Map(regionais.map((r) => [r.regionalId, r.regionalNome]));
   } else if (escopo.papel === 'gerente_regional') {
@@ -340,6 +359,22 @@ export default async function Metricas({
                     </li>
                   );
                 })}
+                {avulsos && totalGerados(avulsos) > 0 ? (
+                  <li className="border-t border-linha pt-3">
+                    <div className="mb-1 flex items-baseline justify-between gap-2">
+                      <span className="font-corpo text-corpo font-bold text-texto">
+                        Avulsos
+                        <span className="ml-2 font-corpo text-corpo-sm font-normal text-texto-suave">
+                          sem regional
+                        </span>
+                      </span>
+                      <span className="font-corpo text-corpo tabular-nums font-bold text-texto-forte">
+                        {totalConfirmados(avulsos)}
+                      </span>
+                    </div>
+                    <BarraDeTaxa taxa={calcularTaxas(avulsos).confirmacao} />
+                  </li>
+                ) : null}
               </ul>
             )}
             <p className="m-0 mt-4">
@@ -431,9 +466,38 @@ export default async function Metricas({
                       </tr>
                     );
                   })}
+                  {avulsos && totalGerados(avulsos) > 0 ? (
+                    <tr className="bg-superficie-alt">
+                      <Celula className="font-bold text-texto-forte">
+                        Avulsos
+                        <span className="block font-corpo text-corpo-sm font-normal text-texto-suave">
+                          gerados pela administração, sem loja
+                        </span>
+                      </Celula>
+                      {nomeDaRegional ? <Celula>Administração</Celula> : null}
+                      <Celula className="text-right tabular-nums">{totalGerados(avulsos)}</Celula>
+                      <Celula className="text-right font-bold tabular-nums">
+                        {totalConfirmados(avulsos)}
+                      </Celula>
+                      <Celula>
+                        <BarraDeTaxa taxa={calcularTaxas(avulsos).confirmacao} />
+                      </Celula>
+                    </tr>
+                  ) : null}
                 </tbody>
               </Tabela>
             )}
+            {avulsos && totalGerados(avulsos) > 0 ? (
+              <p className="m-0 mt-3 font-corpo text-corpo-sm text-texto-suave">
+                A tabela mostra as lojas de melhor conversão; a linha{' '}
+                <strong className="text-texto-forte">Avulsos</strong> não é uma delas, está aí para
+                a conta fechar. No total desta visão, as lojas respondem por{' '}
+                {gerados - totalGerados(avulsos)} convites e os avulsos por{' '}
+                {totalGerados(avulsos)}, somando os {gerados} gerados. Convite avulso não tem loja
+                nem colaborador: entrar num desses recortes falsearia o desempenho de quem está
+                na conta.
+              </p>
+            ) : null}
           </Cartao>
         ) : null}
       </div>

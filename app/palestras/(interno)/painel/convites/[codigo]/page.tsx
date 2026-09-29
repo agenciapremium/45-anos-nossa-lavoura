@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { CabecalhoDeTela } from '@/components/palestras/cabecalho-de-tela';
@@ -19,6 +20,7 @@ import {
 } from '@/lib/palestras/dados';
 import { normalizarCodigo, pareceCodigo } from '@/lib/palestras/codigo';
 import { permitido } from '@/lib/palestras/escopo';
+import { origemDoConvite } from '@/lib/palestras/origem';
 import { exigirEscopo } from '@/lib/palestras/sessao';
 import { formatarCarimbo, formatarData, formatarDataHora, formatarHorario } from '@/lib/tempo';
 import { CancelamentoDoDetalhe } from './cancelamento';
@@ -85,6 +87,8 @@ export default async function DetalheDoConvite({
   const podeCancelar =
     (convite.estado === 'disponivel' || convite.estado === 'confirmado') &&
     permitido(escopo, 'cancelarConvite', { colaboradorId: convite.colaboradorId });
+
+  const origem = origemDoConvite(convite);
 
   const passos: PassoDaLinhaDoTempo[] = [];
   if (convite.estado === 'confirmado') {
@@ -219,22 +223,41 @@ export default async function DetalheDoConvite({
             </p>
           </div>
 
+          {/*
+            Origem do convite (tarefa 6.2 de `convites-avulsos`). No convite
+            avulso não existe colaborador, loja nem regional: o bloco troca
+            de conteúdo em vez de mostrar três campos vazios. Antes deste
+            ajuste, `colaboradorNome` nulo renderizava nada, e o cartão
+            ficava com o rótulo "Colaborador" embaixo de um espaço em branco.
+          */}
           <Cartao superficie="interna">
             <p className="m-0 font-corpo text-rotulo font-bold uppercase tracking-sobrancelha text-texto-suave">
               Origem do convite
             </p>
             <p className="mt-2 mb-0 font-corpo text-corpo font-bold text-texto-forte">
-              {convite.colaboradorNome}
+              {origem.titulo}
             </p>
             <p className="m-0 font-corpo text-[10px] font-bold uppercase tracking-sobrancelha text-texto-suave">
-              Colaborador
+              {origem.avulso ? 'Gerado pela administração' : 'Colaborador'}
             </p>
             <dl className="mt-3 mb-0 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 font-corpo text-corpo-sm">
-              <dt className="m-0 text-texto-suave">Loja</dt>
-              <dd className="m-0 font-bold text-texto-forte">{convite.lojaNome ?? 'Sem loja'}</dd>
+              <dt className="m-0 text-texto-suave">{origem.avulso ? 'Rótulo do lote' : 'Loja'}</dt>
+              <dd className="m-0 font-bold text-texto-forte">
+                {origem.detalhe ?? 'Sem loja'}
+              </dd>
               <dt className="m-0 text-texto-suave">Código</dt>
               <dd className="m-0 font-mono text-texto">{convite.codigo}</dd>
             </dl>
+            {origem.avulso && convite.loteId ? (
+              <p className="mt-3 mb-0 border-t border-linha pt-3 font-corpo text-corpo-sm">
+                <Link
+                  href={`/palestras/admin/gerar/lote/${convite.loteId}`}
+                  className="font-bold text-terra-700 underline underline-offset-4"
+                >
+                  Abrir o lote deste convite
+                </Link>
+              </p>
+            ) : null}
           </Cartao>
 
           {podeCancelar ? (

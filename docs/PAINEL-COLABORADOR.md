@@ -78,6 +78,16 @@ ao servidor) só aparecem em convites `disponivel`. Nenhuma delas é uma rota
 de escrita — o WhatsApp continua sendo um link aberto pelo navegador,
 exatamente como o PRD pede.
 
+**Coluna de origem (`convites-avulsos`).** A coluna que mostrava o
+colaborador passou a se chamar **Origem**, porque também mostra
+"Administração" com o rótulo do lote embaixo, no convite avulso (gerado pelo
+Admin, sem colaborador). O texto vem de `origemDoConvite()`, em
+`lib/palestras/origem.ts`, o mesmo que a lista impressa, o check-in e o CSV
+usam. Para o Admin, um seletor **Origem** filtra entre todas, só os avulsos e
+só os de colaborador; para os outros papéis ele não aparece, porque nenhum
+deles alcança convite avulso. Convite avulso não ganha o botão de WhatsApp
+nem nesta tela: sem colaborador, não há remetente para a mensagem.
+
 ### A mensagem é a mesma do PDF, porque é o mesmo código (D1)
 
 `montarMensagemDoConvite` (`lib/palestras/mensagem.ts`) é o único lugar que

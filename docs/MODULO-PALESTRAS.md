@@ -330,6 +330,91 @@ com nome e motivo num `LEIA-ME.txt` dentro do próprio arquivo.
 
 ---
 
+## Convites avulsos (change `convites-avulsos`)
+
+O Admin gera convites **sem colaborador de origem** direto de uma palestra:
+imprensa, patrocinador, autoridade, convidado do Grupo. É a segunda aba de
+`/palestras/admin/gerar` (`?modo=avulso`), e não uma tela separada, porque o
+que muda é só a ausência de destinatário.
+
+| O que | Onde |
+| --- | --- |
+| Gerar (formulário) | `/palestras/admin/gerar?modo=avulso` |
+| Links do lote recém gerado | `/palestras/admin/gerar/lote/<id>` |
+| Lotes avulsos da palestra | `/palestras/admin/gerar/lotes?palestra=<id>` |
+| PDF do lote | `/palestras/admin/gerar/lote/<id>/pdf` |
+| CSV do lote | `/palestras/admin/gerar/lote/<id>/csv` |
+| Serviço | `gerarLoteAvulso()` em `lib/palestras/servicos/geracao.ts` |
+| Consultas | `resumoAvulso`, `lotesAvulsosDaPalestra`, `loteAvulsoNoEscopo` em `lib/palestras/dados.ts` |
+| Texto de origem | `lib/palestras/origem.ts` |
+
+No banco, convite avulso é `palestra_convite.colaborador_id IS NULL` (as duas
+colunas ficaram anuláveis na migração `0006`, que também acrescentou
+`palestra_lote.rotulo`). Não existe coluna "é avulso": a ausência do vínculo
+**é** a definição, e é o que mantém o resto do sistema coerente sem um campo
+novo para alguém esquecer de preencher.
+
+### Rótulo do lote
+
+Opcional, até 80 caracteres ("Imprensa", "Patrocinador Virbac"). Onde a
+interface mostraria o colaborador, o convite avulso mostra **Administração**,
+com o rótulo como linha secundária; sem rótulo, a linha secundária diz
+**Avulso**. Campo em branco é proibido: numa folha impressa ou na porta,
+célula vazia parece defeito do sistema.
+
+Esse par (título, detalhe) é decidido num lugar só, `origemDoConvite()` em
+`lib/palestras/origem.ts` — módulo puro, sem `server-only`, para que a
+consulta, o Server Component, o Client Component da linha, o PDF e o CSV usem
+o mesmo texto em vez de cada um inventar o próprio "sem colaborador".
+
+### `leftJoin` nas leituras, `innerJoin` nos recortes
+
+É a regra central da change, e a fonte de erro mais provável nela:
+
+- **Leitura** (`convitesNoEscopo`, `conviteNoEscopo`, `confirmacoesNoEscopo`,
+  `listaDeImpressao`, `dadosParaExportacaoCsv`, e o `select` do resultado do
+  check-in) usa `leftJoin` em `user`. Um `innerJoin` faria o convite avulso
+  **desaparecer em silêncio**, sem erro nenhum.
+- **Recorte por origem** (`resumoPorRegional`, `resumoPorLoja`,
+  `resumoPorColaborador`) continua com `innerJoin` de propósito: é o que
+  mantém o avulso fora desses números **por construção**, sem depender de
+  ninguém lembrar de filtrar.
+
+`tests/convite-avulso.test.ts` trava as duas metades lendo o próprio código
+das funções, sem banco. O caso mais grave que isso protege já aconteceu:
+`executarCheckin` fazia `innerJoin` em `user`, e por isso um convidado que
+confirmasse por convite avulso levava **tela vermelha** na portaria (a
+consulta não devolvia linha, o serviço lançava `RecusaDeCheckin('invalido')` e
+a transação inteira era desfeita). Não era campo em branco, era entrada
+negada. A seção 12 de `scripts/integracao-operacao.ts` exercita esse caminho
+contra o banco real.
+
+### Os números
+
+Convite avulso entra no total da palestra, no funil e na série diária. **Não**
+entra nos recortes por regional, loja e colaborador. Como a soma desses
+recortes passa a ser menor que o total, a tela de métricas mostra uma linha
+**Avulsos** com a diferença (`resumoAvulso`), e explica em texto por que ela
+existe: número que não fecha parece erro.
+
+### O que o convite avulso não tem
+
+- **Envio por WhatsApp**, nem na tela do lote, nem na lista de convites, nem
+  no PDF do lote. Não é esquecimento: sem colaborador, não há remetente para
+  a mensagem do sistema. O Admin copia o endereço e distribui pelo canal que
+  fizer sentido.
+- **Anotação de "enviado para"**, que é um lembrete pessoal do colaborador.
+- **Visibilidade fora do Admin.** Colaborador, gerente de loja, gerente
+  regional e recepção não o veem em lista, contagem, exportação nem detalhe.
+  A trava não é a tela: `restricao()` compara vínculos que o avulso não tem,
+  então a igualdade nunca casa, e `resumoAvulso`, `lotesAvulsosDaPalestra` e
+  `loteAvulsoNoEscopo` recusam o papel explicitamente.
+
+A geração avulsa é registrada na auditoria como `lote_avulso.gerado`, ação
+própria e distinta de `lote.gerado`: a origem não precisa ser deduzida de um
+campo nulo.
+
+
 ## Auditoria
 
 Toda ação sensível é gravada em `palestra_auditoria` com ator, ação, entidade,
@@ -413,7 +498,9 @@ app/
         palestras/              CRUD de palestras
         organizacao/            regionais, lojas, usuários
         importar/               assistente de CSV + modelo baixável
-        gerar/                  geração de lotes
+        gerar/                  geração de lotes (por colaborador e avulso)
+          lote/[id]/              links, PDF e CSV de um lote avulso
+          lotes/                  lotes avulsos da palestra
         distribuir/             PDFs (individual e .zip)
         auditoria/              consulta da trilha
       painel/                   painel do colaborador (ver

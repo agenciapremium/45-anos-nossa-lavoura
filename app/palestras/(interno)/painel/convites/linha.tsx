@@ -296,15 +296,23 @@ function AcoesDeEnvio({ c }: { c: ConvitePainel }) {
   return (
     <>
       <BotaoCopiar url={c.url} />
-      <LinkBotao
-        href={c.linkWhatsapp ?? '#'}
-        target="_blank"
-        rel="noopener noreferrer"
-        variante="primario"
-        tamanho="sm"
-      >
-        WhatsApp
-      </LinkBotao>
+      {/*
+        Sem `linkWhatsapp`, sem botão: é o caso do convite avulso
+        (`convites-avulsos`), que não tem colaborador remetente e é
+        distribuído pelo canal que o Admin escolher. Antes o `?? '#'`
+        desenhava um botão "WhatsApp" que não levava a lugar nenhum.
+      */}
+      {c.linkWhatsapp ? (
+        <LinkBotao
+          href={c.linkWhatsapp}
+          target="_blank"
+          rel="noopener noreferrer"
+          variante="primario"
+          tamanho="sm"
+        >
+          WhatsApp
+        </LinkBotao>
+      ) : null}
     </>
   );
 }

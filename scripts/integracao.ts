@@ -448,12 +448,19 @@ async function main() {
         'a URL do convite tem a forma esperada',
         primeiro.url,
       );
+      // `linkWhatsapp` passou a ser anulável em `LinhaDeConvitePdf` por
+      // causa do PDF de lote avulso, que não tem remetente. No PDF por
+      // colaborador ele é obrigatório, e esta é a checagem disso.
       checar(
-        primeiro.linkWhatsapp.startsWith('https://wa.me/?text='),
+        primeiro.linkWhatsapp !== null,
+        'o PDF por colaborador traz o link de WhatsApp',
+      );
+      checar(
+        primeiro.linkWhatsapp?.startsWith('https://wa.me/?text=') ?? false,
         'o botão aponta para wa.me sem número',
       );
       checar(
-        decodeURIComponent(primeiro.linkWhatsapp.split('?text=')[1]!).includes(
+        decodeURIComponent(primeiro.linkWhatsapp?.split('?text=')[1] ?? '').includes(
           primeiro.url,
         ),
         'a mensagem do wa.me traz o link daquele convite',

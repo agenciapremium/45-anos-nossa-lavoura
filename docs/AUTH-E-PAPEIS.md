@@ -134,6 +134,32 @@ incompleto em vez de vazamento.
 As consultas administrativas de `lib/palestras/consultas.ts` também recebem
 escopo, e exigem o papel `admin`: alimentam telas que só existem para ele.
 
+### O convite sem vínculo (`convites-avulsos`)
+
+O convite avulso, gerado pelo Admin sem colaborador, é o caso-limite desta
+matriz: no escopo ele é um recurso com `colaboradorId`, `lojaId` e
+`regionalId` **todos nulos**, porque os três vinham do colaborador que não
+existe.
+
+A consequência cai do próprio mecanismo, sem regra nova: o alcance `todos` do
+Admin não compara vínculo nenhum, então ele alcança o avulso; os outros papéis
+dependem de uma igualdade contra um vínculo que o avulso não tem, e igualdade
+com nulo nunca casa. Ninguém precisou escrever "esconda o avulso do gerente".
+
+Duas camadas a mais, porque a ação `gerarLotes` da matriz também alcança o
+gerente regional em parte do escopo, e a geração avulsa é exclusiva do Admin
+(decisão da cliente, 29/09/2026):
+
+1. a Server Action e as rotas de PDF e CSV do lote conferem `papel === 'admin'`
+   além da ação;
+2. `resumoAvulso`, `lotesAvulsosDaPalestra` e `loteAvulsoNoEscopo` recusam
+   qualquer outro papel na camada de dados, em vez de devolver listas ou zeros
+   — quem recebe zero não sabe se não há avulso ou se não pode ver.
+
+`tests/convite-avulso.test.ts` cobre as duas metades sem banco, e a seção 12 de
+`scripts/integracao-operacao.ts` confere contra o banco real que o gerente
+regional não vê o convidado avulso na lista da porta.
+
 ---
 
 ## CPF mascarado na camada de dados

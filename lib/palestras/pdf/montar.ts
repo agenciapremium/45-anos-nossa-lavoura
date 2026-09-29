@@ -5,9 +5,11 @@ import { and, asc, eq, inArray } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { convite, evento, loja, user } from '@/lib/db/schema';
 import { env } from '@/lib/env';
+import { loteAvulsoNoEscopo } from '@/lib/palestras/dados';
 import { estadoEfetivo } from '@/lib/palestras/estado-do-convite';
-import { montarMensagemDoConvite } from '@/lib/palestras/mensagem';
+import { montarMensagemDoConvite, urlDoConvite } from '@/lib/palestras/mensagem';
 import type { Escopo } from '@/lib/palestras/escopo';
+import { ORIGEM_AVULSA, ROTULO_AVULSO_PADRAO } from '@/lib/palestras/origem';
 import {
   agora,
   formatarCarimbo,
@@ -154,4 +156,82 @@ export function nomeDoArquivo(loja: string, colaborador: string): string {
       .replace(/^-+|-+$/g, '')
       .toLowerCase();
   return `${limpar(loja) || 'sem-loja'}-${limpar(colaborador)}.pdf`;
+}
+
+/* =========================================================
+   PDF do lote avulso (tarefa 5.2 de `convites-avulsos`)
+   ========================================================= */
+
+/**
+ * Reúne o que o PDF de um lote avulso precisa, no mesmo formato
+ * (`DadosDoPdf`) e com o mesmo documento (`DocumentoDeDistribuicao`) do PDF
+ * por colaborador: um arquivo por lote, montado sob demanda e nunca
+ * armazenado.
+ *
+ * Três diferenças, todas consequência de não haver colaborador:
+ *
+ * - o cabeçalho traz o rótulo do lote e "Administração" no lugar do nome e
+ *   da loja;
+ * - `linkWhatsapp` sai nulo, o que apaga o botão de envio de cada linha
+ *   (requisito "Sem envio por WhatsApp");
+ * - só entram os convites **daquele lote**, e não todos os disponíveis da
+ *   palestra: o Admin pode ter gerado três lotes para destinos diferentes,
+ *   e misturá-los num PDF só desfaria a separação que o rótulo criou.
+ *
+ * O filtro por estado efetivo `disponivel` é o mesmo: link de convite já
+ * confirmado, cancelado ou expirado não vai para uma folha de distribuição.
+ */
+export async function montarDadosDoPdfDeLoteAvulso(
+  escopo: Escopo,
+  loteId: string,
+): Promise<DadosDoPdf | null> {
+  const lote = await loteAvulsoNoEscopo(escopo, loteId);
+  if (!lote) return null;
+
+  const origem = env().APP_BASE_URL;
+  const referencia = agora();
+
+  const disponiveis = lote.convites.filter((c) => c.estado === 'disponivel');
+  if (disponiveis.length === 0) return null;
+
+  const [detalhe] = await db()
+    .select({ localEndereco: evento.localEndereco })
+    .from(evento)
+    .where(eq(evento.id, lote.eventoId))
+    .limit(1);
+
+  return {
+    colaborador: lote.rotulo ?? ROTULO_AVULSO_PADRAO,
+    loja: ORIGEM_AVULSA,
+    geradoEm: formatarCarimbo(referencia),
+    semWhatsapp: true,
+    blocos: [
+      {
+        cidade: lote.eventoCidade,
+        data: formatarData(lote.eventoDataHora),
+        horario: formatarHorario(lote.eventoDataHora),
+        localNome: lote.eventoLocalNome,
+        localEndereco: detalhe?.localEndereco ?? '',
+        prazo: formatarCarimbo(lote.eventoPrazo),
+        convites: disponiveis.map((c) => ({
+          codigo: c.codigo,
+          url: urlDoConvite(origem, c.codigo),
+          linkWhatsapp: null,
+        })),
+      },
+    ],
+  };
+}
+
+/** `imprensa-porto-velho.pdf` */
+export function nomeDoArquivoDoLote(rotulo: string | null, cidade: string): string {
+  const limpar = (v: string) =>
+    v
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/['’]/g, '')
+      .replace(/[^a-zA-Z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .toLowerCase();
+  return `${limpar(rotulo ?? ROTULO_AVULSO_PADRAO)}-${limpar(cidade)}.pdf`;
 }

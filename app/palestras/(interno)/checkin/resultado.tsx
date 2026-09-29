@@ -79,9 +79,17 @@ export function ResultadoGrande({
             Pode entrar {resultado.acompanhante ? '2 pessoas' : '1 pessoa'}: o titular
             {resultado.acompanhante ? ' e o acompanhante' : ''}.
           </p>
+          {/*
+            Origem do convite. No convite avulso não há colaborador nem
+            loja: as duas dizem "Administração", e o rótulo do lote entra
+            como detalhe (D7 de `convites-avulsos`). A frase muda junto,
+            porque "loja Administração, colaborador de origem Administração"
+            seria verdade e ainda assim leitura ruim na porta.
+          */}
           <p className="m-0 mt-2 font-corpo text-corpo-sm opacity-80">
-            Loja {resultado.lojaNome ?? 'não informada'}, colaborador de origem{' '}
-            {resultado.colaboradorNome}
+            {resultado.rotuloDoLote !== null
+              ? `Convite da ${resultado.colaboradorNome} · ${resultado.rotuloDoLote}`
+              : `Loja ${resultado.lojaNome ?? 'não informada'}, colaborador de origem ${resultado.colaboradorNome}`}
           </p>
         </div>
       ) : (

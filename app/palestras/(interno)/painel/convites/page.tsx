@@ -28,6 +28,7 @@ import {
 import { listarRegionais } from '@/lib/palestras/consultas';
 import { permitido } from '@/lib/palestras/escopo';
 import { montarMensagemDoConvite } from '@/lib/palestras/mensagem';
+import { origemDoConvite } from '@/lib/palestras/origem';
 import { exigirEscopo } from '@/lib/palestras/sessao';
 import {
   formatarCarimbo,
@@ -64,6 +65,13 @@ type Filtros = {
   busca?: string;
   /** Ordenação da lista (3.6): "recentes" (padrão) ou "codigo". */
   ordenar?: string;
+  /**
+   * Origem do convite (tarefa 6.1 de `convites-avulsos`): `avulsos` para os
+   * gerados direto pela administração, `colaborador` para os da rede de
+   * lojas, ausente para os dois juntos. Só o Admin alcança convite avulso,
+   * então para os outros papéis este filtro não muda nada.
+   */
+  origem?: string;
 };
 
 /* =========================================================
@@ -91,6 +99,7 @@ function paraLinha(
 ): ConvitePainel {
   const recurso = { colaboradorId: c.colaboradorId };
   const podeEnviar = permitido(escopo, 'enviarConvitePorWhatsapp', recurso);
+  const origemDaLinha = origemDoConvite(c);
 
   const mensagem =
     c.estado === 'disponivel' && podeEnviar
@@ -114,14 +123,17 @@ function paraLinha(
     eventoDataHora: formatarDataHora(c.eventoDataHora),
     criadoEm: formatarCarimbo(c.criadoEm),
     url: mensagem?.url ?? null,
-    linkWhatsapp: mensagem?.linkWhatsapp ?? null,
+    // Convite avulso fica com o endereço para copiar, mas sem o botão de
+    // WhatsApp: a mesma regra da tela do lote (requisito "Sem envio por
+    // WhatsApp"), aplicada onde o Admin também encontra esses convites.
+    linkWhatsapp: origemDaLinha.avulso ? null : (mensagem?.linkWhatsapp ?? null),
     enviadoPara: c.enviadoPara,
     checkinEm: c.checkinEm ? formatarCarimbo(c.checkinEm) : null,
-    // Convite avulso não tem colaborador (D1/D7 do design de
-    // `convites-avulsos`): a origem mostrada é "Administração", nunca um
-    // campo vazio. O rótulo do lote entra em telas futuras (grupo 6).
-    colaboradorNome: c.colaboradorNome ?? 'Administração',
-    lojaNome: c.lojaNome,
+    // Origem do convite num lugar só (`lib/palestras/origem.ts`): o
+    // colaborador com a loja embaixo, ou "Administração" com o rótulo do
+    // lote embaixo (D7 de `convites-avulsos`). Nunca campo vazio.
+    colaboradorNome: origemDaLinha.titulo,
+    lojaNome: origemDaLinha.detalhe,
     titular:
       c.estado === 'confirmado' || c.estado === 'presente'
         ? (titularesPorConvite.get(c.id) ?? null)
@@ -220,6 +232,16 @@ export default async function Convites({
     ? (f.estado as EstadoDeConvite)
     : undefined;
 
+  // Origem (tarefa 6.1): só faz sentido para quem alcança convite avulso,
+  // que é só o Admin. Para os outros papéis o seletor não aparece e o valor
+  // da URL é ignorado — nada a ganhar filtrando por uma origem que o escopo
+  // já não alcança.
+  const podeFiltrarOrigem = escopo.papel === 'admin';
+  const origemFiltro =
+    podeFiltrarOrigem && (f.origem === 'avulsos' || f.origem === 'colaborador')
+      ? f.origem
+      : undefined;
+
   const tamanhoNumerico = Number.parseInt(f.tamanho ?? '', 10);
   const tamanho = (TAMANHOS_DE_PAGINA as readonly number[]).includes(tamanhoNumerico)
     ? tamanhoNumerico
@@ -233,6 +255,8 @@ export default async function Convites({
     regionalId,
     lojaId,
     colaboradorId,
+    semColaborador: origemFiltro === 'avulsos',
+    comColaborador: origemFiltro === 'colaborador',
   });
 
   // Titular (e CPF, só para alimentar a busca) vêm de `confirmacoesNoEscopo`
@@ -321,6 +345,7 @@ export default async function Convites({
       pagina: f.pagina,
       busca: f.busca,
       ordenar: f.ordenar,
+      origem: f.origem,
       ...mudancas,
     };
     const params = new URLSearchParams();
@@ -332,7 +357,7 @@ export default async function Convites({
   }
 
   const temFiltroAvancado = Boolean(
-    f.regional || f.loja || f.colaborador || f.tamanho || f.busca || f.ordenar,
+    f.regional || f.loja || f.colaborador || f.tamanho || f.busca || f.ordenar || f.origem,
   );
 
   return (
@@ -442,6 +467,19 @@ export default async function Convites({
             </label>
           ) : null}
 
+          {podeFiltrarOrigem ? (
+            <label className="min-w-0 sm:w-56">
+              <span className="mb-1 block font-corpo text-corpo-sm font-bold text-texto-forte">
+                Origem
+              </span>
+              <Selecao name="origem" defaultValue={origemFiltro ?? ''}>
+                <option value="">Todas as origens</option>
+                <option value="avulsos">Avulsos (sem colaborador)</option>
+                <option value="colaborador">Só de colaborador</option>
+              </Selecao>
+            </label>
+          ) : null}
+
           <label className="min-w-0 sm:w-44">
             <span className="mb-1 block font-corpo text-corpo-sm font-bold text-texto-forte">
               Ordenar por
@@ -478,6 +516,7 @@ export default async function Convites({
                 pagina: undefined,
                 busca: undefined,
                 ordenar: undefined,
+                origem: undefined,
               })}`}
               variante="texto"
               tamanho="sm"
@@ -491,7 +530,7 @@ export default async function Convites({
       {linhas.length === 0 ? (
         <Vazio titulo="Nenhum convite neste filtro.">
           <p className="m-0">
-            {estadoFiltro || regionalId || lojaId || colaboradorId || busca
+            {estadoFiltro || regionalId || lojaId || colaboradorId || busca || origemFiltro
               ? 'Tente limpar os filtros acima.'
               : 'Assim que houver convites nesta palestra, no seu escopo, eles aparecem aqui.'}
           </p>
@@ -504,7 +543,10 @@ export default async function Convites({
                 <tr>
                   <CelulaDeTitulo>Código</CelulaDeTitulo>
                   <CelulaDeTitulo>Palestra</CelulaDeTitulo>
-                  <CelulaDeTitulo>Colaborador</CelulaDeTitulo>
+                  {/* "Origem", e não "Colaborador": a coluna também mostra
+                      "Administração" com o rótulo do lote, no convite
+                      avulso (tarefa 6.1). */}
+                  <CelulaDeTitulo>Origem</CelulaDeTitulo>
                   <CelulaDeTitulo>Convidado ou anotação</CelulaDeTitulo>
                   <CelulaDeTitulo>Estado</CelulaDeTitulo>
                   <CelulaDeTitulo className="text-right">Ações</CelulaDeTitulo>

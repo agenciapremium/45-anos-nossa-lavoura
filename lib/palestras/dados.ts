@@ -10,6 +10,7 @@ import {
   convite,
   evento,
   loja,
+  lote,
   regional,
   user,
   type EstadoDeConvite,
@@ -22,6 +23,7 @@ import {
   veCpfCompleto,
   type Escopo,
 } from '@/lib/palestras/escopo';
+import { ORIGEM_AVULSA } from '@/lib/palestras/origem';
 import { alcanceDe, type AcaoProtegida } from '@/lib/palestras/papeis';
 import { agora } from '@/lib/tempo';
 
@@ -128,6 +130,16 @@ export type ConviteNoEscopo = {
   lojaNome: string | null;
   /** Da loja do colaborador. Usado para o filtro de regional da lista (3.2). */
   regionalId: string | null;
+  /** O lote de origem, quando o convite ainda o tem (`on delete set null`). */
+  loteId: string | null;
+  /**
+   * Rótulo do lote avulso (D4 de `convites-avulsos`): "Imprensa",
+   * "Patrocinador Virbac"... É o detalhe que a tela mostra embaixo de
+   * "Administração". Nulo no convite de colaborador (lote com colaborador
+   * nunca tem rótulo) e também no lote avulso sem rótulo — nos dois casos,
+   * `origemDoConvite()` decide o texto.
+   */
+  loteRotulo: string | null;
   /** Lembrete pessoal do colaborador (D4) — texto livre, sem efeito de sistema. */
   enviadoPara: string | null;
   criadoEm: Date;
@@ -152,6 +164,8 @@ function colunasDoConvite() {
     lojaId: user.lojaId,
     lojaNome: loja.nome,
     regionalId: loja.regionalId,
+    loteId: convite.loteId,
+    loteRotulo: lote.rotulo,
     enviadoPara: convite.enviadoPara,
     criadoEm: convite.criadoEm,
     checkinEm: checkin.feitoEm,
@@ -179,6 +193,8 @@ function linhaParaConviteNoEscopo(
     lojaId: string | null;
     lojaNome: string | null;
     regionalId: string | null;
+    loteId: string | null;
+    loteRotulo: string | null;
     enviadoPara: string | null;
     criadoEm: Date;
     checkinEm: Date | null;
@@ -203,6 +219,8 @@ function linhaParaConviteNoEscopo(
     lojaId: linha.lojaId,
     lojaNome: linha.lojaNome,
     regionalId: linha.regionalId,
+    loteId: linha.loteId,
+    loteRotulo: linha.loteRotulo,
     enviadoPara: linha.enviadoPara,
     criadoEm: linha.criadoEm,
     // Só faz sentido mostrar o check-in quando o estado efetivo é
@@ -235,6 +253,12 @@ export async function convitesNoEscopo(
      * os demais papéis).
      */
     semColaborador?: boolean;
+    /**
+     * O oposto: só convites COM colaborador de origem. É a terceira opção
+     * do filtro de origem da lista (tarefa 6.1), para o Admin separar a
+     * distribuição da rede de lojas dos convites da própria administração.
+     */
+    comColaborador?: boolean;
   } = {},
 ): Promise<ConviteNoEscopo[]> {
   conferirPapel(escopo, 'verConvitesEConfirmacoes');
@@ -251,6 +275,7 @@ export async function convitesNoEscopo(
   if (filtro.lojaId) condicoes.push(eq(user.lojaId, filtro.lojaId));
   if (filtro.colaboradorId) condicoes.push(eq(convite.colaboradorId, filtro.colaboradorId));
   if (filtro.semColaborador) condicoes.push(isNull(convite.colaboradorId));
+  if (filtro.comColaborador) condicoes.push(isNotNull(convite.colaboradorId));
 
   // `leftJoin` em `user` (D3 do design): um `innerJoin` descartaria em
   // silêncio o convite avulso (`colaboradorId` nulo) de toda leitura, Admin
@@ -262,6 +287,7 @@ export async function convitesNoEscopo(
     .innerJoin(evento, eq(evento.id, convite.eventoId))
     .leftJoin(user, eq(user.id, convite.colaboradorId))
     .leftJoin(loja, eq(loja.id, user.lojaId))
+    .leftJoin(lote, eq(lote.id, convite.loteId))
     .leftJoin(checkin, eq(checkin.conviteId, convite.id))
     .where(and(...condicoes.filter(Boolean)))
     .orderBy(asc(evento.dataHora), asc(convite.codigo))
@@ -311,6 +337,7 @@ export async function conviteNoEscopo(
     .innerJoin(evento, eq(evento.id, convite.eventoId))
     .leftJoin(user, eq(user.id, convite.colaboradorId))
     .leftJoin(loja, eq(loja.id, user.lojaId))
+    .leftJoin(lote, eq(lote.id, convite.loteId))
     .leftJoin(checkin, eq(checkin.conviteId, convite.id))
     .where(and(...condicoes.filter(Boolean)))
     .limit(1);
@@ -875,6 +902,224 @@ export async function resumoPorColaborador(
 }
 
 /* ---------------------------------------------------------
+   `convites-avulsos` · o recorte que fecha a conta e os lotes
+
+   Os recortes por regional, por loja e por colaborador ficam com
+   `innerJoin` de propósito (D3 do design): é o que mantém o avulso fora
+   deles **por construção**, sem ninguém precisar lembrar de filtrar. O
+   preço é que a soma desses recortes não bate com o total da palestra, e
+   um número que não fecha parece erro. `resumoAvulso` é a linha que
+   fecha: o mesmo agrupamento por estado, só dos convites sem colaborador.
+   --------------------------------------------------------- */
+
+/**
+ * Contagem por estado efetivo dos convites **sem colaborador**.
+ *
+ * Só o Admin alcança convite avulso (requisito "Convite avulso pertence ao
+ * Admin"), então esta função recusa qualquer outro papel em vez de
+ * devolver zeros: um gerente que recebesse `{ disponivel: 0, ... }` não
+ * saberia se não há avulso ou se ele não pode ver, e a tela poderia
+ * desenhar uma linha "Avulsos: 0" que não é dele.
+ */
+export async function resumoAvulso(
+  escopo: Escopo,
+  filtro: { eventoId?: string } = {},
+): Promise<ResumoDeContagem> {
+  conferirPapel(escopo, 'verConvitesEConfirmacoes');
+  if (escopo.papel !== 'admin') {
+    throw new SemAcesso('verConvitesEConfirmacoes', 'papel');
+  }
+
+  const condicoes: (SQL | undefined)[] = [isNull(convite.colaboradorId)];
+  if (filtro.eventoId) condicoes.push(eq(convite.eventoId, filtro.eventoId));
+
+  const linhas = await db()
+    .select({ chave: sql<string>`'avulso'`, estado: ESTADO_EFETIVO_SQL, total: count() })
+    .from(convite)
+    .innerJoin(evento, eq(evento.id, convite.eventoId))
+    .where(and(...condicoes.filter(Boolean)))
+    .groupBy(ESTADO_EFETIVO_SQL);
+
+  return agruparPorChave(linhas).get('avulso') ?? resumoVazio();
+}
+
+export type LoteAvulso = {
+  id: string;
+  eventoId: string;
+  eventoCidade: string;
+  /** Nulo quando o lote foi gerado sem rótulo; a tela mostra "Avulso". */
+  rotulo: string | null;
+  /** A quantidade PEDIDA na geração. */
+  quantidade: number;
+  criadoEm: Date;
+  criadoPorNome: string | null;
+  /** Contagem por estado efetivo dos convites que nasceram deste lote. */
+  resumo: ResumoDeContagem;
+};
+
+/**
+ * Os lotes avulsos de uma palestra, do mais recente para o mais antigo
+ * (requisito "Admin volta ao lote depois").
+ *
+ * `quantidade` é o que foi pedido e `resumo` é o que existe hoje: os dois
+ * são mostrados porque podem divergir depois de um cancelamento, e a
+ * divergência é informação, não inconsistência.
+ */
+export async function lotesAvulsosDaPalestra(
+  escopo: Escopo,
+  eventoId: string,
+): Promise<LoteAvulso[]> {
+  conferirPapel(escopo, 'gerarLotes');
+  if (escopo.papel !== 'admin') throw new SemAcesso('gerarLotes', 'papel');
+
+  const linhas = await db()
+    .select({
+      id: lote.id,
+      eventoId: lote.eventoId,
+      eventoCidade: evento.cidade,
+      rotulo: lote.rotulo,
+      quantidade: lote.quantidade,
+      criadoEm: lote.criadoEm,
+      criadoPorNome: user.name,
+      estado: ESTADO_EFETIVO_SQL,
+      total: count(convite.id),
+    })
+    .from(lote)
+    .innerJoin(evento, eq(evento.id, lote.eventoId))
+    .leftJoin(user, eq(user.id, lote.criadoPor))
+    .leftJoin(convite, eq(convite.loteId, lote.id))
+    .where(and(eq(lote.eventoId, eventoId), isNull(lote.colaboradorId)))
+    .groupBy(
+      lote.id,
+      lote.eventoId,
+      evento.cidade,
+      lote.rotulo,
+      lote.quantidade,
+      lote.criadoEm,
+      user.name,
+      ESTADO_EFETIVO_SQL,
+    );
+
+  const porLote = agruparPorChave(linhas.map((l) => ({ ...l, chave: l.id })));
+  const detalhe = new Map(linhas.map((l) => [l.id, l]));
+
+  return [...porLote.entries()]
+    .map(([id, resumo]) => {
+      const d = detalhe.get(id)!;
+      return {
+        id,
+        eventoId: d.eventoId,
+        eventoCidade: d.eventoCidade,
+        rotulo: d.rotulo,
+        quantidade: d.quantidade,
+        criadoEm: new Date(d.criadoEm),
+        criadoPorNome: d.criadoPorNome,
+        resumo,
+      };
+    })
+    .sort((a, b) => b.criadoEm.getTime() - a.criadoEm.getTime());
+}
+
+export type ConviteDoLote = {
+  id: string;
+  codigo: string;
+  estado: EstadoDeConvite;
+  /** Titular, quando o convite já foi usado. */
+  titular: string | null;
+};
+
+export type LoteAvulsoComConvites = LoteAvulso & {
+  eventoDataHora: Date;
+  eventoLocalNome: string;
+  eventoPrazo: Date;
+  eventoMensagemTemplate: string;
+  convites: ConviteDoLote[];
+};
+
+/**
+ * Um lote avulso com os convites dele, para a tela de entrega dos links, o
+ * PDF e o CSV do lote.
+ *
+ * Devolve `null` tanto para "não existe" quanto para "não é avulso":
+ * o lote de um colaborador tem a própria tela (o PDF de distribuição), e
+ * esta rota não é um caminho alternativo para chegar nele.
+ */
+export async function loteAvulsoNoEscopo(
+  escopo: Escopo,
+  loteId: string,
+): Promise<LoteAvulsoComConvites | null> {
+  conferirPapel(escopo, 'gerarLotes');
+  if (escopo.papel !== 'admin') throw new SemAcesso('gerarLotes', 'papel');
+
+  const [cabecalho] = await db()
+    .select({
+      id: lote.id,
+      eventoId: lote.eventoId,
+      eventoCidade: evento.cidade,
+      eventoDataHora: evento.dataHora,
+      eventoLocalNome: evento.localNome,
+      eventoPrazo: evento.prazoConfirmacao,
+      eventoMensagemTemplate: evento.mensagemWhatsapp,
+      rotulo: lote.rotulo,
+      quantidade: lote.quantidade,
+      criadoEm: lote.criadoEm,
+      criadoPorNome: user.name,
+    })
+    .from(lote)
+    .innerJoin(evento, eq(evento.id, lote.eventoId))
+    .leftJoin(user, eq(user.id, lote.criadoPor))
+    .where(and(eq(lote.id, loteId), isNull(lote.colaboradorId)))
+    .limit(1);
+
+  if (!cabecalho) return null;
+
+  const linhas = await db()
+    .select({
+      id: convite.id,
+      codigo: convite.codigo,
+      estadoGravado: convite.estado,
+      titular: confirmacao.nome,
+    })
+    .from(convite)
+    .leftJoin(
+      confirmacao,
+      and(eq(confirmacao.conviteId, convite.id), eq(confirmacao.ativa, true)),
+    )
+    .where(eq(convite.loteId, loteId))
+    .orderBy(asc(convite.codigo))
+    .limit(2000);
+
+  const referencia = agora();
+  const prazo = new Date(cabecalho.eventoPrazo);
+  const resumo = resumoVazio();
+  const convites: ConviteDoLote[] = linhas.map((l) => {
+    const estado = estadoEfetivo(
+      l.estadoGravado as EstadoDeConvite,
+      prazo,
+      referencia,
+    );
+    resumo[estado] += 1;
+    return { id: l.id, codigo: l.codigo, estado, titular: l.titular };
+  });
+
+  return {
+    id: cabecalho.id,
+    eventoId: cabecalho.eventoId,
+    eventoCidade: cabecalho.eventoCidade,
+    eventoDataHora: new Date(cabecalho.eventoDataHora),
+    eventoLocalNome: cabecalho.eventoLocalNome,
+    eventoPrazo: prazo,
+    eventoMensagemTemplate: cabecalho.eventoMensagemTemplate,
+    rotulo: cabecalho.rotulo,
+    quantidade: cabecalho.quantidade,
+    criadoEm: new Date(cabecalho.criadoEm),
+    criadoPorNome: cabecalho.criadoPorNome,
+    resumo,
+    convites,
+  };
+}
+
+/* ---------------------------------------------------------
    `operacao-evento` · busca manual do check-in, lista impressa e CSV
 
    As duas buscas abaixo servem a mesma tela (D1 do design: a busca manual
@@ -947,8 +1192,12 @@ export async function buscarConfirmadosPorNome(
  * O que aparece no lugar da loja e do colaborador quando o convite é
  * avulso, gerado direto pela administração (D7 de `convites-avulsos`).
  * Campo em branco na folha da porta parece defeito; isto diz a verdade.
+ *
+ * Mora em `lib/palestras/origem.ts`, que é puro e pode ser importado por
+ * Client Component; re-exportado aqui porque a consulta desta camada já o
+ * aplica e as telas antigas o importam deste módulo.
  */
-export const ORIGEM_AVULSA = 'Administração';
+export { ORIGEM_AVULSA } from '@/lib/palestras/origem';
 
 export type LinhaDeImpressao = {
   conviteId: string;
