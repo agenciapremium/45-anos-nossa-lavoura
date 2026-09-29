@@ -43,6 +43,13 @@
       "when": 1790610121099,
       "tag": "0005_limite_por_ultima_tentativa",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790684099405,
+      "tag": "0006_lively_korvac",
+      "breakpoints": true
     }
   ]
 }

@@ -206,6 +206,30 @@ export const esquemaDeGeracao = z.object({
 });
 
 /* ---------------------------------------------------------
+   Geração avulsa (`convites-avulsos`)
+   --------------------------------------------------------- */
+
+/**
+ * Rótulo do lote avulso (D4 do design): opcional, até 80 caracteres.
+ * Ausente ou vazio validam da mesma forma e resultam em `null`: "Avulso"
+ * é o texto que a TELA mostra na ausência (decisão da cliente,
+ * 29/09/2026), não um valor que esta validação escreve no banco.
+ */
+export const esquemaDeRotulo = z
+  .string()
+  .trim()
+  .max(80, 'O rótulo passa de 80 caracteres.')
+  .optional()
+  .or(z.literal(''))
+  .transform((v) => (v ? v : null));
+
+export const esquemaDeGeracaoAvulsa = z.object({
+  eventoId: textoObrigatorio('A palestra', 64),
+  quantidade: esquemaDeQuantidade,
+  rotulo: esquemaDeRotulo,
+});
+
+/* ---------------------------------------------------------
    Utilitário: erros do Zod por campo
    --------------------------------------------------------- */
 

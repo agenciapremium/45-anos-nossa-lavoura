@@ -16,7 +16,7 @@
  *   npm run test:integracao
  */
 import { config } from 'dotenv';
-import { and, eq, inArray, like, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, like, sql } from 'drizzle-orm';
 
 config({ path: '.env', quiet: true });
 
@@ -60,13 +60,13 @@ const CSV_SUJO = [
 
 async function main() {
   const { db, dbTx, fecharConexoes } = await import('@/lib/db');
-  const { convite, evento, loja, lote, regional, user } = await import(
+  const { auditoria, convite, evento, loja, lote, regional, user } = await import(
     '@/lib/db/schema'
   );
   const { aplicarImportacao, previsualizarImportacao } = await import(
     '@/lib/palestras/servicos/importacao'
   );
-  const { gerarLotesDeConvites } = await import(
+  const { gerarLotesDeConvites, gerarLoteAvulso } = await import(
     '@/lib/palestras/servicos/geracao'
   );
   const { expirarConvitesVencidos } = await import('@/lib/palestras/expiracao');
@@ -317,6 +317,10 @@ async function main() {
     );
     const porColaborador = new Map<string, number>();
     for (const c of gerados) {
+      // Este teste só gera pelo caminho por colaborador: nenhuma linha
+      // deveria vir com `colaboradorId` nulo, mas o tipo agora é anulável
+      // (`convites-avulsos`), então o filtro documenta a garantia.
+      if (!c.colaboradorId) continue;
       porColaborador.set(c.colaboradorId, (porColaborador.get(c.colaboradorId) ?? 0) + 1);
     }
     checar(
@@ -760,7 +764,190 @@ async function main() {
     const apos = await verificarLimite(chaveDeTeste, LOGIN_POR_CPF);
     checar(apos.permitido, 'um login bem-sucedido zera o contador daquele identificador');
 
-    /* ---------- 10. limpeza ---------- */
+    /* ---------- 10. geração avulsa (`convites-avulsos`, tarefa 3.4) ---------- */
+    console.log('\n== geração avulsa ==');
+
+    const av1 = await gerarLoteAvulso({
+      eventoId: idDaPalestra,
+      quantidade: 7,
+      rotulo: `${MARCA} Imprensa`,
+      ator: ATOR_DE_SCRIPT,
+    });
+    checar(av1.ok, 'gera um lote avulso', av1.ok ? '' : av1.mensagem);
+
+    let loteAvulsoId = '';
+    if (av1.ok) {
+      loteAvulsoId = av1.resumo.loteId;
+      checar(av1.resumo.convites === 7, '7 convites no resumo', String(av1.resumo.convites));
+      checar(
+        av1.resumo.rotulo === `${MARCA} Imprensa`,
+        'o resumo devolve o rótulo informado',
+      );
+
+      const criados = await db()
+        .select({
+          codigo: convite.codigo,
+          estado: convite.estado,
+          colaboradorId: convite.colaboradorId,
+          loteId: convite.loteId,
+        })
+        .from(convite)
+        .where(eq(convite.loteId, loteAvulsoId));
+
+      checar(criados.length === 7, 'nascem exatamente 7 convites', String(criados.length));
+      checar(
+        criados.every((c) => c.colaboradorId === null),
+        'nenhum deles tem colaborador',
+      );
+      checar(
+        criados.every((c) => c.estado === 'disponivel'),
+        'todos nascem disponíveis',
+      );
+      checar(
+        new Set(criados.map((c) => c.codigo)).size === 7,
+        'nenhum código repetido',
+      );
+
+      const [loteGravado] = await db()
+        .select({
+          colaboradorId: lote.colaboradorId,
+          rotulo: lote.rotulo,
+          quantidade: lote.quantidade,
+        })
+        .from(lote)
+        .where(eq(lote.id, loteAvulsoId));
+      checar(
+        loteGravado?.colaboradorId === null,
+        'o lote em si também não tem colaborador',
+      );
+      checar(loteGravado?.rotulo === `${MARCA} Imprensa`, 'o rótulo foi gravado no lote');
+    }
+
+    /* --- sem rótulo: "Avulso" é o texto que a TELA mostra na ausência,
+       o serviço grava nulo (D4 do design) --- */
+    const av2 = await gerarLoteAvulso({
+      eventoId: idDaPalestra,
+      quantidade: 2,
+      ator: ATOR_DE_SCRIPT,
+    });
+    checar(av2.ok, 'gera um lote avulso sem rótulo', av2.ok ? '' : av2.mensagem);
+    let loteSemRotuloId = '';
+    if (av2.ok) {
+      loteSemRotuloId = av2.resumo.loteId;
+      checar(av2.resumo.rotulo === null, 'o resumo devolve rótulo nulo, não "Avulso"');
+    }
+
+    /* --- prazo vencido recusa, mesma mensagem da geração por colaborador --- */
+    // A seção 8 MOVEU convites para esta palestra, então ela não está
+    // vazia. O que importa aqui é que a recusa não acrescente nenhum:
+    // por isso a contagem é comparada antes e depois, e não contra zero.
+    const [antesDaRecusa] = await db()
+      .select({ n: sql<number>`count(*)::int` })
+      .from(convite)
+      .where(eq(convite.eventoId, idDaPalestraVencida));
+
+    const av3 = await gerarLoteAvulso({
+      eventoId: idDaPalestraVencida,
+      quantidade: 9,
+      ator: ATOR_DE_SCRIPT,
+    });
+    checar(!av3.ok, 'geração avulsa após o prazo é recusada');
+    checar(
+      !av3.ok && /prazo/i.test(av3.mensagem),
+      'a mensagem explica que o prazo venceu',
+      av3.ok ? '' : av3.mensagem,
+    );
+    const [depoisDaRecusa] = await db()
+      .select({ n: sql<number>`count(*)::int` })
+      .from(convite)
+      .where(eq(convite.eventoId, idDaPalestraVencida));
+    checar(
+      Number(depoisDaRecusa?.n) === Number(antesDaRecusa?.n),
+      'a recusa por prazo não acrescentou nenhum convite à palestra',
+      `${antesDaRecusa?.n} antes, ${depoisDaRecusa?.n} depois`,
+    );
+
+    /* --- quantidade inválida recusa sem gravar nada --- */
+    const antesDaInvalida = await db()
+      .select({ n: sql<number>`count(*)::int` })
+      .from(convite)
+      .where(eq(convite.eventoId, idDaPalestra));
+
+    const av4 = await gerarLoteAvulso({
+      eventoId: idDaPalestra,
+      quantidade: 0,
+      ator: ATOR_DE_SCRIPT,
+    });
+    checar(!av4.ok, 'quantidade zero recusa a operação avulsa');
+
+    const av5 = await gerarLoteAvulso({
+      eventoId: idDaPalestra,
+      quantidade: -5,
+      ator: ATOR_DE_SCRIPT,
+    });
+    checar(!av5.ok, 'quantidade negativa recusa a operação avulsa');
+
+    const av6 = await gerarLoteAvulso({
+      eventoId: idDaPalestra,
+      quantidade: 5000,
+      ator: ATOR_DE_SCRIPT,
+    });
+    checar(!av6.ok, 'quantidade acima do teto por operação recusa');
+    checar(
+      !av6.ok && /500/.test(av6.mensagem),
+      'a mensagem cita o limite (o mesmo teto de esquemaDeQuantidade, D5 do design)',
+      av6.ok ? '' : av6.mensagem,
+    );
+
+    const depoisDaInvalida = await db()
+      .select({ n: sql<number>`count(*)::int` })
+      .from(convite)
+      .where(eq(convite.eventoId, idDaPalestra));
+    checar(
+      Number(antesDaInvalida[0]?.n) === Number(depoisDaInvalida[0]?.n),
+      'nenhum convite foi gravado nas tentativas com quantidade inválida',
+      `${antesDaInvalida[0]?.n} -> ${depoisDaInvalida[0]?.n}`,
+    );
+
+    /* --- rótulo com mais de 80 caracteres recusa (D4 do design) --- */
+    const av7 = await gerarLoteAvulso({
+      eventoId: idDaPalestra,
+      quantidade: 1,
+      rotulo: 'x'.repeat(81),
+      ator: ATOR_DE_SCRIPT,
+    });
+    checar(!av7.ok, 'rótulo com mais de 80 caracteres recusa a operação inteira');
+
+    /* --- rastro de auditoria com ação própria (D5 do design, tarefa 3.3) --- */
+    if (av1.ok) {
+      const [registroDeAuditoria] = await db()
+        .select({ acao: auditoria.acao })
+        .from(auditoria)
+        .where(
+          and(
+            eq(auditoria.entidade, 'palestra_evento'),
+            eq(auditoria.acao, 'lote_avulso.gerado'),
+          ),
+        )
+        .orderBy(desc(auditoria.criadoEm))
+        .limit(1);
+      checar(
+        registroDeAuditoria?.acao === 'lote_avulso.gerado',
+        'a geração avulsa grava a ação lote_avulso.gerado, distinta de lote.gerado',
+      );
+    }
+
+    /* --- limpeza própria: convite e lote avulsos não têm colaborador,
+       então o `limpar()` da seção seguinte (que apaga por `colaboradorId`)
+       não os alcança, e a palestra tem `onDelete: 'restrict'` contra os
+       dois: sem isto, `limpar()` falharia ao tentar apagar `evento`. --- */
+    const idsDosLotesAvulsos = [loteAvulsoId, loteSemRotuloId].filter(Boolean);
+    if (idsDosLotesAvulsos.length) {
+      await db().delete(convite).where(inArray(convite.loteId, idsDosLotesAvulsos));
+      await db().delete(lote).where(inArray(lote.id, idsDosLotesAvulsos));
+    }
+
+    /* ---------- 11. limpeza ---------- */
     console.log('\n== limpeza ==');
     await limpar();
     const restou = await db()

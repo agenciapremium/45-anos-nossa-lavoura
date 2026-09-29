@@ -65,6 +65,12 @@ export const ACOES = {
   importacaoConfirmada: 'importacao.confirmada',
 
   loteGerado: 'lote.gerado',
+  /**
+   * Geração avulsa (`convites-avulsos`, D5 do design): ação própria, não
+   * uma variação de `lote.gerado`, para o rastro distinguir as duas
+   * origens sem precisar interpretar `colaborador_id` nulo no payload.
+   */
+  loteAvulsoGerado: 'lote_avulso.gerado',
   conviteExpirado: 'convite.expirado',
   expiracaoExecutada: 'expiracao.executada',
 

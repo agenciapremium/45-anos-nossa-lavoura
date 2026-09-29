@@ -52,6 +52,9 @@ export default async function Gerar({
       .where(eq(convite.eventoId, eventoEscolhido))
       .groupBy(convite.colaboradorId);
     for (const l of linhas) {
+      // Convite avulso (`colaboradorId` nulo) não é de nenhum colaborador
+      // desta lista: fica fora da contagem "já tem" por colaborador.
+      if (!l.colaboradorId) continue;
       jaTemPorColaborador.set(l.colaboradorId, Number(l.total));
     }
   }

@@ -117,7 +117,10 @@ function paraLinha(
     linkWhatsapp: mensagem?.linkWhatsapp ?? null,
     enviadoPara: c.enviadoPara,
     checkinEm: c.checkinEm ? formatarCarimbo(c.checkinEm) : null,
-    colaboradorNome: c.colaboradorNome,
+    // Convite avulso não tem colaborador (D1/D7 do design de
+    // `convites-avulsos`): a origem mostrada é "Administração", nunca um
+    // campo vazio. O rótulo do lote entra em telas futuras (grupo 6).
+    colaboradorNome: c.colaboradorNome ?? 'Administração',
     lojaNome: c.lojaNome,
     titular:
       c.estado === 'confirmado' || c.estado === 'presente'
