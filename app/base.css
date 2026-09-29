@@ -9,4 +9,23 @@
    `/palestras`, em `app/globals.css`.
    ========================================================= */
 
-@import '../tokens.css';
+/*
+   `tokens.css` entra numa camada, e não solto.
+
+   Ele traz, além das variáveis, regras de elemento: `a`, `:focus-visible`,
+   `::selection`. CSS fora de camada vence QUALQUER camada, por mais
+   específico que o seletor da camada seja. Como as utilidades do Tailwind
+   vivem em `@layer utilities`, o `a { color: var(--text-link) }` daqui
+   apagava a cor de todo link do módulo `/palestras`: no menu lateral
+   escuro isso virava marrom sobre marrom, com o texto sumindo.
+
+   Dentro de `layer(marca)`, declarada antes das camadas do Tailwind, a
+   ordem passa a ser a esperada: token perde para utilidade, e a landing,
+   que não carrega Tailwind, continua exatamente como estava, porque os
+   estilos de página dela também são declarados fora de camada e seguem
+   vencendo estes.
+
+   `tokens.css` é cópia literal do design system e não pode ser editado
+   aqui: por isso o ajuste é no import, não no arquivo.
+*/
+@import '../tokens.css' layer(marca);
