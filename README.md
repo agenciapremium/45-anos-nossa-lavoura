@@ -7,7 +7,15 @@ que vai do afetivo ao comercial conforme a copy estruturada em
 O hero ocupa a tela inteira com a fotografia do rebanho: manchete e chamadas à esquerda,
 selo dos 45 anos à direita, lado a lado. Não há barra de topo nenhuma.
 
-**Stack:** HTML, CSS e JavaScript puros. Sem build, sem dependências. Deploy direto na Vercel.
+**Stack:** Next.js 15 (App Router) com React 19, TypeScript e CSS próprio, sem framework de
+utilitários. Deploy na Vercel. As páginas são estáticas: a landing não tem banco nem variável de
+ambiente nenhuma.
+
+> **O Circuito de Palestras não vive mais aqui.** O módulo de confirmação de presença do
+> Acelera no Campo 3.0 foi construído neste repositório por engano e migrou, com os dados, para
+> [`agenciapremium/acelera-no-campo`](https://github.com/agenciapremium/acelera-no-campo), onde
+> responde em `/palestras`. Nenhum link de convite havia sido distribuído, então os códigos
+> continuam os mesmos, agora sob `aceleranocampo.nossalavoura.com.br`.
 
 ---
 

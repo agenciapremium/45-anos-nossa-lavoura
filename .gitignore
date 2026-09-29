@@ -24,3 +24,23 @@ docs/Nossa Lavoura 45 Anos Design System/uploads/
 /out/
 next-env.d.ts
 *.tsbuildinfo
+
+# --- acrescentado na migração do Circuito para o repo acelera-no-campo ---
+
+# Arquivos de credencial que não são `.env`. O `.env2` com as credenciais do
+# banco novo foi parar no stage de um `git add -A` durante a migração; o
+# padrão abaixo impede que qualquer variante volte a passar.
+.env[0-9]*
+*.env
+
+# Backups de remoção de cadastro: são despejos de `INSERT` com nome, CPF e
+# e-mail de pessoas reais, gerados por `remover-cadastros-de-teste.ts` para o
+# caso de precisar restaurar. Ficam na máquina de quem rodou, nunca no
+# repositório.
+docs/*-removidos-*.sql
+docs/estrutura-removida-*.sql
+
+# Artes da campanha em PNG sem otimizar: são dezenas de MB e não são código.
+# (Duas delas, 32 MB somados, já tentaram entrar num commit duas vezes.)
+docs/*.png
+docs/**/*.png
