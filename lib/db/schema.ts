@@ -487,8 +487,33 @@ export const auditoria = pgTable(
   'palestra_auditoria',
   {
     id: id(),
-    /** Nulo quando a ação é de rotina automática (cron). */
-    atorId: text('ator_id').references(() => user.id, { onDelete: 'set null' }),
+    /**
+     * Nulo quando a ação é de rotina automática (cron).
+     *
+     * **Sem chave estrangeira para `user`, de propósito** (migração `0007`).
+     * A que existia era `ON DELETE SET NULL`, e isso contradizia o contrato
+     * de imutabilidade desta tabela: para o Postgres, `SET NULL` é um
+     * `UPDATE`, e os gatilhos `palestra_auditoria_sem_update`/`_sem_delete`
+     * proíbem qualquer UPDATE ou DELETE aqui. O resultado prático era que
+     * **apagar um usuário era impossível por construção** — qualquer
+     * `DELETE` em `user` batia no gatilho e derrubava a transação inteira,
+     * inclusive a dos usuários de teste dos scripts de integração, que
+     * ficavam acumulando no banco.
+     *
+     * Tirar a FK resolve a contradição na direção mais forte, e não na mais
+     * fraca: nenhuma linha de auditoria é mais tocada pelo ciclo de vida de
+     * outra tabela, e os três gatilhos ficam armados o tempo inteiro. A
+     * alternativa era abrir exceção na imutabilidade a cada remoção de
+     * usuário.
+     *
+     * O que se perde é a garantia referencial do ponteiro: `ator_id` pode
+     * apontar para um usuário que não existe mais. É perda pequena porque
+     * **nenhuma leitura do sistema junta esta tabela com `user`** — a tela
+     * de auditoria, o filtro por ator e a linha do tempo do convite usam
+     * `ator_nome`, que é gravado junto e é o que a pessoa lê. O id continua
+     * indexado, para correlacionar quando o usuário ainda existe.
+     */
+    atorId: text('ator_id'),
     /** Rótulo legível do ator, preservado mesmo se o usuário for removido. */
     atorNome: text('ator_nome'),
     acao: text('acao').notNull(),

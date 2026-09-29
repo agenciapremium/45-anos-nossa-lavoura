@@ -61,6 +61,13 @@ export const ACOES = {
   usuarioCriado: 'usuario.criado',
   usuarioEditado: 'usuario.editado',
   usuarioDesativado: 'usuario.desativado',
+  /**
+   * Remoção definitiva de usuário. Ação própria, e não uma variação de
+   * `usuario.desativado`: desativar é reversível com um UPDATE, remover não
+   * é. A linha guarda nome e papel de quem saiu em `dados_json`, porque
+   * depois do DELETE não há mais para onde apontar.
+   */
+  usuarioRemovido: 'usuario.removido',
 
   importacaoConfirmada: 'importacao.confirmada',
 

@@ -11,13 +11,20 @@
  * `colaborador` e `recepcao` ainda aceitam login por CPF e data de
  * nascimento, e as datas usadas nos testes são redondas e previsíveis.
  *
- * Como não dá para apagar, desativa-se: `ativo = false` barra o login na
- * requisição seguinte e preserva a trilha. É reversível — basta um
- * UPDATE — e deve ser rodado depois de cada rodada de integração, antes
- * de qualquer uso sério do ambiente.
+ * Desativar barra o login na requisição seguinte e preserva a trilha. É
+ * reversível com um UPDATE, e deve ser rodado depois de cada rodada de
+ * integração, antes de qualquer uso sério do ambiente.
  *
  *   npm run usuarios:desativar-teste          # mostra o que faria
  *   npm run usuarios:desativar-teste -- --aplicar
+ *
+ * **Apagar agora é possível**, desde a migração `0007`, que tirou a chave
+ * estrangeira de `palestra_auditoria.ator_id` — era o `ON DELETE SET NULL`
+ * dela que colidia com o gatilho de imutabilidade (o parágrafo acima
+ * descreve a colisão). Para a limpeza definitiva, com backup em `.sql` e
+ * sem tocar em gatilho nenhum, use
+ * `scripts/remover-usuarios-de-teste.ts`. Este script continua sendo o
+ * certo para o uso diário: é a higiene entre rodadas, não a faxina.
  */
 import { config } from 'dotenv';
 import { and, eq, or, like } from 'drizzle-orm';

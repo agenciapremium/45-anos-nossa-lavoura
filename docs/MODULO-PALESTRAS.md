@@ -126,25 +126,46 @@ importação de CSV.
 
 ### Usuários de teste
 
-Os scripts de integração criam usuários para exercitar papéis e escopo, e
-não conseguem se apagar: quem fez check-in ou cancelou um convite virou
-`ator_id` de uma linha de auditoria, e a auditoria é imutável por gatilho.
-
-O resíduo **não é cosmético**. São contas ativas, algumas com papel
-`admin`, num banco que preview e produção compartilham — e as de papel
-`colaborador` e `recepcao` aceitam login por CPF e data de nascimento,
+Os scripts de integração criam usuários para exercitar papéis e escopo, e não
+conseguem se apagar por completo. O resíduo **não é cosmético**: são contas num
+banco que preview e produção compartilham, algumas com papel `admin`, e as de
+papel `colaborador` e `recepcao` aceitam login por CPF e data de nascimento,
 com datas redondas e previsíveis.
 
-Como não dá para apagar, desativa-se:
+Duas ferramentas, e a segunda é a definitiva:
 
 ```sh
 npm run usuarios:desativar-teste             # mostra o que faria
-npm run usuarios:desativar-teste -- --aplicar
+npm run usuarios:desativar-teste -- --aplicar   # ativo = false, reversível
+
+npm run usuarios:remover-teste               # mostra o que faria
+npm run usuarios:remover-teste -- --aplicar     # DELETE, com backup em docs/
 ```
 
-Rode **depois de cada rodada de integração**, antes de qualquer uso sério
-do ambiente. É reversível: os próprios scripts recriam ou reativam o que
-precisarem.
+Desativar deve rodar **depois de cada rodada de integração**, antes de
+qualquer uso sério do ambiente. Remover é para a limpeza de verdade: escreve
+um backup `.sql` dos usuários e das contas antes de apagar, recusa se algum
+deles tiver convite ou lote apontando para si (as duas colunas são
+`on delete restrict`: não seriam usuários descartáveis, teriam distribuído
+convites de verdade) e recusa também se alguma linha de auditoria deles
+estiver sem `ator_nome`, que seria a única identificação de quem agiu ali.
+
+#### Por que apagar era impossível até a migração 0007
+
+`palestra_auditoria.ator_id` tinha chave estrangeira para `user` com
+`ON DELETE SET NULL`. Para o Postgres, `SET NULL` é um `UPDATE` — e o gatilho
+`palestra_auditoria_sem_update` proíbe qualquer UPDATE nessa tabela. As duas
+regras se anulavam: **qualquer** `DELETE` em `user` derrubava a transação
+inteira, e por isso só existia o caminho de desativar.
+
+A migração `0007` tirou aquela FK. `ator_id` continua lá, como texto e
+indexado; o que sai é a garantia referencial do ponteiro, que pode passar a
+apontar para um usuário removido. A troca vale porque **nenhuma leitura do
+sistema junta essa tabela com `user`**: a tela de auditoria, o filtro por ator
+e a linha do tempo do convite usam `ator_nome`, gravado junto de cada
+registro. Em troca, nenhuma linha de auditoria é mais tocada pelo ciclo de
+vida de outra tabela, e os três gatilhos ficam armados o tempo inteiro — é
+imutabilidade mais forte que antes, não uma exceção aberta nela.
 
 ---
 
@@ -654,7 +675,10 @@ estado efetivo. Colaborador sem convites recebe **409**, não um PDF em branco.
   `disponivel` vencidos, **não toca em `confirmado`** e é idempotente.
 - `/palestras/admin/*` sem o token responde **404** (nunca 401), com a 404 do
   circuito.
-- `palestra_auditoria` recusa UPDATE, DELETE e TRUNCATE no próprio banco.
+- `palestra_auditoria` recusa UPDATE, DELETE e TRUNCATE no próprio banco. Desde
+  a migração `0007` isso vale sem exceção: a FK `ator_id -> user` saiu
+  justamente porque o `ON DELETE SET NULL` dela era um UPDATE disfarçado e
+  tornava a remoção de qualquer usuário impossível (ver "Usuários de teste").
 
 ### Desempenho
 
