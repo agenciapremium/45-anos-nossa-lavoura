@@ -61,6 +61,7 @@
   --color-acento: var(--surface-accent);
   --color-acento-suave: var(--surface-accent-soft);
   --color-campo: var(--surface-field);
+  --color-veu: var(--surface-scrim);
 
   /* ---------- texto ---------- */
   --color-texto: var(--text-body);

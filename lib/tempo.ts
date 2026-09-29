@@ -33,6 +33,11 @@ export function formatarDataHora(instante: Date): string {
   return `${formatarData(instante)} às ${formatarHorario(instante)}`;
 }
 
+/** `13/10` — data curta, para seletores e cartões compactos. */
+export function formatarDataCurta(instante: Date): string {
+  return formatInTimeZone(instante, FUSO, 'dd/MM', { locale: ptBR });
+}
+
 /** `13/10/2026 19:59` — carimbos e telas administrativas. */
 export function formatarCarimbo(instante: Date): string {
   return formatInTimeZone(instante, FUSO, 'dd/MM/yyyy HH:mm', { locale: ptBR });

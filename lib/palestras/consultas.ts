@@ -360,6 +360,12 @@ export type FiltroDeAuditoria = {
   ator?: string;
   acao?: string;
   entidade?: string;
+  /**
+   * Estreita para o rastro de um registro específico (o convite de código
+   * X, por exemplo). Opcional e só reduz o resultado: sem ele, a consulta
+   * se comporta como antes (tarefa 5.8 do redesenho de interface).
+   */
+  entidadeId?: string;
   de?: Date;
   ate?: Date;
 };
@@ -373,6 +379,8 @@ export async function listarAuditoria(
   if (filtro.ator) condicoes.push(eq(auditoria.atorNome, filtro.ator));
   if (filtro.acao) condicoes.push(eq(auditoria.acao, filtro.acao));
   if (filtro.entidade) condicoes.push(eq(auditoria.entidade, filtro.entidade));
+  if (filtro.entidadeId)
+    condicoes.push(eq(auditoria.entidadeId, filtro.entidadeId));
   if (filtro.de) condicoes.push(gte(auditoria.criadoEm, filtro.de));
   if (filtro.ate) condicoes.push(lte(auditoria.criadoEm, filtro.ate));
 

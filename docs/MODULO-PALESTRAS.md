@@ -15,6 +15,16 @@ de CSV, geração de convites, expiração e PDF de distribuição.
 > `auth-e-papeis` **já está implementada**: login, papéis, escopo e travas
 > estão em [`docs/AUTH-E-PAPEIS.md`](./AUTH-E-PAPEIS.md). O guard provisório
 > descrito mais abaixo **não existe mais**.
+>
+> `redesenho-da-interface` **também já está implementada**: as telas
+> administrativas descritas neste documento (`/palestras/admin/*`)
+> passaram a viver dentro do grupo de rotas `app/palestras/(interno)/`,
+> com uma casca única (menu lateral filtrado por papel, barra de topo,
+> seletor de palestra como contexto), no lugar do antigo
+> `admin/layout.tsx` com barra de abas. Nenhum endereço mudou. A change
+> também acrescentou uma tela de indicadores, `/palestras/painel/metricas`
+> (funil, série diária de confirmações e desempenho por regional e loja),
+> documentada em [`docs/PAINEL-COLABORADOR.md`](./PAINEL-COLABORADOR.md).
 
 ---
 
@@ -379,6 +389,12 @@ Na landing e na foto comemorativa, o selo dos 45 anos.
 
 ## Mapa dos arquivos
 
+> **Atualizado por `redesenho-da-interface`:** o antigo `admin/layout.tsx`
+> (barra de abas) foi removido. As telas administrativas agora vivem em
+> `app/palestras/(interno)/admin/`, dentro da casca única com menu lateral
+> e barra de topo de `app/palestras/(interno)/layout.tsx` (ver a nota no
+> topo deste documento). Os endereços continuam os mesmos.
+
 ```
 app/
   layout.tsx                  casca comum: fontes, tokens
@@ -390,14 +406,21 @@ app/
     layout.tsx                carrega o Tailwind
     page.tsx                  página pública do circuito
     not-found.tsx             404 com a identidade do Acelera
-    admin/
-      layout.tsx              sessão + papel admin + navegação + noindex
-      palestras/              CRUD de palestras
-      organizacao/            regionais, lojas, usuários
-      importar/               assistente de CSV + modelo baixável
-      gerar/                  geração de lotes
-      distribuir/             PDFs (individual e .zip)
-      auditoria/              consulta da trilha
+    (interno)/                casca única: menu lateral, barra de topo,
+                               contexto de palestra (`redesenho-da-interface`)
+      layout.tsx               sessão + escopo + navegação, sem mudar URL
+      admin/
+        palestras/              CRUD de palestras
+        organizacao/            regionais, lojas, usuários
+        importar/               assistente de CSV + modelo baixável
+        gerar/                  geração de lotes
+        distribuir/             PDFs (individual e .zip)
+        auditoria/              consulta da trilha
+      painel/                   painel do colaborador (ver
+                                 `docs/PAINEL-COLABORADOR.md`), incluindo
+                                 `metricas/` (indicadores do circuito)
+      checkin/ relatorios/      operação do evento (ver
+                                 `docs/OPERACAO-EVENTO.md`)
   api/cron/expirar-convites/  rotina diária
 
 components/

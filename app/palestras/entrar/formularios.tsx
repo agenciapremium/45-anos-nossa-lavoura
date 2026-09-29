@@ -19,12 +19,15 @@ import {
 import { ESTADO_INICIAL } from './estado';
 
 /* =========================================================
-   Formulários das telas de acesso
+   Formulários das telas de acesso (tarefas 6.4 e 6.5)
 
    Cada um faz uma coisa só e devolve uma mensagem. A mensagem vem pronta
-   do servidor — nenhum texto de recusa é montado aqui, porque a
+   do servidor, nenhum texto de recusa é montado aqui, porque a
    neutralidade das respostas é uma regra de segurança e não pode depender
    de quem escreveu a tela.
+
+   Alvo de 48 px em todo campo: é a tela de acesso, aberta com frequência
+   no celular, muitas vezes na primeira tentativa do dia de trabalho.
    ========================================================= */
 
 const TOM: Record<
@@ -61,6 +64,7 @@ function CampoDeCpf({ id = 'cpf' }: { id?: string }) {
       placeholder="000.000.000-00"
       value={valor}
       onChange={(e) => setValor(mascaraProgressiva(e.target.value))}
+      className="min-h-12"
       required
     />
   );
@@ -86,6 +90,7 @@ export function FormularioDeSenha({ destino }: { destino?: string }) {
           autoComplete="username"
           autoCapitalize="none"
           spellCheck={false}
+          className="min-h-12"
           required
         />
       </Grupo>
@@ -95,6 +100,7 @@ export function FormularioDeSenha({ destino }: { destino?: string }) {
           name="senha"
           type="password"
           autoComplete="current-password"
+          className="min-h-12"
           required
         />
       </Grupo>
@@ -131,6 +137,7 @@ export function FormularioDeLinkMagico() {
           autoComplete="email"
           autoCapitalize="none"
           spellCheck={false}
+          className="min-h-12"
           required
         />
       </Grupo>
@@ -195,7 +202,7 @@ export function FormularioDoCodigo({
             autoComplete="one-time-code"
             maxLength={7}
             placeholder="000000"
-            className="text-center font-mono text-t2 tracking-[0.4em]"
+            className="min-h-12 text-center font-mono text-t2 tracking-[0.4em]"
             required
           />
         </Grupo>
@@ -240,6 +247,7 @@ export function FormularioDeCpfENascimento({ destino }: { destino?: string }) {
           name="dataNascimento"
           type="date"
           autoComplete="bday"
+          className="min-h-12"
           required
         />
       </Grupo>
@@ -271,6 +279,7 @@ export function FormularioDeRedefinicao() {
           autoComplete="email"
           autoCapitalize="none"
           spellCheck={false}
+          className="min-h-12"
           required
         />
       </Grupo>
@@ -297,6 +306,7 @@ export function FormularioDeNovaSenha({ token }: { token: string }) {
           type="password"
           autoComplete="new-password"
           minLength={10}
+          className="min-h-12"
           required
         />
       </Grupo>
@@ -307,6 +317,7 @@ export function FormularioDeNovaSenha({ token }: { token: string }) {
           type="password"
           autoComplete="new-password"
           minLength={10}
+          className="min-h-12"
           required
         />
       </Grupo>

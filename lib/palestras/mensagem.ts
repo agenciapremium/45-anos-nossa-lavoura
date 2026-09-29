@@ -100,7 +100,7 @@ export function explicarProblemas(problemas: ProblemaDaMensagem[]): string {
   const partes: string[] = [];
   if (faltando.length) {
     partes.push(
-      `A mensagem precisa conter ${faltando.join(', ')} — é onde entra o endereço do convite.`,
+      `A mensagem precisa conter ${faltando.join(', ')}: é onde entra o endereço do convite.`,
     );
   }
   if (desconhecidos.length) {

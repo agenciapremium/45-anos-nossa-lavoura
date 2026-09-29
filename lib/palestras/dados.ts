@@ -4,6 +4,7 @@ import { and, asc, count, eq, ilike, inArray, isNotNull, sql, type SQL } from 'd
 
 import { db } from '@/lib/db';
 import {
+  auditoria,
   checkin,
   confirmacao,
   convite,
@@ -65,7 +66,7 @@ type Colunas = {
 
 const NADA = sql`false`;
 
-function restricao(escopo: Escopo, colunas: Colunas): SQL | undefined {
+export function restricao(escopo: Escopo, colunas: Colunas): SQL | undefined {
   switch (escopo.papel) {
     case 'admin':
       return undefined;
@@ -119,6 +120,8 @@ export type ConviteNoEscopo = {
   colaboradorNome: string;
   lojaId: string | null;
   lojaNome: string | null;
+  /** Da loja do colaborador. Usado para o filtro de regional da lista (3.2). */
+  regionalId: string | null;
   /** Lembrete pessoal do colaborador (D4) — texto livre, sem efeito de sistema. */
   enviadoPara: string | null;
   criadoEm: Date;
@@ -142,6 +145,7 @@ function colunasDoConvite() {
     colaboradorNome: user.name,
     lojaId: user.lojaId,
     lojaNome: loja.nome,
+    regionalId: loja.regionalId,
     enviadoPara: convite.enviadoPara,
     criadoEm: convite.criadoEm,
     checkinEm: checkin.feitoEm,
@@ -168,6 +172,7 @@ function linhaParaConviteNoEscopo(
     colaboradorNome: string;
     lojaId: string | null;
     lojaNome: string | null;
+    regionalId: string | null;
     enviadoPara: string | null;
     criadoEm: Date;
     checkinEm: Date | null;
@@ -191,6 +196,7 @@ function linhaParaConviteNoEscopo(
     colaboradorNome: linha.colaboradorNome,
     lojaId: linha.lojaId,
     lojaNome: linha.lojaNome,
+    regionalId: linha.regionalId,
     enviadoPara: linha.enviadoPara,
     criadoEm: linha.criadoEm,
     // Só faz sentido mostrar o check-in quando o estado efetivo é
@@ -203,7 +209,19 @@ function linhaParaConviteNoEscopo(
 /** Convites que o escopo alcança, com o estado efetivo já resolvido. */
 export async function convitesNoEscopo(
   escopo: Escopo,
-  filtro: { eventoId?: string; estado?: EstadoDeConvite } = {},
+  filtro: {
+    eventoId?: string;
+    estado?: EstadoDeConvite;
+    /**
+     * Filtros adicionais da lista de convites (3.2): estreitam o que o
+     * escopo já alcança, nunca o ampliam. Um gerente regional que informe
+     * a `lojaId` de outra regional simplesmente não ganha linha nenhuma,
+     * porque a restrição de escopo (acima) já corta antes deste filtro entrar.
+     */
+    regionalId?: string;
+    lojaId?: string;
+    colaboradorId?: string;
+  } = {},
 ): Promise<ConviteNoEscopo[]> {
   conferirPapel(escopo, 'verConvitesEConfirmacoes');
 
@@ -215,6 +233,9 @@ export async function convitesNoEscopo(
     }),
   ];
   if (filtro.eventoId) condicoes.push(eq(convite.eventoId, filtro.eventoId));
+  if (filtro.regionalId) condicoes.push(eq(loja.regionalId, filtro.regionalId));
+  if (filtro.lojaId) condicoes.push(eq(user.lojaId, filtro.lojaId));
+  if (filtro.colaboradorId) condicoes.push(eq(convite.colaboradorId, filtro.colaboradorId));
 
   const linhas = await db()
     .select(colunasDoConvite())
@@ -270,6 +291,45 @@ export async function conviteNoEscopo(
 
   if (!linha) return null;
   return linhaParaConviteNoEscopo(linha, agora());
+}
+
+/** Um evento da linha do tempo de um convite (3.4 das tasks). */
+export type EventoDoConvite = {
+  acao: string;
+  criadoEm: Date;
+  atorNome: string | null;
+  dados: unknown;
+};
+
+/**
+ * A trilha de auditoria de UM convite, na ordem em que aconteceu.
+ *
+ * A confirmação de escopo é a mesma de `conviteNoEscopo` (D2): só depois de
+ * confirmar que o convite está dentro do que este usuário pode LER, a
+ * função consulta a auditoria por `entidade`/`entidadeId`, sem exigir o
+ * papel Admin, porque quem já pode ler o convite pode ler o rastro dele.
+ * Fora do escopo, lista vazia, a mesma resposta de "não existe".
+ */
+export async function linhaDoTempoDoConvite(
+  escopo: Escopo,
+  conviteId: string,
+): Promise<EventoDoConvite[]> {
+  const alcancado = await conviteNoEscopo(escopo, { id: conviteId });
+  if (!alcancado) return [];
+
+  return db()
+    .select({
+      acao: auditoria.acao,
+      criadoEm: auditoria.criadoEm,
+      atorNome: auditoria.atorNome,
+      dados: auditoria.dadosJson,
+    })
+    .from(auditoria)
+    .where(
+      and(eq(auditoria.entidade, 'palestra_convite'), eq(auditoria.entidadeId, conviteId)),
+    )
+    .orderBy(asc(auditoria.criadoEm))
+    .limit(50);
 }
 
 /**
@@ -909,6 +969,21 @@ export async function listaDeImpressao(
     .where(and(...condicoes.filter(Boolean)))
     .orderBy(asc(confirmacao.nome))
     .limit(2000);
+}
+
+/**
+ * Total de pessoas esperadas: titulares mais acompanhantes, a partir das
+ * linhas de `listaDeImpressao` (tarefa 6.7).
+ *
+ * É a mesma conta que o cabeçalho da lista impressa já faz (tarefa 6.2):
+ * uma linha por titular confirmado, mais uma para cada acompanhante
+ * informado. Reaproveitada aqui para não haver duas fórmulas do mesmo
+ * número em telas diferentes.
+ */
+export function totalDePessoasEsperadas(
+  linhas: Pick<LinhaDeImpressao, 'acompanhante'>[],
+): number {
+  return linhas.length + linhas.filter((l) => l.acompanhante).length;
 }
 
 /** Uma linha da exportação CSV: todas as colunas que a spec `exportacao-csv` pede. */

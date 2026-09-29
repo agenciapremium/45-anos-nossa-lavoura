@@ -84,7 +84,7 @@ function mensagemForaDoDia(dataDaPalestra: Date): string {
 
 function mensagemAmarela(primeiroCheckinEm: Date): string {
   return (
-    `Este convite já foi utilizado — check-in em ${formatarData(primeiroCheckinEm)} ` +
+    `Este convite já foi utilizado: check-in em ${formatarData(primeiroCheckinEm)} ` +
     `às ${formatarHorario(primeiroCheckinEm)}.`
   );
 }

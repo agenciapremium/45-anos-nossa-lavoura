@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { RodapePublico } from '@/components/palestras/publico';
 import { SeloDoCircuito } from '@/components/palestras/selo';
-import { Aviso, Cartao, Sobrancelha, Vazio } from '@/components/ui';
+import { Aviso, Cartao, LinkBotao, Sobrancelha, Vazio } from '@/components/ui';
 import { listarPalestrasAtivas } from '@/lib/palestras/consultas';
 import {
   formatarData,
@@ -56,7 +56,7 @@ export default async function PaginaDoCircuito() {
 
       <main className="flex-1">
         <section className="mx-auto w-full max-w-conteudo px-[var(--gutter-page)] py-24">
-          <Sobrancelha>As palestras</Sobrancelha>
+          <Sobrancelha>As quatro palestras</Sobrancelha>
 
           {palestras.length === 0 ? (
             <Vazio titulo="As datas ainda vão ser anunciadas.">
@@ -70,7 +70,7 @@ export default async function PaginaDoCircuito() {
               {palestras.map((p) => (
                 <li key={p.id}>
                   <Cartao elevado className="h-full">
-                    <p className="m-0 font-corpo text-rotulo font-bold uppercase tracking-sobrancelha text-lima-700">
+                    <p className="m-0 font-corpo text-rotulo font-bold uppercase tracking-sobrancelha text-texto-suave">
                       {formatarData(p.dataHora)} · {formatarHorario(p.dataHora)}
                     </p>
                     <h2 className="mt-2 mb-3 font-titulo text-t2 font-bold leading-justo tracking-destaque text-texto-forte">
@@ -96,8 +96,9 @@ export default async function PaginaDoCircuito() {
           <div className="mx-auto w-full max-w-conteudo px-[var(--gutter-page)] py-16">
             {/*
               Esta página NÃO confirma presença. A confirmação acontece
-              exclusivamente pelo link pessoal que o colaborador envia — é o
-              que amarra cada convite a um CPF. Nada de campo de CPF aqui.
+              exclusivamente pelo link pessoal que o colaborador envia, e é
+              isso que amarra cada convite a um CPF. Nada de campo de CPF
+              aqui.
             */}
             <Aviso
               tom="informacao"
@@ -113,16 +114,16 @@ export default async function PaginaDoCircuito() {
                 Ainda não recebeu o seu? Fale com o consultor da loja Nossa
                 Lavoura mais próxima.
               </p>
-              <p>
-                Já confirmou e perdeu o ingresso?{' '}
-                <a
+              <div className="mt-4">
+                <LinkBotao
                   href="/palestras/ingresso"
-                  className="font-bold text-terra-700 underline underline-offset-4"
+                  variante="secundario"
+                  tamanho="lg"
+                  className="w-full"
                 >
-                  Recupere com o CPF e o código do convite
-                </a>
-                .
-              </p>
+                  Já confirmei · ver meu ingresso
+                </LinkBotao>
+              </div>
             </Aviso>
           </div>
         </section>

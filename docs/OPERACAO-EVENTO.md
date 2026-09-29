@@ -20,6 +20,17 @@ Para a equipe que vai operar a porta: [`docs/ROTEIRO-RECEPCAO.md`](./ROTEIRO-REC
 
 ---
 
+> **Atualização (`redesenho-da-interface`):** check-in e relatórios
+> passaram a viver dentro do mesmo grupo de rotas das demais telas
+> autenticadas, `app/palestras/(interno)/`, com uma casca única (menu
+> lateral por papel, barra de topo, seletor de palestra como contexto).
+> Nenhum endereço mudou. O seletor de palestra da barra de topo substitui o
+> formulário de escolha de palestra que cada tela tinha por conta própria;
+> a palestra escolhida é lembrada num cookie de sessão e continua podendo
+> ser sobrescrita por `?palestra=` na URL, para um link continuar
+> compartilhável. Detalhes em
+> `openspec/changes/redesenho-da-interface/design.md` (decisões D1 e D2).
+
 ## Rotas
 
 | Rota | O que faz | Acesso |
@@ -30,7 +41,8 @@ Para a equipe que vai operar a porta: [`docs/ROTEIRO-RECEPCAO.md`](./ROTEIRO-REC
 | `/palestras/relatorios/csv?palestra=` | Exportação CSV | Admin e gerentes (**não** Recepção) |
 
 As quatro já estavam no `middleware.ts` de `auth-e-papeis`, que as
-antecipou — nenhuma mudança no arquivo foi necessária para esta change.
+antecipou: nenhuma mudança no arquivo foi necessária para esta change, nem
+para `redesenho-da-interface` depois.
 
 ---
 
@@ -60,7 +72,7 @@ espírito de `lib/palestras/confirmacao.ts`.
 
 A câmera só lê o `ingresso_token` do QR e manda para o servidor
 (`checkinPorToken`). O componente `Leitor`
-(`app/palestras/checkin/leitor.tsx`) não interpreta o texto lido nem
+(`app/palestras/(interno)/checkin/leitor.tsx`) não interpreta o texto lido nem
 decide nada — devolve a string crua. Quem resolve verde/amarelo/vermelho é
 sempre `lib/palestras/servicos/checkin.ts`.
 
@@ -126,7 +138,7 @@ aceito no dia da palestra: 13/10/2026.").
 ### Busca manual (D1): não é contingência escondida
 
 Fica na mesma tela do leitor, atrás de um botão "Busca manual" — sem
-navegação, sem recarregar (`app/palestras/checkin/tela.tsx` alterna entre
+navegação, sem recarregar (`app/palestras/(interno)/checkin/tela.tsx` alterna entre
 os dois com `useState`). Um campo só decide sozinho se o que foi digitado
 é CPF (11 dígitos) ou nome parcial.
 
@@ -145,7 +157,7 @@ para `manual`.
 
 ## Lista para impressão
 
-`/palestras/relatorios/lista?palestra=` (`app/palestras/relatorios/lista/`),
+`/palestras/relatorios/lista?palestra=` (`app/palestras/(interno)/relatorios/lista/`),
 com CSS próprio (`impressao.css`) para A4 retrato: `@page { size: A4
 portrait }`, cabeçalho de tabela repetido em cada página quebrada
 (`thead { display: table-header-group }`) e numeração de página via
@@ -180,7 +192,7 @@ tem escopo de palestra.
 
 ## Exportação CSV
 
-`/palestras/relatorios/csv?palestra=` (`app/palestras/relatorios/csv/route.ts`).
+`/palestras/relatorios/csv?palestra=` (`app/palestras/(interno)/relatorios/csv/route.ts`).
 
 ### D7: compatível com Excel em pt-BR
 
@@ -270,9 +282,9 @@ por palestra".
 ## Leitura de QR
 
 `@zxing/browser` (`BrowserQRCodeReader`) + `@zxing/library`, importados
-**sob demanda** dentro de um `useEffect` — quem abre a tela em "busca
+**sob demanda** dentro de um `useEffect`: quem abre a tela em "busca
 manual" nunca baixa o decodificador
-(`app/palestras/checkin/leitor.tsx`).
+(`app/palestras/(interno)/checkin/leitor.tsx`).
 
 - `NotFoundException` do zxing dispara a cada quadro sem código
   encontrado — tratada como caminho normal ("ainda não achei"), não como
@@ -313,8 +325,13 @@ Continua presente no cabeçalho de `/palestras/checkin` e
 
 ## Mapa dos arquivos desta change
 
+> As rotas abaixo vivem hoje dentro de `app/palestras/(interno)/` (grupo de
+> rotas da change `redesenho-da-interface`, sem efeito no endereço: veja a
+> nota no topo deste documento). A árvore a seguir mantém os caminhos como
+> a change `operacao-evento` os criou, só com o prefixo atualizado.
+
 ```
-app/palestras/
+app/palestras/(interno)/
   checkin/
     page.tsx           sessão + papel + palestra do dia sugerida
     tela.tsx            orquestra leitor e busca manual (client)

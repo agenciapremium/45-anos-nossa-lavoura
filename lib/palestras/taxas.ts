@@ -18,7 +18,7 @@ import type { ResumoDeContagem } from '@/lib/palestras/dados';
      (Confere com o exemplo da spec: 40 confirmados dos quais 30 com
      check-in não são "40 mais 30" — são 40 no total, 30 já presentes.)
    - Divisor zero não é erro: a taxa fica indisponível (`null`), e quem
-     exibe mostra um traço ou "—", nunca "0%" nem uma exceção.
+     exibe mostra "N/D", nunca "0%" nem uma exceção.
    ========================================================= */
 
 export type Taxas = {
@@ -55,9 +55,9 @@ export function calcularTaxas(resumo: Partial<ResumoDeContagem>): Taxas {
   };
 }
 
-/** `0.4` -> `"40%"`; `null` -> `"—"` (indisponível, sem erro). */
+/** `0.4` -> `"40%"`; `null` -> `"N/D"` (indisponível, sem erro, sem travessão). */
 export function formatarTaxa(taxa: number | null): string {
-  if (taxa === null) return '—';
+  if (taxa === null) return 'N/D';
   return `${Math.round(taxa * 100)}%`;
 }
 

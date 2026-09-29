@@ -48,7 +48,7 @@ import { ehODispositivoDoTitular } from './titular';
 /**
  * Metadados fixos, sem nada do convite.
  *
- * `generateMetadata` poderia pôr a cidade no `<title>` — e aí a aba, o
+ * `generateMetadata` poderia pôr a cidade no `<title>`, e aí a aba, o
  * histórico do navegador e a pré-visualização de qualquer compartilhamento
  * contariam que aquele código existe. O título é o mesmo para código
  * válido, expirado, cancelado e inexistente.
@@ -76,7 +76,7 @@ function Moldura({ children }: { children: React.ReactNode }) {
  * Tela de estado, com piso de tempo.
  *
  * Todas as saídas sem ingresso passam por aqui, com a mesma moldura e o
- * mesmo título — a diferença fica só no corpo do aviso.
+ * mesmo título: a diferença fica só no corpo do aviso.
  */
 async function estado(variante: VarianteDeEstado, inicio: number) {
   await aguardarPisoDeTempo(inicio);

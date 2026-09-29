@@ -157,7 +157,7 @@ export function Rodape() {
     <>
       <Hr style={estilos.divisor} />
       <Text style={estilos.rodape}>
-        Se você não pediu este acesso, ignore esta mensagem — nada acontece
+        Se você não pediu este acesso, ignore esta mensagem: nada acontece
         sem alguém abrir o link ou digitar o código.
       </Text>
       <Text style={estilos.rodape}>

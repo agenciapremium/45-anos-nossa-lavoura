@@ -14,9 +14,9 @@ import { ESTADO_INICIAL } from './estado';
  * Repetido de `lib/palestras/codigo.ts` de propósito.
  *
  * Aquele módulo sorteia códigos com `node:crypto`, e importá-lo daqui
- * arrastaria o gerador — e um módulo nativo do Node — para dentro do
- * pacote do navegador. O valor é um número, e o servidor valida de novo
- * com `pareceCodigo`, que é a autoridade.
+ * arrastaria o gerador, um módulo nativo do Node, para dentro do pacote do
+ * navegador. O valor é um número, e o servidor valida de novo com
+ * `pareceCodigo`, que é a autoridade.
  */
 const TAMANHO_DO_CODIGO = 6;
 
@@ -63,6 +63,7 @@ export function FormularioDeRecuperacao() {
           autoComplete="off"
           placeholder="000.000.000-00"
           maxLength={14}
+          className="min-h-12"
           required
         />
       </Grupo>
@@ -93,7 +94,7 @@ export function FormularioDeRecuperacao() {
           spellCheck={false}
           placeholder="K7Q2MX"
           maxLength={TAMANHO_DO_CODIGO}
-          className="font-mono tracking-[0.3em] uppercase"
+          className="min-h-12 font-mono tracking-[0.3em] uppercase"
           required
         />
       </Grupo>
