@@ -20,24 +20,38 @@ continuou sendo um só.
 
 ---
 
+> **Atualização (`redesenho-da-interface`):** todas as telas autenticadas
+> (este painel, a administração, os relatórios e o check-in) passaram a
+> viver dentro de um único grupo de rotas, `app/palestras/(interno)/`, sem
+> mudar nenhum endereço. A casca ganhou menu lateral (filtrado pelo papel,
+> conforme `lib/palestras/papeis.ts`), barra de topo com a identidade da
+> sessão e um seletor de palestra que vale como contexto para convites,
+> equipe, relatórios, métricas e check-in: a palestra escolhida atravessa a
+> navegação em vez de ser filtro repetido em cada tela. Detalhes em
+> `openspec/changes/redesenho-da-interface/design.md` (decisões D1 a D3).
+
 ## Rotas
 
 | Rota | O que faz | Acesso |
 | --- | --- | --- |
 | `/palestras/painel` | Início por papel: números por palestra e atalhos | Todos os autenticados |
-| `/palestras/painel/convites` | Lista de convites, com filtros, contagens e ações na linha | Admin, gerentes, colaborador |
+| `/palestras/painel/convites` | Lista de convites, com busca, ordenação, filtros, contagens e ações na linha | Admin, gerentes, colaborador |
 | `/palestras/painel/convites/[codigo]` | Detalhe de um convite confirmado: titular, acompanhante, CPF mascarado | Dentro do escopo |
 | `/palestras/painel/convites/pdf` | PDF com os próprios convites disponíveis | Só colaborador |
 | `/palestras/painel/equipe` | Números e listas por regional, loja e colaborador, somente leitura | Admin e gerentes |
+| `/palestras/painel/metricas` | Indicadores do circuito: funil, série diária de confirmações, colaboradores sem distribuição e desempenho por regional e loja | Quem tem alcance acima de "próprios" em `verConvitesEConfirmacoes` |
 
-As cinco já estavam na tabela de rotas do middleware (`middleware.ts`),
-publicada por `auth-e-papeis` antecipando esta change.
+As cinco primeiras já estavam na tabela de rotas do middleware
+(`middleware.ts`), publicada por `auth-e-papeis` antecipando esta change. A
+tela de métricas é nova, da change `redesenho-da-interface`: números lidos
+de `lib/palestras/metricas.ts`, sempre recebendo o escopo, e gráficos em
+SVG desenhados no servidor (sem biblioteca de gráfico).
 
 ---
 
 ## Lista de convites — a tela mais usada (D6)
 
-`app/palestras/painel/convites/page.tsx` busca os convites com
+`app/palestras/(interno)/painel/convites/page.tsx` busca os convites com
 `convitesNoEscopo(escopo, filtro)` — a mesma função central de
 `lib/palestras/dados.ts` que já aplicava o escopo por vínculo e a máscara de
 CPF desde `auth-e-papeis`. Esta change **estendeu** a função, não duplicou:
@@ -125,7 +139,7 @@ existir e grava a auditoria. Duas fachadas por cima dela:
   o colaborador operando uma lista merece saber o que já mudou.
 
 **Escopo da ação (D2), em duas etapas**, em
-`app/palestras/painel/convites/acoes.ts`:
+`app/palestras/(interno)/painel/convites/acoes.ts`:
 
 1. `conviteNoEscopo(escopo, { codigo })` — o convite só existe para quem
    chamou se estiver dentro do que ele **lê**. Fora do escopo, `forbidden()`
@@ -173,7 +187,7 @@ função por baixo de `/palestras/admin/distribuir/pdf`,
 (`DocumentoDeDistribuicao`), a mesma mensagem de WhatsApp, o mesmo PDF
 "nunca armazenado, montado na hora" de `fundacao`.
 
-A rota do painel (`app/palestras/painel/convites/pdf/route.tsx`) **nem lê**
+A rota do painel (`app/palestras/(interno)/painel/convites/pdf/route.tsx`) **nem lê**
 um identificador de colaborador da query — diferente da rota do Admin, que
 recebe `?colaborador=`. Não há parâmetro para ignorar porque não existe
 parâmetro: o único alvo possível é a própria sessão. Gerentes recebem 403
@@ -195,7 +209,7 @@ continua sendo ignorado.
 
 ## Visão de equipe (`visao-gerencial`)
 
-`app/palestras/painel/equipe/page.tsx` — somente leitura, sem formulário de
+`app/palestras/(interno)/painel/equipe/page.tsx`, somente leitura, sem formulário de
 escrita nenhum. Três novas consultas agregadas em `lib/palestras/dados.ts`,
 todas em SQL (`GROUP BY` + `count()`), não trazendo convite por convite
 para agrupar em JavaScript (D5):
@@ -276,8 +290,13 @@ banco, de propósito — como a própria auditoria.
 
 ## Mapa dos arquivos desta change
 
+> As rotas abaixo vivem hoje dentro de `app/palestras/(interno)/` (grupo de
+> rotas da change `redesenho-da-interface`, sem efeito no endereço: veja a
+> nota no topo deste documento). A árvore a seguir mantém os caminhos como
+> a change `painel-colaborador` os criou, só com o prefixo atualizado.
+
 ```
-app/palestras/painel/
+app/palestras/(interno)/painel/
   page.tsx                     início por papel (de auth-e-papeis, com os
                                 atalhos "Convites" e "Equipe" desta change)
   convites/
@@ -289,6 +308,8 @@ app/palestras/painel/
     pdf/route.tsx               PDF do próprio colaborador
   equipe/
     page.tsx                   visão gerencial, somente leitura
+  metricas/
+    page.tsx                   indicadores do circuito (`redesenho-da-interface`)
 
 lib/palestras/
   dados.ts                     +enviadoPara/checkinEm em ConviteNoEscopo,

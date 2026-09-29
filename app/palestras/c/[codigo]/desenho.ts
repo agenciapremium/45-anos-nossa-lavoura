@@ -7,15 +7,33 @@ import type { DadosDoIngresso } from './ingresso';
    Canvas em vez de captura de HTML (`html-to-image`), como D6 do design
    permite. Motivo prático: a captura de HTML depende de o navegador
    rasterizar webfont, `clip-path` e sombra do mesmo jeito, e o Safari do
-   iPhone — o navegador desta audiência — é justamente onde ela falha
-   mais. Desenhando, o resultado é igual em todo lugar, e o arquivo sai
-   com o QR já embutido.
+   iPhone (o navegador desta audiência) é justamente onde ela falha mais.
+   Desenhando, o resultado é igual em todo lugar, e o arquivo sai com o QR
+   já embutido.
    --------------------------------------------------------- */
 
 const LARGURA = 1080;
 const ALTURA = 1620;
 
-const COR = {
+/**
+ * Cores do desenho, lidas dos tokens de `tokens.css`.
+ *
+ * O `canvas` não lê `var(...)`, então quem chama `desenharIngresso` resolve
+ * as variáveis com `getComputedStyle` (mesmo caminho que já existe para as
+ * famílias de fonte) e repassa aqui. Os valores abaixo só entram quando a
+ * leitura falha, e são os mesmos tokens, por extenso, como último recurso.
+ */
+export type CoresDoIngresso = {
+  fundo: string;
+  escuro: string;
+  terra: string;
+  lima: string;
+  creme: string;
+  branco: string;
+  suave: string;
+};
+
+export const CORES_PADRAO: CoresDoIngresso = {
   fundo: '#fffadc',
   escuro: '#2a1512',
   terra: '#3d201b',
@@ -83,6 +101,7 @@ function escrever(
 export async function desenharIngresso(
   dados: DadosDoIngresso,
   familias: { titulo: string; corpo: string },
+  cores: CoresDoIngresso = CORES_PADRAO,
 ): Promise<HTMLCanvasElement> {
   const canvas = document.createElement('canvas');
   canvas.width = LARGURA;
@@ -95,12 +114,12 @@ export async function desenharIngresso(
     carregarImagem(dados.qr),
   ]);
 
-  ctx.fillStyle = COR.fundo;
+  ctx.fillStyle = cores.fundo;
   ctx.fillRect(0, 0, LARGURA, ALTURA);
 
   /* ---- faixa superior ---- */
   const faixa = 430;
-  ctx.fillStyle = COR.escuro;
+  ctx.fillStyle = cores.escuro;
   ctx.fillRect(0, 0, LARGURA, faixa);
 
   if (selo) {
@@ -111,20 +130,20 @@ export async function desenharIngresso(
 
   ctx.textAlign = 'center';
   ctx.font = `700 26px ${familias.corpo}`;
-  ctx.fillStyle = COR.lima;
+  ctx.fillStyle = cores.lima;
   ctx.fillText('ACELERA NO CAMPO 3.0', LARGURA / 2, 330);
 
   ctx.font = `700 44px ${familias.titulo}`;
-  ctx.fillStyle = COR.creme;
+  ctx.fillStyle = cores.creme;
   ctx.fillText('INGRESSO CONFIRMADO', LARGURA / 2, 390);
 
   /* ---- QR ---- */
   const cartao = 620;
   const cartaoX = (LARGURA - cartao) / 2;
   const cartaoY = faixa + 48;
-  ctx.fillStyle = COR.branco;
+  ctx.fillStyle = cores.branco;
   ctx.fillRect(cartaoX, cartaoY, cartao, cartao);
-  ctx.strokeStyle = COR.terra;
+  ctx.strokeStyle = cores.terra;
   ctx.lineWidth = 6;
   ctx.strokeRect(cartaoX, cartaoY, cartao, cartao);
 
@@ -137,7 +156,7 @@ export async function desenharIngresso(
 
   ctx.textAlign = 'center';
   ctx.font = `700 30px ${familias.corpo}`;
-  ctx.fillStyle = COR.terra;
+  ctx.fillStyle = cores.terra;
   ctx.fillText('VALE PARA 2 PESSOAS', LARGURA / 2, y);
   y += 60;
 
@@ -147,7 +166,7 @@ export async function desenharIngresso(
 
   y = escrever(ctx, dados.titular, LARGURA / 2, y, {
     fonte: `700 46px ${familias.titulo}`,
-    cor: COR.escuro,
+    cor: cores.escuro,
     largura: util,
     entrelinha: 56,
     centro: true,
@@ -157,7 +176,7 @@ export async function desenharIngresso(
     y += 8;
     y = escrever(ctx, `com ${dados.acompanhante}`, LARGURA / 2, y, {
       fonte: `400 32px ${familias.corpo}`,
-      cor: COR.suave,
+      cor: cores.suave,
       largura: util,
       entrelinha: 42,
       centro: true,
@@ -165,7 +184,7 @@ export async function desenharIngresso(
   }
 
   y += 40;
-  ctx.fillStyle = COR.lima;
+  ctx.fillStyle = cores.lima;
   ctx.fillRect(margem, y, util, 6);
   y += 62;
 
@@ -177,7 +196,7 @@ export async function desenharIngresso(
     y,
     {
       fonte: `700 40px ${familias.titulo}`,
-      cor: COR.escuro,
+      cor: cores.escuro,
       largura: util,
       entrelinha: 50,
       centro: true,
@@ -187,7 +206,7 @@ export async function desenharIngresso(
   y += 12;
   y = escrever(ctx, dados.localNome, LARGURA / 2, y, {
     fonte: `700 32px ${familias.corpo}`,
-    cor: COR.terra,
+    cor: cores.terra,
     largura: util,
     entrelinha: 42,
     centro: true,
@@ -195,18 +214,18 @@ export async function desenharIngresso(
 
   y = escrever(ctx, dados.localEndereco, LARGURA / 2, y, {
     fonte: `400 28px ${familias.corpo}`,
-    cor: COR.terra,
+    cor: cores.terra,
     largura: util,
     entrelinha: 38,
     centro: true,
   });
 
   /* ---- rodapé ---- */
-  ctx.fillStyle = COR.escuro;
+  ctx.fillStyle = cores.escuro;
   ctx.fillRect(0, ALTURA - 96, LARGURA, 96);
   ctx.textAlign = 'center';
   ctx.font = `700 26px ${familias.corpo}`;
-  ctx.fillStyle = COR.creme;
+  ctx.fillStyle = cores.creme;
   ctx.fillText(
     `Convite ${dados.codigo} · pessoal e intransferível`,
     LARGURA / 2,

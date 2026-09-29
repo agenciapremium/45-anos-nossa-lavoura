@@ -14,7 +14,7 @@ import { CANCELAMENTO_INICIAL } from './estado';
 
    Componente de cliente inteiro, por dois motivos: o ingresso precisa ser
    desenhado num `canvas` para ser salvo como imagem, e o cancelamento
-   troca a tela sem recarregar. Nada aqui é segredo — só o titular chega a
+   troca a tela sem recarregar. Nada aqui é segredo: só o titular chega a
    esta árvore, e é a informação que ele já está lendo.
    ========================================================= */
 
@@ -86,8 +86,24 @@ export function Ingresso({ dados }: { dados: DadosDoIngresso }) {
 
       // Carregado só no toque: o desenho do canvas é o pedaço mais pesado
       // desta rota, e quem abre o link para *confirmar* nunca precisa dele.
-      const { desenharIngresso } = await import('./desenho');
-      const canvas = await desenharIngresso(dados, familias);
+      const { desenharIngresso, CORES_PADRAO } = await import('./desenho');
+
+      // O `canvas` não lê `var(...)`: as cores são lidas dos mesmos tokens
+      // de `tokens.css` por `getComputedStyle`, e caem no valor por
+      // extenso de `CORES_PADRAO` só se a leitura falhar.
+      const cor = (token: string, padrao: string) =>
+        estilo?.getPropertyValue(token) || padrao;
+      const cores = {
+        fundo: cor('--creme-500', CORES_PADRAO.fundo),
+        escuro: cor('--terra-900', CORES_PADRAO.escuro),
+        terra: cor('--terra-700', CORES_PADRAO.terra),
+        lima: cor('--lima-500', CORES_PADRAO.lima),
+        creme: cor('--creme-500', CORES_PADRAO.creme),
+        branco: cor('--branco', CORES_PADRAO.branco),
+        suave: cor('--terra-300', CORES_PADRAO.suave),
+      };
+
+      const canvas = await desenharIngresso(dados, familias, cores);
       const url = canvas.toDataURL('image/png');
       setImagem(url);
 
@@ -163,14 +179,14 @@ export function Ingresso({ dados }: { dados: DadosDoIngresso }) {
           </p>
 
           <div className="w-full text-center">
-            <p className="m-0 font-corpo text-rotulo font-bold uppercase tracking-sobrancelha text-lima-700">
+            <p className="m-0 font-corpo text-rotulo font-bold uppercase tracking-sobrancelha text-texto-suave">
               Titular
             </p>
             <p className="mt-1 mb-0 font-titulo text-t2 font-bold leading-justo tracking-destaque text-texto-forte">
               {dados.titular}
             </p>
 
-            <p className="mt-4 mb-0 font-corpo text-rotulo font-bold uppercase tracking-sobrancelha text-lima-700">
+            <p className="mt-4 mb-0 font-corpo text-rotulo font-bold uppercase tracking-sobrancelha text-texto-suave">
               Acompanhante
             </p>
             <p className="mt-1 mb-0 font-corpo text-corpo-lg text-texto">
@@ -193,7 +209,7 @@ export function Ingresso({ dados }: { dados: DadosDoIngresso }) {
             </p>
           </div>
 
-          <p className="m-0 font-corpo text-corpo-sm text-texto-suave">
+          <p className="m-0 font-mono text-corpo-sm text-texto-suave">
             Convite {dados.codigo}
           </p>
         </div>
@@ -208,7 +224,7 @@ export function Ingresso({ dados }: { dados: DadosDoIngresso }) {
           disabled={gerando}
           aria-busy={gerando}
         >
-          {gerando ? 'Gerando imagem…' : 'Salvar ingresso'}
+          {gerando ? 'Gerando imagem…' : 'Salvar ingresso na galeria'}
         </Botao>
 
         <LinkBotao
@@ -224,7 +240,7 @@ export function Ingresso({ dados }: { dados: DadosDoIngresso }) {
         <Aviso tom="atencao" className="mt-4">
           <p>
             Não foi possível gerar a imagem neste navegador. Você pode tirar
-            um print desta tela — ou mostrar o QR aqui mesmo na entrada.
+            um print desta tela, ou mostrar o QR aqui mesmo na entrada.
           </p>
         </Aviso>
       ) : null}
@@ -244,11 +260,13 @@ export function Ingresso({ dados }: { dados: DadosDoIngresso }) {
         </div>
       ) : null}
 
-      <p className="mt-4 mb-0 font-corpo text-corpo-sm text-texto-suave">
-        Leve o ingresso salvo no celular: na entrada pode não haver sinal de
-        internet. Se precisar, a recepção também localiza você pelo nome ou
-        pelo CPF.
-      </p>
+      <Aviso tom="informacao" className="mt-4">
+        <p>
+          Leve o ingresso salvo no celular: na entrada pode não haver sinal
+          de internet. Se precisar, a recepção também localiza você pelo
+          nome ou pelo CPF.
+        </p>
+      </Aviso>
 
       {/* ---------- cancelamento ---------- */}
       {dados.podeCancelar ? (
@@ -262,7 +280,8 @@ export function Ingresso({ dados }: { dados: DadosDoIngresso }) {
                 Não vou poder ir
               </Botao>
               <p className="mt-2 mb-0 font-corpo text-corpo-sm text-texto-suave">
-                Você pode cancelar até {dados.prazoDeCancelamento}.
+                Você pode cancelar até {dados.prazoDeCancelamento}. O
+                convite não volta a ficar disponível.
               </p>
             </>
           ) : (

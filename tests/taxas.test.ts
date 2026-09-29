@@ -54,7 +54,7 @@ describe('taxa de confirmação e comparecimento', () => {
     });
     assert.equal(taxas.confirmacao, null);
     assert.equal(taxas.comparecimento, null);
-    assert.equal(formatarTaxa(taxas.confirmacao), '—');
+    assert.equal(formatarTaxa(taxas.confirmacao), 'N/D');
   });
 
   it('divisor zero: convites gerados mas nenhum confirmado -> comparecimento indisponível', () => {

@@ -155,7 +155,7 @@ export async function previsualizarImportacao(
       nome: l.nome,
       cpf: l.cpf,
       papel: l.papel,
-      loja: l.lojaCodigo ? `${l.lojaCodigo} · ${l.lojaNome ?? ''}` : '—',
+      loja: l.lojaCodigo ? `${l.lojaCodigo} · ${l.lojaNome ?? ''}` : 'Sem loja vinculada',
       regional: l.regional,
       situacao: existentes.usuariosPorCpf.has(l.cpf)
         ? ('atualizado' as const)

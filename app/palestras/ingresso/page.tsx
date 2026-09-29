@@ -5,7 +5,7 @@ import {
   RodapePublico,
   TopoPublico,
 } from '@/components/palestras/publico';
-import { Aviso } from '@/components/ui';
+import { Aviso, LinkBotao } from '@/components/ui';
 import { FormularioDeRecuperacao } from './formulario';
 
 export const metadata: Metadata = {
@@ -42,6 +42,17 @@ export default function PaginaDeRecuperacao() {
             que enviou o convite consegue localizá-lo.
           </p>
         </Aviso>
+
+        <div className="mt-6">
+          <LinkBotao
+            href="/palestras"
+            variante="contorno"
+            tamanho="lg"
+            className="w-full"
+          >
+            Ver as palestras do circuito
+          </LinkBotao>
+        </div>
       </ColunaPublica>
 
       <RodapePublico />

@@ -120,6 +120,7 @@ export function FormularioDeConfirmacao({
           placeholder="000.000.000-00"
           maxLength={14}
           aria-invalid={Boolean(erro('cpf'))}
+          className="min-h-12"
           required
         />
       </Grupo>
@@ -129,7 +130,7 @@ export function FormularioDeConfirmacao({
         htmlFor="nome"
         obrigatorio
         erro={erro('nome')}
-        ajuda="Como está no seu documento — é o nome conferido na entrada."
+        ajuda="Como está no seu documento: é o nome conferido na entrada."
       >
         <Campo
           id="nome"
@@ -138,6 +139,7 @@ export function FormularioDeConfirmacao({
           autoCapitalize="words"
           maxLength={200}
           aria-invalid={Boolean(erro('nome'))}
+          className="min-h-12"
           required
         />
       </Grupo>
@@ -158,6 +160,7 @@ export function FormularioDeConfirmacao({
           placeholder="(69) 90000-0000"
           maxLength={16}
           aria-invalid={Boolean(erro('whatsapp'))}
+          className="min-h-12"
           required
         />
       </Grupo>
@@ -170,6 +173,7 @@ export function FormularioDeConfirmacao({
           autoCapitalize="words"
           maxLength={120}
           aria-invalid={Boolean(erro('cidade'))}
+          className="min-h-12"
           required
         />
       </Grupo>
@@ -186,6 +190,7 @@ export function FormularioDeConfirmacao({
           autoCapitalize="words"
           maxLength={160}
           aria-invalid={Boolean(erro('propriedade'))}
+          className="min-h-12"
           required
         />
       </Grupo>
@@ -201,6 +206,7 @@ export function FormularioDeConfirmacao({
           name="atividade"
           defaultValue=""
           aria-invalid={Boolean(erro('atividade'))}
+          className="min-h-12"
           required
         >
           <option value="" disabled>
@@ -226,12 +232,13 @@ export function FormularioDeConfirmacao({
           autoCapitalize="words"
           maxLength={200}
           aria-invalid={Boolean(erro('acompanhanteNome'))}
+          className="min-h-12"
         />
       </Grupo>
 
       {/* ---------- consentimento ---------- */}
       <fieldset className="mt-8 mb-4 rounded-cartao border-2 border-linha bg-superficie-alt p-4">
-        <legend className="px-2 font-corpo text-rotulo font-bold uppercase tracking-sobrancelha text-lima-700">
+        <legend className="px-2 font-corpo text-rotulo font-bold uppercase tracking-sobrancelha text-texto-suave">
           Uso dos seus dados
         </legend>
 

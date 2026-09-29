@@ -153,7 +153,7 @@ export function DadosDaPalestra({
         className,
       )}
     >
-      <p className="m-0 font-corpo text-rotulo font-bold uppercase tracking-sobrancelha text-lima-700">
+      <p className="m-0 font-corpo text-rotulo font-bold uppercase tracking-sobrancelha text-texto-suave">
         {formatarData(palestra.dataHora)} · {formatarHorario(palestra.dataHora)}
       </p>
       <p className="mt-2 mb-0 font-titulo text-t2 font-bold leading-justo tracking-destaque text-texto-forte">

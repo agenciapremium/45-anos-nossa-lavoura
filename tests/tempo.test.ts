@@ -8,11 +8,14 @@ import {
   formatarCarimbo,
   formatarData,
   formatarDataHora,
+  formatarDiaDaSemana,
   formatarHorario,
+  formatarHorarioCurto,
   inicioDoDia,
   isoParaDataBr,
   mesmoDiaCivil,
   paraCampoDataHora,
+  partesDaData,
   prazoPadrao,
   venceu,
 } from '@/lib/tempo';
@@ -155,5 +158,21 @@ describe('data de nascimento em DD/MM/AAAA', () => {
 
   it('volta para DD/MM/AAAA', () => {
     assert.equal(isoParaDataBr('1984-09-07'), '07/09/1984');
+  });
+});
+
+describe('formatos da landing do circuito', () => {
+  it('horário curto omite os minutos da hora cheia', () => {
+    assert.equal(formatarHorarioCurto(deHoraLocal('2026-10-13T19:00')), '19h');
+    assert.equal(formatarHorarioCurto(deHoraLocal('2026-10-15T08:00')), '8h');
+    assert.equal(formatarHorarioCurto(deHoraLocal('2026-10-17T10:30')), '10h30');
+  });
+
+  it('dia da semana e data no fuso do evento, não em UTC', () => {
+    // 13/10 às 21h em Porto Velho já é 14/10 em UTC.
+    const noite = deHoraLocal('2026-10-13T21:00');
+    assert.equal(formatarDiaDaSemana(noite), 'Terça-feira');
+    assert.deepEqual(partesDaData(noite), { dia: '13', mes: 'Outubro' });
+    assert.equal(formatarDiaDaSemana(deHoraLocal('2026-10-17T10:30')), 'Sábado');
   });
 });

@@ -50,7 +50,7 @@ export const TEXTO_DE_ACEITE_PADRAO =
  */
 export const TEXTO_DE_OPT_IN_PADRAO =
   'Quero receber novidades, convites e ofertas da Nossa Lavoura. ' +
-  'Opcional — sua presença está confirmada do mesmo jeito.';
+  'Opcional: sua presença está confirmada do mesmo jeito.';
 
 /**
  * Apoio, em corpo menor, abaixo dos checkboxes.

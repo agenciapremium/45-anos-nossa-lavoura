@@ -162,7 +162,7 @@ export function analisarCsv(conteudo: string): ResultadoDaAnalise {
       faltando,
       inesperadas,
       mensagem:
-        'A linha de cabeçalho não confere com o modelo — nenhuma linha foi processada. ' +
+        'A linha de cabeçalho não confere com o modelo: nenhuma linha foi processada. ' +
         `Colunas ${partes.join('; ')}. ` +
         `O cabeçalho esperado é: ${LINHA_DE_CABECALHO}`,
     };

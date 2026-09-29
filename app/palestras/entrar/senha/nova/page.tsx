@@ -8,7 +8,10 @@ import { FormularioDeNovaSenha } from '../../formularios';
 export const dynamic = 'force-dynamic';
 
 /**
- * Definição da senha a partir do link recebido por e-mail.
+ * Definição da senha a partir do link recebido por e-mail (tarefa 6.5).
+ *
+ * Mesma casca de `/palestras/entrar`: título, formulário e ação dentro do
+ * cartão único de `layout.tsx`.
  *
  * O token vem na query. Não é conferido aqui: quem confere é o Better Auth
  * no momento de salvar. Conferir antes e mostrar "link inválido" de cara

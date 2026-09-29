@@ -214,7 +214,7 @@ describe('textos de consentimento', () => {
     assert.equal(
       TEXTOS_PADRAO.optIn,
       'Quero receber novidades, convites e ofertas da Nossa Lavoura. ' +
-        'Opcional — sua presença está confirmada do mesmo jeito.',
+        'Opcional: sua presença está confirmada do mesmo jeito.',
     );
   });
 
@@ -274,7 +274,7 @@ describe('mensagens e rótulos', () => {
   it('as quatro atividades têm rótulo legível', () => {
     assert.equal(ATIVIDADES.length, 4);
     assert.equal(rotuloDaAtividade('leite'), 'Gado de leite');
-    assert.equal(rotuloDaAtividade('inexistente'), '—');
-    assert.equal(rotuloDaAtividade(null), '—');
+    assert.equal(rotuloDaAtividade('inexistente'), 'Não informada');
+    assert.equal(rotuloDaAtividade(null), 'Não informada');
   });
 });

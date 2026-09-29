@@ -9,7 +9,10 @@ import { FormularioDoCodigo } from '../formularios';
 export const dynamic = 'force-dynamic';
 
 /**
- * Segundo passo do acesso por CPF.
+ * Segundo passo do acesso por CPF (tarefa 6.5).
+ *
+ * Mesma casca de `/palestras/entrar`: só troca o título e o formulário
+ * dentro do cartão único de `layout.tsx`.
  *
  * Só existe depois de o CPF ser aceito: sem a pendência assinada no
  * cookie, a tela volta para o começo. É isso que impede que alguém abra

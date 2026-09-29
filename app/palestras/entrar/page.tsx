@@ -1,7 +1,6 @@
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { Aviso, Subtitulo } from '@/components/ui';
+import { AbaSegmentada, AbasSegmentadas, Aviso, Subtitulo } from '@/components/ui';
 import { destinoSeguro } from '@/lib/palestras/destino';
 import { painelInicial } from '@/lib/palestras/papeis';
 import { sessaoAtual } from '@/lib/palestras/sessao';
@@ -16,17 +15,21 @@ import {
 export const dynamic = 'force-dynamic';
 
 /* =========================================================
-   /palestras/entrar · quatro métodos, quatro abas
+   /palestras/entrar: quatro métodos, quatro abas (tarefa 6.4)
 
-   As abas são **links**, não botões de JavaScript: o método escolhido vive
-   na URL. Assim o endereço é compartilhável ("entra pela aba de CPF e
-   nascimento"), o botão voltar funciona, e a tela abre mesmo com o script
-   ainda carregando — que é o cenário real de um celular na área rural.
+   As abas são **links** (`AbaSegmentada`, D7 do design), não botões de
+   JavaScript: o método escolhido vive na URL. Assim o endereço é
+   compartilhável ("entra pela aba de CPF e nascimento"), o botão voltar
+   funciona, e a tela abre mesmo com o script ainda carregando, que é o
+   cenário real de um celular na área rural.
 
    A ordem é a do PRD, e não é acidental: os métodos por e-mail vêm
    primeiro, e o CPF + nascimento fica por último. Ele é a credencial mais
-   fraca do sistema e existe para quem não tem e-mail — não é o caminho
-   que se oferece primeiro a quem tem escolha.
+   fraca do sistema e existe para quem não tem e-mail, não é o caminho que
+   se oferece primeiro a quem tem escolha.
+
+   Alvo de 48 px nas abas: é a tela de acesso, muitas vezes aberta no
+   celular, na primeira tentativa do dia.
    ========================================================= */
 
 const ABAS = [
@@ -98,32 +101,27 @@ export default async function Entrar({
         Escolha como prefere entrar.
       </p>
 
-      <nav aria-label="Formas de entrar" className="mb-6">
-        <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-          {ABAS.map((aba) => {
-            const ativa = aba.chave === escolhida;
-            const alvo = new URLSearchParams();
-            alvo.set('metodo', aba.chave);
-            if (destino) alvo.set('destino', destino);
-            return (
-              <li key={aba.chave}>
-                <Link
-                  href={`/palestras/entrar?${alvo.toString()}`}
-                  aria-current={ativa ? 'page' : undefined}
-                  className={[
-                    'inline-block rounded-controle border-2 px-3 py-2 font-corpo text-corpo-sm font-bold no-underline',
-                    ativa
-                      ? 'border-terra-700 bg-terra-700 text-creme-500'
-                      : 'border-linha bg-transparent text-terra-700 hover:bg-lima-100',
-                  ].join(' ')}
-                >
-                  {aba.rotulo}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+      <AbasSegmentadas
+        aria-label="Formas de entrar"
+        className="mb-6 grid w-full grid-cols-2 sm:grid-cols-4"
+      >
+        {ABAS.map((aba) => {
+          const ativa = aba.chave === escolhida;
+          const alvo = new URLSearchParams();
+          alvo.set('metodo', aba.chave);
+          if (destino) alvo.set('destino', destino);
+          return (
+            <AbaSegmentada
+              key={aba.chave}
+              href={`/palestras/entrar?${alvo.toString()}`}
+              ativo={ativa}
+              className="min-h-12 px-2 text-center"
+            >
+              {aba.rotulo}
+            </AbaSegmentada>
+          );
+        })}
+      </AbasSegmentadas>
 
       {recado ? (
         <Aviso tom={recado.tom} className="mb-6">

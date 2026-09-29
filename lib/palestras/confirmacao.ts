@@ -34,7 +34,7 @@ export const VALORES_DE_ATIVIDADE = ATIVIDADES.map((a) => a.valor) as [
 export type Atividade = (typeof ATIVIDADES)[number]['valor'];
 
 export function rotuloDaAtividade(valor: string | null): string {
-  return ATIVIDADES.find((a) => a.valor === valor)?.rotulo ?? '—';
+  return ATIVIDADES.find((a) => a.valor === valor)?.rotulo ?? 'Não informada';
 }
 
 /* ---------------------------------------------------------
