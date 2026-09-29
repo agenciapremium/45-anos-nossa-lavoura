@@ -39,23 +39,31 @@ function LajeDoPalestrante({
     >
       <div className={cn(estilo.miolo, estilo.palestranteGrade)}>
         <div className={estilo.foto}>
-          {/* Mesma imagem, ampliada e esmaecida: decorativa (D3). */}
+          {/*
+            Mesma imagem, ampliada e esmaecida: decorativa (D3). Sempre a
+            versão pequena: a 45% de opacidade, a nitidez não aparece, e o
+            navegador reaproveita o download da foto do celular.
+          */}
           <img
             className={estilo.fantasma}
-            src={p.foto.src}
+            src={p.foto.pequena.src}
             alt=""
             aria-hidden="true"
-            width={p.foto.largura}
-            height={p.foto.altura}
+            width={p.foto.pequena.largura}
+            height={p.foto.pequena.altura}
             loading="lazy"
             decoding="async"
           />
           <img
             className={estilo.recorte}
-            src={p.foto.src}
+            src={p.foto.grande.src}
+            srcSet={`${p.foto.pequena.src} ${p.foto.pequena.largura}w, ${p.foto.grande.src} ${p.foto.grande.largura}w`}
+            // Celular: 420 px de altura. Desktop: ~690 px de altura. A
+            // largura vem da proporção de cada foto.
+            sizes={`(min-width: 900px) ${Math.round((690 * p.foto.grande.largura) / p.foto.grande.altura)}px, ${Math.round((420 * p.foto.grande.largura) / p.foto.grande.altura)}px`}
             alt={p.foto.alt}
-            width={p.foto.largura}
-            height={p.foto.altura}
+            width={p.foto.grande.largura}
+            height={p.foto.grande.altura}
             loading="lazy"
             decoding="async"
           />

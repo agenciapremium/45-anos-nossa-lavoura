@@ -7,13 +7,19 @@
    ficam aqui: vêm do banco, por `listarPalestrasAtivas()`.
    ========================================================= */
 
+export type VersaoDaImagem = { src: string; largura: number; altura: number };
+
 export type Palestrante = {
   id: string;
   nome: string;
   sobrenome: string;
   credenciais: string[];
   tema: string;
-  foto: { src: string; largura: number; altura: number; alt: string };
+  /**
+   * Duas alturas, geradas por `scripts/otimizar-imagens-da-landing.mjs`:
+   * a pequena serve o celular e o rosto esmaecido; a grande, o desktop.
+   */
+  foto: { alt: string; pequena: VersaoDaImagem; grande: VersaoDaImagem };
 };
 
 export const PALESTRANTES: Palestrante[] = [
@@ -24,10 +30,9 @@ export const PALESTRANTES: Palestrante[] = [
     credenciais: ['Zootecnista', 'TRI Comunicação'],
     tema: 'Desafios do Agro Moderno: você está preparado?',
     foto: {
-      src: '/assets/img/palestrantes/ricardo-arantes.webp',
-      largura: 1179,
-      altura: 1400,
       alt: 'Ricardo Arantes, de chapéu e camisa azul-marinho',
+      pequena: { src: '/assets/img/palestrantes/ricardo-arantes-500.webp', largura: 421, altura: 500 },
+      grande: { src: '/assets/img/palestrantes/ricardo-arantes-900.webp', largura: 758, altura: 900 },
     },
   },
   {
@@ -41,10 +46,9 @@ export const PALESTRANTES: Palestrante[] = [
     ],
     tema: 'Controle sanitário na reprodução: estratégias para otimizar a rentabilidade na cria',
     foto: {
-      src: '/assets/img/palestrantes/giovani-pastre.webp',
-      largura: 1387,
-      altura: 1400,
       alt: 'Giovani Pastre, de óculos e jaqueta escura',
+      pequena: { src: '/assets/img/palestrantes/giovani-pastre-500.webp', largura: 495, altura: 500 },
+      grande: { src: '/assets/img/palestrantes/giovani-pastre-900.webp', largura: 891, altura: 900 },
     },
   },
 ];
@@ -55,8 +59,8 @@ export const PROMOCAO = {
   premio: 'John Deere 5080E.',
   trator: {
     src: '/assets/img/trator-5080e.webp',
-    largura: 741,
-    altura: 614,
+    largura: 640,
+    altura: 530,
     alt: 'Trator John Deere 5080E, verde com rodas amarelas',
   },
   bordao: ['Acelere conhecimento.', 'Acelere resultados. Acelere no Campo.'],

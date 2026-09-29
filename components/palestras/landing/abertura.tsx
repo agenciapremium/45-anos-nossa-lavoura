@@ -14,12 +14,12 @@ export function Abertura({ cidades }: { cidades: number }) {
     <header className={estilo.abertura}>
       <div className={estilo.pasto} aria-hidden="true">
         <img
-          src="/assets/img/pasto-1600.webp"
-          srcSet="/assets/img/pasto-900.webp 900w, /assets/img/pasto-1600.webp 1600w, /assets/img/pasto-2400.webp 2400w"
+          src="/assets/img/pasto-circuito-1400.webp"
+          srcSet="/assets/img/pasto-circuito-800.webp 800w, /assets/img/pasto-circuito-1400.webp 1400w"
           sizes="(min-width: 1260px) 980px, 78vw"
           alt=""
-          width={1600}
-          height={1067}
+          width={1400}
+          height={933}
           fetchPriority="high"
         />
       </div>

@@ -23,7 +23,10 @@ describe('landing do circuito', () => {
   });
 
   it('as imagens citadas no conteúdo existem em public/', () => {
-    const imagens = [...PALESTRANTES.map((p) => p.foto.src), PROMOCAO.trator.src];
+    const imagens = [
+      ...PALESTRANTES.flatMap((p) => [p.foto.pequena.src, p.foto.grande.src]),
+      PROMOCAO.trator.src,
+    ];
     for (const src of imagens) {
       assert.ok(fs.existsSync(path.join(RAIZ, 'public', src)), `falta ${src}`);
     }
