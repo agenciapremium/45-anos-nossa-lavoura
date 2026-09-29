@@ -28,6 +28,31 @@ export function formatarHorario(instante: Date): string {
   return formatInTimeZone(instante, FUSO, "HH'h'mm", { locale: ptBR });
 }
 
+/**
+ * `19h` ou `10h30`: o horário como o slide "Onde e quando" do carrossel
+ * escreve, sem os zeros da hora cheia.
+ */
+export function formatarHorarioCurto(instante: Date): string {
+  const minutos = formatInTimeZone(instante, FUSO, 'mm');
+  const hora = String(Number(formatInTimeZone(instante, FUSO, 'HH')));
+  return minutos === '00' ? `${hora}h` : `${hora}h${minutos}`;
+}
+
+/** `Terça-feira`, com inicial maiúscula, como no carrossel. */
+export function formatarDiaDaSemana(instante: Date): string {
+  const dia = formatInTimeZone(instante, FUSO, 'EEEE', { locale: ptBR });
+  return dia.charAt(0).toUpperCase() + dia.slice(1);
+}
+
+/** `{ dia: '13', mes: 'Outubro' }`, para compor "13 de Outubro" com pesos diferentes. */
+export function partesDaData(instante: Date): { dia: string; mes: string } {
+  const mes = formatInTimeZone(instante, FUSO, 'MMMM', { locale: ptBR });
+  return {
+    dia: String(Number(formatInTimeZone(instante, FUSO, 'dd'))),
+    mes: mes.charAt(0).toUpperCase() + mes.slice(1),
+  };
+}
+
 /** `13/10/2026 às 19h00` */
 export function formatarDataHora(instante: Date): string {
   return `${formatarData(instante)} às ${formatarHorario(instante)}`;
