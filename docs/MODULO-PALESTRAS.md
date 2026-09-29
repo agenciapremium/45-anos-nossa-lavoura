@@ -138,17 +138,25 @@ Duas ferramentas, e a segunda é a definitiva:
 npm run usuarios:desativar-teste             # mostra o que faria
 npm run usuarios:desativar-teste -- --aplicar   # ativo = false, reversível
 
-npm run usuarios:remover-teste               # mostra o que faria
-npm run usuarios:remover-teste -- --aplicar     # DELETE, com backup em docs/
+npm run teste:remover-cadastros              # mostra o que faria
+npm run teste:remover-cadastros -- --aplicar    # DELETE, com backup em docs/
 ```
 
 Desativar deve rodar **depois de cada rodada de integração**, antes de
-qualquer uso sério do ambiente. Remover é para a limpeza de verdade: escreve
-um backup `.sql` dos usuários e das contas antes de apagar, recusa se algum
-deles tiver convite ou lote apontando para si (as duas colunas são
-`on delete restrict`: não seriam usuários descartáveis, teriam distribuído
-convites de verdade) e recusa também se alguma linha de auditoria deles
-estiver sem `ator_nome`, que seria a única identificação de quem agiu ali.
+qualquer uso sério do ambiente. Remover é para a limpeza de verdade: varre
+usuários, lojas e regionais de teste, **nessa ordem**, escreve um backup
+`.sql` dos três antes de apagar, recusa se algum usuário tiver convite ou
+lote apontando para si (as duas colunas são `on delete restrict`: não seriam
+usuários descartáveis, teriam distribuído convites de verdade) e recusa
+também se alguma linha de auditoria deles estiver sem `ator_nome`, que seria
+a única identificação de quem agiu ali.
+
+A ordem importa porque `user.loja_id`, `user.regional_id` e
+`palestra_loja.regional_id` também são `on delete restrict`: enquanto sobrar
+um usuário de teste, a loja dele não sai, e enquanto sobrar a loja, a
+regional não sai. Varrer só os usuários deixa a loja e a regional órfãs e
+**visíveis na tela de Estrutura** — foi o que aconteceu na primeira versão
+deste script.
 
 #### Por que apagar era impossível até a migração 0007
 

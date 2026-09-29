@@ -112,15 +112,22 @@ async function main() {
     await db().delete(evento).where(like(evento.cidade, `${MARCA}%`));
 
     /*
-       `palestra_auditoria.ator_id` referencia `user.id` com
-       `ON DELETE SET NULL` — mas a auditoria é imutável por contrato
+       Apagar um por um, em vez de um DELETE só, para que uma linha travada
+       por alguma referência não derrube a limpeza das outras centenas.
+
+       Historicamente, quem virava ator de uma linha de auditoria NUNCA mais
+       podia ser apagado: `palestra_auditoria.ator_id` referenciava `user.id`
+       com `ON DELETE SET NULL`, e a auditoria é imutável por contrato
        (`drizzle/0001_auditoria_imutavel.sql` recusa UPDATE na tabela,
-       inclusive o UPDATE que o próprio cascade tentaria). Um colaborador ou
-       Admin de teste que cancelou algo pelo painel vira ator de uma linha
-       de auditoria e, por isso, nunca pode ser apagado depois — igual à
-       auditoria em si. Apagar um por um, em vez de um DELETE só, evita que
-       essa MEIA DÚZIA de linhas travadas derrube a limpeza das outras
-       centenas (os colaboradores de volume, que nunca viraram ator).
+       inclusive o UPDATE que o próprio cascade tentava). Era por isso que
+       cada rodada deste script deixava resíduo — e, com ele preso, a loja e
+       a regional de teste também ficavam, por serem `on delete restrict`.
+
+       `drizzle/0007_right_legion.sql` tirou aquela FK, então esta limpeza
+       passa a completar sozinha. Os `try/catch` continuam: a tolerância a
+       uma linha presa é barata e vale para qualquer referência futura, não
+       só para aquela. Se algum resíduo sobrar mesmo assim, a faxina é
+       `npm run teste:remover-cadastros`.
     */
     const usuarios = await db()
       .select({ id: user.id })

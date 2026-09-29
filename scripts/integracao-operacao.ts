@@ -13,7 +13,7 @@
  * NÃO aponte `DATABASE_URL` para produção.
  */
 import { config } from 'dotenv';
-import { and, eq, inArray, like, notInArray, sql } from 'drizzle-orm';
+import { and, eq, inArray, like, sql } from 'drizzle-orm';
 
 import type { Escopo } from '@/lib/palestras/escopo';
 
@@ -101,14 +101,20 @@ async function main() {
   const proximoCpf = () => cpfDe(`5${String(700000 + sufixo++).padStart(8, '0')}`);
 
   /*
-     Admin e Recepção são autores de check-in, e todo check-in grava uma
-     linha de auditoria imutável (`palestra_auditoria`, `ator_id` -> este
-     usuário). `ON DELETE SET NULL` exigiria um UPDATE na auditoria para
-     apagá-los, e o gatilho de imutabilidade recusa esse UPDATE — a mesma
-     situação que `painel-colaborador` já documentou para o autor de um
-     cancelamento. A solução é a mesma: CPF fixo, reaproveitado entre
-     execuções, em vez de um usuário novo por rodada. `limpar()` os
-     mantém de propósito.
+     CPF fixo para Admin e Recepção, reaproveitado entre execuções em vez de
+     um usuário novo por rodada.
+
+     Isso NASCEU de uma limitação que não existe mais: os dois são autores
+     de check-in, todo check-in grava uma linha de auditoria imutável
+     apontando para eles, e `palestra_auditoria.ator_id` era
+     `ON DELETE SET NULL` — apagá-los exigiria um UPDATE na auditoria, que o
+     gatilho de imutabilidade recusa. Eram indeletáveis, então `limpar()` os
+     mantinha de propósito, e o CPF fixo evitava acumular um par novo a cada
+     rodada.
+
+     `drizzle/0007_right_legion.sql` tirou aquela FK, e `limpar()` passou a
+     apagá-los como qualquer outro. O CPF fixo fica: com ou sem exclusão, é
+     bom que a rodada seja determinística.
   */
   const CPF_ADMIN_FIXO = cpfDe('900000001');
   const CPF_RECEPCAO_FIXO = cpfDe('900000002');
@@ -225,20 +231,12 @@ async function main() {
         );
     }
     await db().delete(evento).where(like(evento.cidade, `${MARCA}%`));
-    // Admin e Recepção ficam de fora, por papel — não só os dois CPFs
-    // fixos de hoje: qualquer usuário `admin`/`recepcao` de execuções
-    // passadas deste script pode ter virado ator de check-in, e a
-    // auditoria que o referencia é imutável (ver comentário acima de
-    // CPF_ADMIN_FIXO). Excluir por papel é o que torna a limpeza segura
-    // mesmo depois de uma execução antiga com outro esquema de CPF.
-    await db()
-      .delete(user)
-      .where(
-        and(
-          like(user.name, `${MARCA}%`),
-          notInArray(user.papel, ['admin', 'recepcao']),
-        ),
-      );
+    // Todos os usuários de teste, inclusive Admin e Recepção. Eles ficavam
+    // de fora por papel enquanto eram indeletáveis (ver o comentário acima
+    // de CPF_ADMIN_FIXO), e o efeito colateral era ruim: duas contas ATIVAS,
+    // uma delas admin, sobrevivendo a cada rodada num banco que preview e
+    // produção compartilham. Desde a migração 0007 eles saem junto.
+    await db().delete(user).where(like(user.name, `${MARCA}%`));
     await db().delete(loja).where(like(loja.nome, `${MARCA}%`));
     await db().delete(regional).where(like(regional.nome, `${MARCA}%`));
   };

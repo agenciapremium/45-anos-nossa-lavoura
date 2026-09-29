@@ -1,6 +1,13 @@
 /**
- * Remove definitivamente os usuários que os scripts de integração e de smoke
- * deixam no banco.
+ * Remove definitivamente os cadastros que os scripts de integração e de smoke
+ * deixam no banco: usuários, lojas e regionais, nessa ordem.
+ *
+ * A ordem não é estética. `user.loja_id`, `user.regional_id` e
+ * `palestra_loja.regional_id` são todos `on delete restrict`: enquanto
+ * sobrar um usuário de teste, a loja dele não sai; enquanto sobrar a loja, a
+ * regional não sai. Foi exatamente o que aconteceu na primeira versão deste
+ * script, que só varria usuários: os usuários saíram, e a regional e a loja
+ * de teste ficaram órfãs e VISÍVEIS na tela de Estrutura da administração.
  *
  * Companheiro de `desativar-usuarios-de-teste.ts`, que só marca
  * `ativo = false`. Aquele existia porque **apagar era impossível**: a chave
@@ -21,13 +28,14 @@
  * O que fica sem garantia referencial é `ator_id`, que passa a poder apontar
  * para um usuário removido.
  *
- *   npm run usuarios:remover-teste                # mostra o que faria
- *   npm run usuarios:remover-teste -- --aplicar   # remove
+ *   npm run teste:remover-cadastros                # mostra o que faria
+ *   npm run teste:remover-cadastros -- --aplicar   # remove
  *
  * Antes de apagar, escreve um backup em
- * `docs/usuarios-de-teste-removidos-<data>.sql`, com `INSERT`s de `user` e
- * `account`. Restaurar de lá devolve os usuários, mas não o `ator_id` das
- * linhas de auditoria: os ids seriam outros, e a auditoria é imutável.
+ * `docs/cadastros-de-teste-removidos-<data>.sql`, com `INSERT`s de `user`,
+ * `account`, `palestra_loja` e `palestra_regional`. Restaurar de lá devolve
+ * os cadastros, mas não o `ator_id` das linhas de auditoria: os ids seriam
+ * outros, e a auditoria é imutável.
  */
 import { writeFileSync } from 'node:fs';
 
@@ -63,9 +71,8 @@ async function principal() {
   const aplicar = process.argv.includes('--aplicar');
 
   const { db, dbTx, fecharConexoes } = await import('@/lib/db');
-  const { account, auditoria, convite, lote, session, user } = await import(
-    '@/lib/db/schema'
-  );
+  const { account, auditoria, convite, loja, lote, regional, session, user } =
+    await import('@/lib/db/schema');
   const { registrarAuditoria, ACOES, ATOR_DE_SCRIPT } = await import(
     '@/lib/palestras/auditoria'
   );
@@ -92,13 +99,26 @@ async function principal() {
 
     const filtroDeNome = or(...PREFIXOS.map((p) => like(user.name, p)))!;
 
+    const filtroDeLoja = or(...PREFIXOS.map((p) => like(loja.nome, p)))!;
+    const filtroDeRegional = or(...PREFIXOS.map((p) => like(regional.nome, p)))!;
+
     const alvos = await db()
       .select({ id: user.id, nome: user.name, papel: user.papel, ativo: user.ativo })
       .from(user)
       .where(filtroDeNome);
 
-    if (alvos.length === 0) {
-      console.log('Nenhum usuário de teste no banco. Nada a fazer.');
+    const lojasAlvo = await db()
+      .select({ id: loja.id, codigo: loja.codigo, nome: loja.nome })
+      .from(loja)
+      .where(filtroDeLoja);
+
+    const regionaisAlvo = await db()
+      .select({ id: regional.id, nome: regional.nome })
+      .from(regional)
+      .where(filtroDeRegional);
+
+    if (alvos.length + lojasAlvo.length + regionaisAlvo.length === 0) {
+      console.log('Nenhum cadastro de teste no banco. Nada a fazer.');
       return;
     }
 
@@ -120,6 +140,10 @@ async function principal() {
         `  ${a.papel.padEnd(18)} ${a.nome}${a.ativo ? '  (ATIVO)' : ''}`,
       );
     }
+    console.log(`${lojasAlvo.length} loja(s) de teste:`);
+    for (const l of lojasAlvo) console.log(`  ${l.codigo} ${l.nome}`);
+    console.log(`${regionaisAlvo.length} regional(is) de teste:`);
+    for (const r of regionaisAlvo) console.log(`  ${r.nome}`);
 
     const ativos = alvos.filter((a) => a.ativo);
     if (ativos.length > 0) {
@@ -181,15 +205,23 @@ async function principal() {
 
     /* --- 4. backup antes --- */
     const usuariosCompletos = await db().select().from(user).where(filtroDeNome);
+    const lojasCompletas = await db().select().from(loja).where(filtroDeLoja);
+    const regionaisCompletas = await db()
+      .select()
+      .from(regional)
+      .where(filtroDeRegional);
     const data = new Date().toISOString().slice(0, 10);
-    const caminho = `docs/usuarios-de-teste-removidos-${data}.sql`;
+    const caminho = `docs/cadastros-de-teste-removidos-${data}.sql`;
 
     writeFileSync(
       caminho,
-      `-- Usuários de teste e smoke removidos em ${data}.\n` +
+      `-- Cadastros de teste e smoke removidos em ${data}:\n` +
+        `--   ${usuariosCompletos.length} usuário(s), ${lojasCompletas.length} loja(s), ${regionaisCompletas.length} regional(is).\n` +
         `--\n` +
-        `-- Nenhum tinha convite ou lote apontando para si (conferido antes: as duas\n` +
-        `-- colunas são \`on delete restrict\`, e o script recusa se houver).\n` +
+        `-- Nenhum usuário tinha convite ou lote apontando para si (conferido antes: as\n` +
+        `-- duas colunas são \`on delete restrict\`, e o script recusa se houver).\n` +
+        `-- A ordem do DELETE foi usuário, loja, regional, porque user.loja_id,\n` +
+        `-- user.regional_id e palestra_loja.regional_id também são \`restrict\`.\n` +
         `--\n` +
         `-- O DELETE encostou em:\n` +
         `--   palestra_auditoria: ${auditadas?.total} linha(s) ficaram com ator_id órfão. Nenhuma foi\n` +
@@ -200,8 +232,17 @@ async function principal() {
         `--   account: ${contas.length} linha(s), por cascade.\n` +
         `--   session: ${sessoes?.n} linha(s), por cascade.\n` +
         `--\n` +
-        `-- Restaurar daqui devolve os usuários, mas NÃO o ator_id das linhas de\n` +
-        `-- auditoria: os ids seriam outros, e a auditoria é imutável por contrato.\n\n` +
+        `--\n` +
+        `-- Restaurar daqui devolve os cadastros, mas NÃO o ator_id das linhas de\n` +
+        `-- auditoria: os ids seriam outros, e a auditoria é imutável por contrato.\n` +
+        `-- Restaure na ordem inversa da remoção: regional, loja, usuário, conta.\n\n` +
+        inserts(
+          'palestra_regional',
+          regionaisCompletas as unknown as Record<string, unknown>[],
+        ) +
+        '\n' +
+        inserts('palestra_loja', lojasCompletas as unknown as Record<string, unknown>[]) +
+        '\n' +
         inserts('"user"', usuariosCompletos as unknown as Record<string, unknown>[]) +
         '\n' +
         inserts('account', contas as unknown as Record<string, unknown>[]),
@@ -209,9 +250,25 @@ async function principal() {
     );
     console.log(`\nbackup: ${caminho}`);
 
-    /* --- 5. a remoção, numa transação --- */
+    /* --- 5. a remoção, numa transação e na ordem que as FKs exigem --- */
     await dbTx().transaction(async (tx) => {
-      await tx.delete(user).where(inArray(user.id, ids));
+      if (ids.length) await tx.delete(user).where(inArray(user.id, ids));
+      if (lojasAlvo.length) {
+        await tx.delete(loja).where(
+          inArray(
+            loja.id,
+            lojasAlvo.map((l) => l.id),
+          ),
+        );
+      }
+      if (regionaisAlvo.length) {
+        await tx.delete(regional).where(
+          inArray(
+            regional.id,
+            regionaisAlvo.map((r) => r.id),
+          ),
+        );
+      }
     });
 
     await registrarAuditoria({
@@ -220,11 +277,15 @@ async function principal() {
       entidade: 'user',
       entidadeId: null,
       dados: {
-        total: alvos.length,
+        usuarios: alvos.length,
+        lojas: lojasAlvo.length,
+        regionais: regionaisAlvo.length,
         removidos: alvos.map((a) => ({ nome: a.nome, papel: a.papel })),
-        motivo: 'usuários de teste e smoke dos scripts de integração',
+        lojasRemovidas: lojasAlvo.map((l) => `${l.codigo} ${l.nome}`),
+        regionaisRemovidas: regionaisAlvo.map((r) => r.nome),
+        motivo: 'cadastros de teste e smoke dos scripts de integração',
         backup: caminho,
-        origem: 'scripts/remover-usuarios-de-teste.ts',
+        origem: 'scripts/remover-cadastros-de-teste.ts',
       },
     });
 
@@ -240,12 +301,27 @@ async function principal() {
     const gatilhos = consultaDeGatilhos.rows;
     const desarmado = gatilhos.filter((g) => g.tgenabled !== 'O');
 
-    const [restaram] = await db()
+    const [usuariosRestantes] = await db()
       .select({ n: sql<number>`count(*)::int` })
       .from(user)
       .where(filtroDeNome);
+    const [lojasRestantes] = await db()
+      .select({ n: sql<number>`count(*)::int` })
+      .from(loja)
+      .where(filtroDeLoja);
+    const [regionaisRestantes] = await db()
+      .select({ n: sql<number>`count(*)::int` })
+      .from(regional)
+      .where(filtroDeRegional);
 
-    console.log(`\n${alvos.length} usuário(s) removido(s). Restaram ${restaram?.n}.`);
+    console.log(
+      `\nremovidos: ${alvos.length} usuário(s), ${lojasAlvo.length} loja(s), ` +
+        `${regionaisAlvo.length} regional(is).`,
+    );
+    console.log(
+      `restaram com marca de teste: ${usuariosRestantes?.n} usuário(s), ` +
+        `${lojasRestantes?.n} loja(s), ${regionaisRestantes?.n} regional(is).`,
+    );
     console.log('gatilhos de palestra_auditoria:');
     for (const g of gatilhos) {
       console.log(`  ${g.tgname} = ${g.tgenabled === 'O' ? 'armado' : g.tgenabled}`);

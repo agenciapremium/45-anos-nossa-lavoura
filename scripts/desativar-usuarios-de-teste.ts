@@ -23,8 +23,9 @@
  * dela que colidia com o gatilho de imutabilidade (o parágrafo acima
  * descreve a colisão). Para a limpeza definitiva, com backup em `.sql` e
  * sem tocar em gatilho nenhum, use
- * `scripts/remover-usuarios-de-teste.ts`. Este script continua sendo o
- * certo para o uso diário: é a higiene entre rodadas, não a faxina.
+ * `scripts/remover-cadastros-de-teste.ts`, que varre usuário, loja e
+ * regional na ordem que as chaves estrangeiras exigem. Este script continua
+ * sendo o certo para o uso diário: é a higiene entre rodadas, não a faxina.
  */
 import { config } from 'dotenv';
 import { and, eq, or, like } from 'drizzle-orm';
