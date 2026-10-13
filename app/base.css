@@ -10,22 +10,28 @@
    ========================================================= */
 
 /*
-   `tokens.css` entra numa camada, e não solto.
+   `tokens.css` entra solto, sem camada.
 
-   Ele traz, além das variáveis, regras de elemento: `a`, `:focus-visible`,
-   `::selection`. CSS fora de camada vence QUALQUER camada, por mais
-   específico que o seletor da camada seja. Como as utilidades do Tailwind
-   vivem em `@layer utilities`, o `a { color: var(--text-link) }` daqui
-   apagava a cor de todo link do módulo `/palestras`: no menu lateral
-   escuro isso virava marrom sobre marrom, com o texto sumindo.
+   Ele esteve em `layer(marca)` por um tempo, e a camada existia por um
+   motivo que não existe mais: o módulo `/palestras` carregava Tailwind, e
+   o `a { color: var(--text-link) }` deste arquivo, por ser CSS fora de
+   camada, vencia as utilidades do Tailwind e apagava a cor de todo link do
+   painel — no menu lateral escuro virava marrom sobre marrom, com o texto
+   sumindo. Pôr os tokens numa camada declarada antes do Tailwind invertia
+   essa disputa.
 
-   Dentro de `layer(marca)`, declarada antes das camadas do Tailwind, a
-   ordem passa a ser a esperada: token perde para utilidade, e a landing,
-   que não carrega Tailwind, continua exatamente como estava, porque os
-   estilos de página dela também são declarados fora de camada e seguem
-   vencendo estes.
+   O módulo saiu deste repositório, o Tailwind saiu junto, e com ele a
+   única razão da camada. Manter o `layer(marca)` aqui agora QUEBRA a
+   página: sem o PostCSS do Tailwind no pipeline, o compilador de CSS do
+   Next traduz `@import ... layer(marca)` para `@media layer(marca){...}`,
+   que não é CSS válido. Nenhum navegador entende, o bloco inteiro de
+   tokens morre, e a landing renderiza sem `--terra-900`, sem
+   `--content-max` e sem fonte.
+
+   A landing não tem com quem disputar camada: o CSS dela também é solto e
+   vem depois. Import simples é o certo aqui.
 
    `tokens.css` é cópia literal do design system e não pode ser editado
    aqui: por isso o ajuste é no import, não no arquivo.
 */
-@import '../tokens.css' layer(marca);
+@import '../tokens.css';
