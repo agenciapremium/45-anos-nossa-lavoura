@@ -619,3 +619,48 @@ img{height:auto}
 @media(prefers-reduced-motion:reduce){
   [data-reveal]{opacity:1;translate:0 0}
 }
+
+/* =========================================================
+   13 · MARCAS PARCEIRAS — faixa branca antes do rodapé
+   ========================================================= */
+.marcas{background:var(--surface-card);padding-block:var(--space-7)}
+
+/*
+   Flex com quebra, e não grade de colunas.
+
+   São onze marcas, número que não fecha linha em quase nenhuma contagem de
+   colunas: numa grade, a última linha encostava à esquerda e deixava um
+   vão à direita. No flex centralizado, as duas linhas ficam centradas e a
+   faixa continua equilibrada se a lista crescer ou diminuir — e ela vai
+   crescer, assim que a arte positiva da Supremax chegar.
+*/
+.marcas__grade{
+  list-style:none;margin:var(--space-5) 0 0;padding:0;
+  display:flex;flex-wrap:wrap;justify-content:center;align-items:center;
+  gap:var(--space-5) var(--space-6);
+}
+.marcas__item{
+  display:flex;align-items:center;justify-content:center;
+  flex:0 0 auto;width:150px;
+}
+
+/*
+   Trava nas duas dimensões, e não só na altura.
+
+   Os logos vão de marca quadrada (Germibrás) a assinatura larga (SememBrás,
+   Ouro Fino): com altura igual para todos, as largas ficariam três vezes
+   maiores que as quadradas e dominariam a faixa. O limite de largura
+   equilibra o peso visual, e o `object-fit:contain` garante que nenhuma
+   seja distorcida para caber.
+*/
+.marcas__item img{
+  max-height:44px;max-width:100%;width:auto;height:auto;
+  object-fit:contain;
+}
+.marcas .eyebrow{color:var(--terra-300)}
+
+@media (max-width:640px){
+  .marcas__grade{gap:var(--space-4) var(--space-5)}
+  .marcas__item{width:120px}
+  .marcas__item img{max-height:36px}
+}

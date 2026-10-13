@@ -56,6 +56,32 @@ export const metadata: Metadata = {
   },
 };
 
+/*
+   Marcas parceiras do rodapé, na ordem definida pela cliente.
+
+   A largura de cada arquivo vai junto porque os logos têm proporções muito
+   diferentes (de 141px a 640px para a mesma altura de 96px): sem `width` e
+   `height` no `<img>`, o navegador não reserva o espaço e a faixa inteira
+   pula quando as imagens carregam.
+
+   Todos foram normalizados para 96px de altura (2x da exibição) e tiveram a
+   moldura uniforme removida, para o espaçamento da faixa não depender da
+   sobra que cada marca deixou no próprio arquivo.
+*/
+const MARCAS_PARCEIRAS = [
+  { nome: 'Virbac', arquivo: 'virbac', largura: 194 },
+  { nome: 'Zoetis', arquivo: 'zoetis', largura: 255 },
+  { nome: 'MSD Saúde Animal', arquivo: 'msd', largura: 269 },
+  { nome: 'Elanco', arquivo: 'elanco', largura: 194 },
+  { nome: 'Ourofino Saúde Animal', arquivo: 'ourofino', largura: 601 },
+  { nome: 'Gerdau', arquivo: 'gerdau', largura: 336 },
+  { nome: 'Belgo Arames', arquivo: 'belgo', largura: 189 },
+  { nome: 'Corteva Agriscience', arquivo: 'corteva', largura: 487 },
+  { nome: 'Husqvarna', arquivo: 'husqvarna', largura: 525 },
+  { nome: 'SememBrás Sementes', arquivo: 'semembras', largura: 640 },
+  { nome: 'Germibrás Sementes', arquivo: 'germibras', largura: 141 },
+] as const;
+
 const CATEGORIAS = [
   {
     chapeu: 'Nutrição animal',
@@ -692,6 +718,41 @@ export default function Landing() {
       </main>
 
       {/* ============ 13 · RODAPÉ ============ */}
+      {/* ============ 13 · MARCAS PARCEIRAS ============ */}
+      <section className="marcas" aria-labelledby="marcas-titulo">
+        <div className="wrap">
+          <p className="eyebrow eyebrow--center" id="marcas-titulo" data-reveal>
+            Marcas que você encontra na Nossa Lavoura
+          </p>
+          {/*
+            Faixa branca (`--surface-card`), e não creme nem o marrom do
+            rodapé: logo de parceiro se exibe na cor original, e a maioria
+            destas vem com fundo branco ou transparente. Sobre o marrom, as
+            de texto escuro sumiriam; sobre o creme, as que trazem fundo
+            branco apareceriam como um retângulo recortado.
+
+            Falta a SUPREMAX, que abre a sequência pedida: a única arte que
+            existe dela é a versão negativa (branca) do material da
+            campanha, que some numa faixa clara. Assim que chegar a versão
+            positiva, ela entra como primeiro item desta lista.
+          */}
+          <ul className="marcas__grade" data-reveal>
+            {MARCAS_PARCEIRAS.map((m) => (
+              <li className="marcas__item" key={m.arquivo}>
+                <img
+                  src={`/assets/img/marcas/${m.arquivo}.webp`}
+                  alt={m.nome}
+                  width={m.largura}
+                  height={96}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       <footer className="ft">
         <div className="wrap ft__in">
           <div className="ft__brand">
