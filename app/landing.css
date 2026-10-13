@@ -301,20 +301,21 @@ img{height:auto}
 }
 .vt__play{position:absolute;left:50%;bottom:var(--space-5);translate:-50% 0;z-index:1}
 .vt__play:active{transform:translate(-50%,1px)}
-.vt video{width:100%;height:100%;object-fit:cover}
-.vt__missing{
-  position:absolute;left:50%;top:50%;translate:-50% -50%;z-index:2;
-  margin:0;text-align:center;max-width:32ch;
-  color:var(--creme-500);font-size:var(--text-body-md);
-  background:var(--surface-scrim);
-  padding:var(--space-4) var(--space-5);border-radius:var(--radius-card);
-}
+.vt video,.vt iframe{width:100%;height:100%;border:0;object-fit:cover}
 .vt__txt{
   max-width:var(--measure-prose);margin:var(--space-7) auto 0;
   text-align:center;color:var(--text-on-inverse-muted);
   font-size:var(--text-lead);font-weight:var(--weight-light);
 }
 .vt__txt p{margin:0}
+.vt__txt p + p{margin-top:var(--space-4)}
+.vt__assinatura{font-weight:var(--weight-bold);color:var(--text-on-inverse)}
+.vt__fonte{
+  margin:var(--space-4) 0 0;text-align:center;
+  font-size:var(--text-body-md);color:var(--text-on-inverse-muted);
+}
+.vt__fonte a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.vt__fonte a:hover{color:var(--text-on-inverse)}
 
 /* =========================================================
    06 · GRATIDÃO — cards creme sobre o fundo escuro

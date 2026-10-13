@@ -7,7 +7,7 @@ import {
   DadosEstruturados,
   grafoDaLanding,
 } from '@/components/landing/dados-estruturados';
-import { PlayerVt } from '@/components/landing/player-vt';
+import { PlayerVt, URL_DO_VT } from '@/components/landing/player-vt';
 import { RevelarAoRolar } from '@/components/landing/revelar-ao-rolar';
 import { GeometriaDoSistema, Seta } from '@/components/landing/seta';
 import { TarjaCampanha } from '@/components/landing/tarja-campanha';
@@ -341,21 +341,42 @@ export default function Landing() {
               O filme
             </p>
             <h2 className="h2 h2--center" data-reveal>
-              45 anos em pouco mais de um minuto
+              Laços que atravessam gerações
             </h2>
             <p className="lead lead--center" data-reveal>
-              O filme que preparamos para contar essa história do jeito que ela
-              merece ser contada: pelas pessoas que a construíram.
+              Uma trajetória construída ao lado de produtores, colaboradores e
+              parceiros que acreditaram, cresceram e ajudaram a escrever cada
+              capítulo dessa história. Dê o play e veja por quem ela foi feita.
             </p>
 
             <PlayerVt />
 
+            <p className="vt__fonte" data-reveal>
+              <a href={URL_DO_VT} target="_blank" rel="noopener">
+                Assistir no YouTube
+              </a>
+            </p>
+
+            {/*
+              O texto do VT na página, e não só no vídeo: é o que faz esta
+              seção dizer alguma coisa para quem não vai dar play, para quem
+              abriu com a internet ruim e para o buscador, que não lê o áudio
+              do filme.
+            */}
             <div className="vt__txt" data-reveal>
               <p>
                 Há 45 anos, a Nossa Lavoura faz parte da vida de quem vive o
                 agro. São 45 anos compartilhando sonhos, desafios, conquistas e
-                o trabalho que move o campo todos os dias. A todos que fazem
-                parte dessa jornada, o nosso sincero obrigado.
+                o trabalho que move o campo todos os dias.
+              </p>
+              <p>
+                Relações construídas dia após dia, no campo e na vida, com
+                confiança, parceria e laços que atravessam gerações. A todos que
+                fazem parte dessa jornada, o nosso sincero obrigado.
+              </p>
+              <p className="vt__assinatura">
+                Nossa Lavoura, 45 anos de história, amiga de quem planta, cria e
+                produz.
               </p>
             </div>
           </div>
