@@ -451,8 +451,25 @@ export default function Landing() {
               <ContagemRegressiva />
             </div>
 
-            <a className="btn btn--lg btn--secondary" href="#lojas" data-reveal>
-              Falar com um consultor
+            {/*
+              Era "Falar com um consultor", apontando para a seção de lojas
+              como lugar de espera, porque o destino do consultor nunca foi
+              definido. Passa a ser o mesmo destino direto do botão da seção
+              de lojas: quem está decidido não precisa rolar a página inteira
+              até achar o link.
+
+              O `utm_content` é o que separa os dois botões no relatório. Sem
+              ele, os dois cairiam no mesmo `utm_medium=button` e não daria
+              para saber qual CTA trouxe o clique.
+            */}
+            <a
+              className="btn btn--lg btn--secondary"
+              href="https://lojas.nossalavoura.com.br/?utm_source=lp&utm_medium=button&utm_campaign=45anos&utm_content=semana"
+              target="_blank"
+              rel="noopener"
+              data-reveal
+            >
+              Encontrar a loja mais próxima
               <Seta />
             </a>
           </div>
